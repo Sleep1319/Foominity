@@ -1,4 +1,4 @@
-package com.example.foominity.entity;
+package com.example.foominity.domain;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,13 +10,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 @Entity
-public class Report {
+public class Guide {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String board_id;
+    private String title;
 
-    private String report;
+    private String content;
 }
