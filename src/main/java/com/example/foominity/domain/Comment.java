@@ -19,7 +19,7 @@ public class Comment {
     private Long id;
 
     // 유저 닉네임 (멤버)
-    private Member nickname;
+    private Member member;
 
     // 내용
     private String content;

@@ -18,6 +18,6 @@ public class Following {
     private Long id;
 
     // 유저 닉네임 (멤버)
-    private Member nickname;
+    private Member member;
 
 }
