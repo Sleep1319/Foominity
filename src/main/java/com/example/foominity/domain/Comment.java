@@ -1,4 +1,4 @@
-package com.example.foominity.entity;
+package com.example.foominity.domain;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
