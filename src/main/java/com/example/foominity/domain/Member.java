@@ -1,4 +1,4 @@
-package com.example.foominity.entity;
+package com.example.foominity.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
