@@ -19,4 +19,6 @@ public class Report {
     private String board_id;
 
     private String report;
+
+    private 
 }
