@@ -31,12 +31,15 @@ public class Member extends BaseEntity {
 
     private String password;
 
+    @Column(name = "user_name")
     private String userName;
 
-    @Column(unique = true)
+    @Column(unique = true, name = "nick_name")
     private String nickName;
 
+    @Column(name = "social_type")
     private String socialType;
 
+    @Column(name = "provider_id")
     private String providerId;
 }

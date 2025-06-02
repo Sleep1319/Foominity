@@ -26,6 +26,6 @@ public class Role {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "required_point")
     private int requiredPoint;
 }
