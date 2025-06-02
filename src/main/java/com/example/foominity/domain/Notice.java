@@ -12,8 +12,6 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Notice {
 
-    // test
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
