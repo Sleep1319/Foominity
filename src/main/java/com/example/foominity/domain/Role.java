@@ -20,6 +20,7 @@ import lombok.ToString;
 public class Role {
 
     // 커밋 용 주석
+    // 다시 추가
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private Long id;
