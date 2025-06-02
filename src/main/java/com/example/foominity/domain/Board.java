@@ -18,6 +18,8 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Board extends BaseEntity {
 
+    // test
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
