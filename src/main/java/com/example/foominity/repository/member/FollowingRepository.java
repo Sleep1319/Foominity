@@ -1,4 +1,4 @@
-package com.example.foominity.repository;
+package com.example.foominity.repository.member;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
