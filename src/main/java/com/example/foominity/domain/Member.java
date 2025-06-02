@@ -36,9 +36,6 @@ public class Member extends BaseEntity {
     @Column(unique = true)
     private String nickName;
 
-    @Enumerated(EnumType.STRING)
-    private MemberRole memberRole;
-
     private String socialType;
 
     private String providerId;
