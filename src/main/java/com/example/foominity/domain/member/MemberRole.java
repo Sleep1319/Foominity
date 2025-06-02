@@ -1,8 +1,6 @@
-package com.example.foominity.domain;
+package com.example.foominity.domain.member;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,6 +14,9 @@ import lombok.ToString;
 @ToString
 @Entity
 public class MemberRole {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @OneToOne
     @JoinColumn(name = "member_id")

@@ -1,5 +1,6 @@
-package com.example.foominity.domain;
+package com.example.foominity.domain.member;
 
+import com.example.foominity.domain.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
