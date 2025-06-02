@@ -1,10 +1,13 @@
 package com.example.foominity.domain;
 
+import java.lang.reflect.Member;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -25,9 +28,10 @@ public class Review {
     @Column(nullable = false)
     private String content;
 
-    @Column(unique = true)
-    private String member_id;
+    @JoinColumn(name = "member_id")
+    private Member memberId;
 
-    private float starpoint;
+    @Column(name = "star_point")
+    private float starPoint;
 
 }
