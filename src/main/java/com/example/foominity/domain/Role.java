@@ -29,6 +29,7 @@ public class Role {
 public class BoardComment {
 >>>>>>>> origin/feat/comment:src/main/java/com/example/foominity/domain/BoardComment.java
 
+    // 커밋 용 주석
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private Long id;
