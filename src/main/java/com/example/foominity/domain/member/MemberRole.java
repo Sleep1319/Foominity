@@ -1,5 +1,7 @@
 package com.example.foominity.domain.member;
 
+import com.example.foominity.domain.sign.SocialType;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,4 +27,5 @@ public class MemberRole {
     @OneToOne
     @JoinColumn(name = "role_id")
     private Role role;
+
 }

@@ -1,6 +1,8 @@
 package com.example.foominity.domain.member;
 
 import com.example.foominity.domain.BaseEntity;
+import com.example.foominity.domain.sign.SocialType;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -38,9 +40,22 @@ public class Member extends BaseEntity {
     @Column(unique = true, name = "nick_name")
     private String nickName;
 
+    private Role role;
+
     @Column(name = "social_type")
     private String socialType;
 
     @Column(name = "provider_id")
     private String providerId;
+
+    public Member(String email, String password, String userName, String nickName, Role role) {
+        this.email = email;
+        this.password = password;
+        this.userName = userName;
+        this.nickName = nickName;
+        this.role = role;
+        socialType = "NORMAL";
+        providerId = null;
+    }
+
 }
