@@ -23,4 +23,9 @@ public class Notice {
 
     @Column(nullable = false)
     private String content;
+
+    public Notice(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
 }
