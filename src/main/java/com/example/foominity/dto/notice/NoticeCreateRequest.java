@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class NoticeRequest {
+public class NoticeCreateRequest {
 
     @NotNull
     private String title;

@@ -14,4 +14,5 @@ public class ReportResponse {
     private Long targetId;
 
     private String targetType;
+
 }
