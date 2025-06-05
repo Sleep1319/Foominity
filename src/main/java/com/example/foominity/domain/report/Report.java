@@ -38,6 +38,6 @@ public class Report {
         this.targetId = targetId;
         this.targetType = targetType;
         this.member = member;
-    } 
+    }
 
 }

@@ -20,12 +20,8 @@ public class NoticeController {
     private final NoticeService noticeService;
 
     @GetMapping("/api/notice/{id}")
-    public void getMethodName(@PathVariable Long id) {
-        // return ResponseEntity.ok(noticeService.findById(id));
+    public ResponseEntity<?> getMethodName(@PathVariable Long id) {
+        return ResponseEntity.ok(noticeService.findByID(id));
     }
-    // @GetMapping("/api/notice/{id}")
-    // public ResponseEntity<?> getMethodName(@PathVariable Long id) {
-    // return ResponseEntity.ok(noticeService.findById(id));
-    // }
 
 }
