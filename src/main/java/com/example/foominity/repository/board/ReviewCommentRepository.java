@@ -11,5 +11,5 @@ import com.example.foominity.domain.board.ReviewComment;
 @Repository
 public interface ReviewCommentRepository extends JpaRepository<ReviewComment, Long> {
 
-    List<ReviewComment> findAllByReviewId(Long id);
+    List<ReviewComment> findByReviewId(Long id);
 }

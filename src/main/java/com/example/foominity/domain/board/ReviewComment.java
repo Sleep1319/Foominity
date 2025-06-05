@@ -19,11 +19,20 @@ public class ReviewComment {
     private String content;
 
     @JoinColumn(name = "member_id")
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE )
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private Member member;
     // 게시판 아이디
     @JoinColumn(name = "review_id")
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE )
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private Review review;
 
+    public ReviewComment(String content, Review review, Member member) {
+        this.content = content;
+        this.review = review;
+        this.member = member;
+    }
+
+    public void changeContent(String content) {
+        this.content = content;
+    }
 }
