@@ -34,4 +34,10 @@ public class Report {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
+    public Report(Long targetId, String targetType, Member member) {
+        this.targetId = targetId;
+        this.targetType = targetType;
+        this.member = member;
+    }
+
 }
