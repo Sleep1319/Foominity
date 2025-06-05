@@ -12,13 +12,15 @@ public interface SignRepository extends JpaRepository<Member, Long> {
 
     // 기능 구현 후 참고 및 사용
 
-    // Optional<Member> findById(int id);
+    Optional<Member> findById(int id);
+
     // 이메일로 찾기
-    // public Optional<Member> findByEmail(String email);
+    public Optional<Member> findByEmail(String email);
+
     // 넥네임으로 찾기
-    // public Optional<Member> findByNickname(String nickname);
+    public Optional<Member> findByNickname(String nickname);
 
-    // boolean existsByEmail(String email);
+    boolean existsByEmail(String email);
 
-    // boolean existsByNickname(String nickname);
+    boolean existsByNickname(String nickname);
 }
