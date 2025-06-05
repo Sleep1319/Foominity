@@ -47,7 +47,7 @@ public class ReviewCommentService {
     }
 
     @Transactional
-    public void createReviewComment(BoardCommentRequest req) {
+    public void createReviewComment(ReviewCommentRequest req) {
         // 멤버 아이디 토큰
         // Member member =
         // memberRepository.findById().orElseThrow(NotFoundMemberException::new);

@@ -40,7 +40,7 @@ public class BoardCommentService {
     }
 
     @Transactional
-    public void createReviewComment(BoardCommentRequest req) {
+    public void createBoardComment(BoardCommentRequest req) {
         // 멤버 아이디 토큰
         // Member member =
         // memberRepository.findById().orElseThrow(NotFoundMemberException::new);
@@ -49,13 +49,13 @@ public class BoardCommentService {
     }
 
     @Transactional
-    public void updateReviewComment(Long id) {
+    public void updateBoardComment(Long id) {
         // 멤버 아이디 토큰
 
     }
 
     @Transactional
-    public void deleteReviewComment(Long id) {
+    public void deleteBoardComment(Long id) {
         // 멤버 아이디 토큰
 
     }
