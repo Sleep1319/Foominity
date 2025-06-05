@@ -9,6 +9,8 @@ import com.example.foominity.domain.member.Member;
 import com.example.foominity.dto.sign.SignInRequest;
 import com.example.foominity.dto.sign.SignInResponse;
 import com.example.foominity.dto.sign.SignUpRequest;
+import com.example.foominity.exception.MemberEmailAlreadyExistsException;
+import com.example.foominity.exception.MemberNicknameAlreadyExistsException;
 import com.example.foominity.exception.SignInFailureException;
 import com.example.foominity.repository.sign.SignRepository;
 
@@ -26,31 +28,36 @@ public class SignService {
     @Transactional
     public void signUp(SignUpRequest req) {
         validateSignUp(req.getEmail(), req.getNickname());
+
         req.setPassword(passwordEncoder.encode(req.getPassword()));
         signRepository
-                .save(req.toEntity(req.getEmail(), req.getPassword(), req.getUsername(), req.getNickname(), null));
+                .save(req.toEntity(req.getEmail(), req.getPassword(), req.getUsername(),
+                        req.getNickname()));
     }
 
     public boolean existsNickname(String nickname) {
         return signRepository.existsByNickname(nickname);
     }
 
-    // public SignInResponse signIn(SignInRequest req) {
-    // Member member = signRepository.findByEmail(req.getEmail()).orElseThrow(
-    // () -> new SignInFailureException("이메일을 다시 확인해주세요."));
+    public SignInResponse signIn(SignInRequest req) {
+        Member member = signRepository.findByEmail(req.getEmail()).orElseThrow(
+                () -> new SignInFailureException("이메일을 다시 확인해주세요."));
 
-    // validateSignInPassword(req.getPassword(), member.getPassword());
-    // String accessToken = jwtTokenProvider.createAccessToken(member.getId(),
-    // member.getEmail(), member.getUserName(),
-    // member.getNickname());
-    // String refreshToken = jwtTokenProvider.createRefreshToken(member.getId());
+        validateSignInPassword(req.getPassword(), member.getPassword());
+        String accessToken = jwtTokenProvider.createAccessToken(member.getId(), member.getEmail(), member.getUserName(),
+                member.getNickname(), null);
+        String refreshToken = jwtTokenProvider.createRefreshToken(member.getId());
 
-    // return new SignInResponse(accessToken, refreshToken);
-    // }
+        return new SignInResponse(accessToken, refreshToken);
+    }
 
     private void validateSignUp(String email, String nickname) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'validateSignUp'");
+        if (signRepository.existsByEmail(email)) {
+            throw new MemberEmailAlreadyExistsException();
+        }
+        if (signRepository.existsByNickname(nickname)) {
+            throw new MemberNicknameAlreadyExistsException();
+        }
     }
 
     private void validateSignInPassword(String reqPassword, String password) {
