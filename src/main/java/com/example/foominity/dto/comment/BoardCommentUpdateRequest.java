@@ -11,9 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class BoardCommentUpdateRequest {
 
-    @NotNull
-    private Long boardCommentId;
-
     @NotBlank
     private String comment;
 }
