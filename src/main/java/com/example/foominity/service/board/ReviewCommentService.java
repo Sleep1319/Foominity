@@ -53,7 +53,7 @@ public class ReviewCommentService {
     }
 
     @Transactional
-    public void createReviewComment(Long reviewId, ReviewCommentRequest req, HttpServletRequest tokenRequest) {
+    public void createReviewComment(Long reviewId, HttpServletRequest tokenRequest, ReviewCommentRequest req) {
         String token = jwtTokenProvider.resolveTokenFromCookie(tokenRequest);
 
         // 유효성검증
