@@ -11,6 +11,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BoardCommentRepository extends JpaRepository<BoardComment, Long> {
 
-    List<BoardComment> findAllByBoardId(Long id);
+    List<BoardComment> findByBoardId(Long id);
 
 }

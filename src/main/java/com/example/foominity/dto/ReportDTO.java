@@ -2,6 +2,9 @@ package com.example.foominity.dto;
 
 import java.time.LocalDateTime;
 
+import com.example.foominity.domain.board.Report;
+import com.example.foominity.dto.report.ReportResponse;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -21,4 +24,13 @@ public class ReportDTO {
 
     private LocalDateTime updatedDate;
 
+    // public Report toEntity(Long id, Long memberId, Long targetId, String
+    // targetType) {
+    // return new Report(
+    // id,
+    // memberId,
+    // targetId,
+    // targetType
+    // );
 }
+// }
