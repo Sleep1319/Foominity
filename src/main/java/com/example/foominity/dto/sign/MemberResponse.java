@@ -8,7 +8,7 @@ import lombok.Data;
 public class MemberResponse {
     private int memberId;
     private String email;
-    private String username;
+    private String userName;
     private String nickname;
     private String roleName;
 }

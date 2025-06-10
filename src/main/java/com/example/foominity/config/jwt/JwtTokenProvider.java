@@ -36,7 +36,7 @@ public class JwtTokenProvider {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    //Assess토큰 생성
+    // Assess토큰 생성
     public String createAccessToken(Long memberId, String email, String username, String nickname, String role) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + accessTokenValidity);
@@ -56,7 +56,7 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    //리프레쉬 토큰 생성
+    // 리프레쉬 토큰 생성
     public String createRefreshToken(Long memberId) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + refreshTokenValidity);
@@ -121,10 +121,11 @@ public class JwtTokenProvider {
                 .build();
     }
 
-    //인증용
+    // 인증용
 
     public String resolveTokenFromCookie(HttpServletRequest request) {
-        if (request.getCookies() == null) return null;
+        if (request.getCookies() == null)
+            return null;
 
         for (Cookie cookie : request.getCookies()) {
             if ("token".equals(cookie.getName())) {

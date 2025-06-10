@@ -18,9 +18,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Table(name = "member")
-@Builder
 @NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @ToString
 @Entity
@@ -37,10 +35,8 @@ public class Member extends BaseEntity {
     @Column(name = "user_name")
     private String userName;
 
-    @Column(unique = true, name = "nick_name")
-    private String nickName;
-
-    private Role role;
+    @Column(unique = true)
+    private String nickname;
 
     @Column(name = "social_type")
     private String socialType;
@@ -48,12 +44,11 @@ public class Member extends BaseEntity {
     @Column(name = "provider_id")
     private String providerId;
 
-    public Member(String email, String password, String userName, String nickName, Role role) {
+    public Member(String email, String password, String userName, String nickname) {
         this.email = email;
         this.password = password;
         this.userName = userName;
-        this.nickName = nickName;
-        this.role = role;
+        this.nickname = nickname;
         socialType = "NORMAL";
         providerId = null;
     }
