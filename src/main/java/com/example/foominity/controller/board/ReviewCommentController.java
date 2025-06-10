@@ -30,7 +30,7 @@ public class ReviewCommentController {
     private final ReviewCommentService reviewCommentService;
 
     // 전체 조회
-    @GetMapping("/api/reviews/{boardId}/comments")
+    @GetMapping("/api/reviews/{reviewId}/comments")
     public ResponseEntity<List<ReviewCommentResponse>> findAll(@PathVariable Long reviewId) {
         List<ReviewCommentResponse> res = reviewCommentService.getList(reviewId);
         return ResponseEntity.ok(res);

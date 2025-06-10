@@ -25,7 +25,7 @@ public class BoardCommentResponse {
     public static BoardCommentResponse fromEntity(BoardComment comment) {
         return new BoardCommentResponse(
                 comment.getId(),
-                comment.getMember().getNickName(),
+                comment.getMember().getNickname(),
                 comment.getContent(),
                 null,
                 null);
