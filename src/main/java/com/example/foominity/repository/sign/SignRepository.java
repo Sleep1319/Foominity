@@ -1,6 +1,8 @@
 package com.example.foominity.repository.sign;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.example.foominity.domain.member.Member;
@@ -23,4 +25,8 @@ public interface SignRepository extends JpaRepository<Member, Long> {
     boolean existsByEmail(String email);
 
     boolean existsByNickname(String nickname);
+
+    @Modifying
+    @Query("UPDATE Member m SET m.nickname = :nickname WHERE m.email = :email")
+    void updateNickname(String nickname, String email);
 }
