@@ -1,6 +1,7 @@
 package com.example.foominity.dto.report;
 
-import java.time.LocalDateTime;
+import com.example.foominity.domain.member.Member;
+import com.example.foominity.domain.report.Report;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -10,10 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReportResponse {
-
-    @NotNull
-    private Long id;
+public class ReportCreateRequest {
 
     @NotNull
     private Long memberId;
@@ -23,4 +21,8 @@ public class ReportResponse {
 
     @NotNull
     private String targetType;
+
+    public Report toEntity(ReportCreateRequest req, Member member) {
+        return new Report(req.getTargetId(), req.getTargetType(), member);
+    }
 }
