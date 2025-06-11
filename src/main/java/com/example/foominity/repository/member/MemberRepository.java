@@ -9,7 +9,6 @@ import org.springframework.data.jpa.repository.Query;
 import com.example.foominity.domain.member.Member;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
-    Optional<Member> findByEmail(String email);
 
     boolean existsByNickname(String nickname);
 
@@ -17,14 +16,13 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     // ----------------------------------------------------------------------------------------------------
 
-    // 기능 구현 후 참고 및 사용
-
+    // 아이디로 찾기
     Optional<Member> findById(int id);
 
     // 이메일로 찾기
-    // public Optional<Member> findByEmail(String email);
+    Optional<Member> findByEmail(String email);
 
     // 넥네임으로 찾기
-    public Optional<Member> findByNickname(String nickname);
+    Optional<Member> findByNickname(String nickname);
 
 }
