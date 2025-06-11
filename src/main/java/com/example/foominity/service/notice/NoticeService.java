@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.foominity.domain.notice.Notice;
-import com.example.foominity.dto.notice.NoticeCreateRequest;
+import com.example.foominity.dto.notice.NoticeRequest;
 import com.example.foominity.dto.notice.NoticeResponse;
 import com.example.foominity.dto.notice.NoticeUpdateRequest;
 import com.example.foominity.exception.NotFoundNoticeException;
@@ -46,8 +46,14 @@ public class NoticeService {
                 notice.getContent());
     }
 
-    // public void createNotice(NoticeCreateRequest req) {
-    // Notice notice = noticeRepository.findById(req)
-    // }
+    @Transactional
+    public void createNotice(NoticeRequest req) {
+        noticeRepository.save(req.toEntity(req));
+    }
+
+    @Transactional
+    public void deleteNotice(Long id) {
+        noticeRepository.delete(noticeRepository.findById(id).orElseThrow(NotFoundNoticeException::new));
+    }
 
 }

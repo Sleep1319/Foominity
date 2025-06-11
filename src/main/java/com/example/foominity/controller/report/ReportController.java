@@ -33,18 +33,18 @@ public class ReportController {
         return ResponseEntity.ok(res);
     }
 
-    @GetMapping("api/report/{id}")
+    @GetMapping("/api/report/{id}")
     public ResponseEntity<ReportResponse> findById(@PathVariable Long id) {
         return ResponseEntity.ok(reportService.findById(id));
     }
 
-    @PostMapping("api/report")
+    @PostMapping("/api/report")
     public ResponseEntity<String> createReport(@Valid @RequestBody ReportCreateRequest req) {
         reportService.createReport(req);
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("api/report/{id}")
+    @DeleteMapping("/api/report/{id}")
     public ResponseEntity<String> deleteReport(@PathVariable Long id, HttpServletRequest tokenRequest) {
         reportService.deleteReport(id, tokenRequest);
         return ResponseEntity.ok().build();
