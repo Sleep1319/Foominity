@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.foominity.dto.comment.BoardCommentRequest;
 import com.example.foominity.dto.comment.BoardCommentResponse;
+import com.example.foominity.dto.comment.BoardCommentUpdateRequest;
 import com.example.foominity.service.board.BoardCommentService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,33 +30,31 @@ public class BoardCommentController {
 
     private final BoardCommentService boardCommentService;
 
-    @GetMapping("/api/boards/{id}/comments")
-    public ResponseEntity<List<BoardCommentResponse>> findAll(@PathVariable Long id) {
-        List<BoardCommentResponse> res = boardCommentService.getList(id);
+    @GetMapping("/api/boards/{boardId}/comments")
+    public ResponseEntity<List<BoardCommentResponse>> findAll(@PathVariable Long boardId) {
+        List<BoardCommentResponse> res = boardCommentService.getList(boardId);
         return ResponseEntity.ok(res);
     }
 
-    @PostMapping("/api/comments")
-    public ResponseEntity<String> createBoardComment(@Valid @RequestBody BoardCommentRequest req) {
-        boardCommentService.createBoardComment(req);
+    @PostMapping("/api/boards/{boardId}/comments")
+    public ResponseEntity<String> createBoardComment(@PathVariable Long boardId, HttpServletRequest tokenRequest,
+            @Valid @RequestBody BoardCommentRequest req) {
+        boardCommentService.createBoardComment(boardId, tokenRequest, req);
         return ResponseEntity.ok().build();
     }
 
-    // id 토큰 필요
+    @PutMapping("/api/boards/{boardId}/comments/{id}")
+    public ResponseEntity<String> updateBoardComment(@PathVariable Long commentId, HttpServletRequest tokenRequest,
+            @Valid @RequestBody BoardCommentUpdateRequest req) {
+        boardCommentService.updateBoardComment(commentId, tokenRequest, req);
+        return ResponseEntity.ok().build();
+    }
 
-    // @PutMapping("/api/comments/{id}")
-    // public ResponseEntity<String> updateBoardComment(@PathVariable Long id,
-    // @Valid @RequestBody BoardCommentRequest req, HttpServletRequest tokenRequest)
-    // {
-    // boardCommentService.updateBoardComment(id, req, tokenRequest);
-    // return ResponseEntity.ok().build();
-    // }
-
-    // @DeleteMapping("/api/comments/{id}")
-    // public ResponseEntity<String> deleteBoardComment(@PathVariable Long id,
-    // HttpServletRequest tokenRequest) {
-    // boardCommentService.deleteBoardComment(id, tokenRequest);
-    // return ResponseEntity.ok().build();
-    // }
+    @DeleteMapping("/api/boards/{boardId}/comments/{id}")
+    public ResponseEntity<String> deleteBoardComment(@PathVariable Long commentId,
+            HttpServletRequest tokenRequest) {
+        boardCommentService.deleteBoardComment(commentId, tokenRequest);
+        return ResponseEntity.ok().build();
+    }
 
 }
