@@ -53,4 +53,10 @@ public class Member extends BaseEntity {
         providerId = null;
     }
 
+    // setter가 아닌 도메인 메서드 쓰는 이유
+    // 닉네임 unique 라서 중복되면 안 되니까 setter 쓰면 안 됨
+    public void changeNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
 }

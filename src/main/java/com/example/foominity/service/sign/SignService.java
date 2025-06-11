@@ -8,16 +8,20 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.foominity.config.jwt.JwtTokenProvider;
 import com.example.foominity.domain.member.Member;
-import com.example.foominity.dto.sign.MemberResponse;
+import com.example.foominity.dto.member.MemberRequest;
 import com.example.foominity.dto.sign.SignInRequest;
 import com.example.foominity.dto.sign.SignInResponse;
 import com.example.foominity.dto.sign.SignUpRequest;
 import com.example.foominity.exception.MemberEmailAlreadyExistsException;
 import com.example.foominity.exception.MemberNicknameAlreadyExistsException;
+import com.example.foominity.exception.NotFoundMemberException;
 import com.example.foominity.exception.SignInFailureException;
+import com.example.foominity.exception.UnauthorizedException;
 import com.example.foominity.repository.member.MemberRepository;
 import com.example.foominity.repository.sign.SignRepository;
 
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -25,20 +29,25 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SignService {
 
-    private final SignRepository signRepository;
+    // private final SignRepository signRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
 
     // 회원 탈퇴
     @Transactional
-    public void deleteMember(MemberResponse memberResponse) {
+    public void deleteMember(HttpServletRequest tokenRequest, MemberRequest req) {
+        String token = jwtTokenProvider.resolveTokenFromCookie(tokenRequest);
 
-        Member member = signRepository.findByEmail(memberResponse.getEmail())
-                .orElseThrow(() -> new IllegalStateException("회원이 존재하지 않습니다"));
+        // 유효성검증
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw new UnauthorizedException();
+        }
+        Long memberId = jwtTokenProvider.getUserIdFromToken(token);
+        Member member = memberRepository.findById(memberId).orElseThrow(NotFoundMemberException::new);
 
         // 비밀번호 일치 확인
-        if (!passwordEncoder.matches(memberResponse.getPassword(), member.getPassword())) {
+        if (!passwordEncoder.matches(req.getPassword(), member.getPassword())) {
             throw new IllegalStateException("비밀번호가 일치하지 않습니다.");
         } else {
             memberRepository.delete(member);
@@ -47,8 +56,22 @@ public class SignService {
 
     // 닉네임 변경
     @Transactional
-    public void updateNickname(MemberResponse memberResponse) {
-        signRepository.updateNickname(memberResponse.getNickname(), memberResponse.getEmail());
+    public void changeNickname(HttpServletRequest toekRequest, MemberRequest req) {
+
+        String token = jwtTokenProvider.resolveTokenFromCookie(toekRequest);
+
+        // 유효성검증
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw new UnauthorizedException();
+        }
+        Long memberId = jwtTokenProvider.getUserIdFromToken(token);
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(NotFoundMemberException::new);
+
+        if (memberRepository.existsByNickname(req.getNickname())) {
+            throw new IllegalStateException("이미 사용 중인 닉네임입니다.");
+        }
+        member.changeNickname(req.getNickname());
     }
 
     // 회원가입
@@ -57,18 +80,20 @@ public class SignService {
         validateSignUp(req.getEmail(), req.getNickname());
 
         req.setPassword(passwordEncoder.encode(req.getPassword()));
-        signRepository
+        //
+        memberRepository
                 .save(req.toEntity(req.getEmail(), req.getPassword(), req.getUsername(),
                         req.getNickname()));
     }
 
     public boolean existsNickname(String nickname) {
-        return signRepository.existsByNickname(nickname);
+        return memberRepository.existsByNickname(nickname);
     }
 
     // 로그인
     public SignInResponse signIn(SignInRequest req) {
-        Member member = signRepository.findByEmail(req.getEmail()).orElseThrow(
+        //
+        Member member = memberRepository.findByEmail(req.getEmail()).orElseThrow(
                 () -> new SignInFailureException("이메일을 다시 확인해주세요."));
 
         validateSignInPassword(req.getPassword(), member.getPassword());
@@ -80,10 +105,10 @@ public class SignService {
     }
 
     private void validateSignUp(String email, String nickname) {
-        if (signRepository.existsByEmail(email)) {
+        if (memberRepository.existsByEmail(email)) {
             throw new MemberEmailAlreadyExistsException();
         }
-        if (signRepository.existsByNickname(nickname)) {
+        if (memberRepository.existsByNickname(nickname)) {
             throw new MemberNicknameAlreadyExistsException();
         }
     }
