@@ -1,3 +1,4 @@
+package com.example.foominity.dto.board;
 
 import org.springframework.lang.Nullable;
 
@@ -28,7 +29,7 @@ public class ReviewCreateRequest {
     private String Category;
 
     public Review toEntity(ReviewCreateRequest req, Member member) {
-        return new Review(title, content, null, starPoint);
+        return new Review(req.getTitle(), req.getContent(), member, req.getStarPoint());
     }
 
 }
