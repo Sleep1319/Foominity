@@ -61,8 +61,7 @@ public class ReportService {
     @Transactional
     public void createReport(ReportCreateRequest req) {
         Member member = memberRepository.findById(req.getMemberId()).orElseThrow(NotFoundMemberException::new);
-        Report report = req.toEntity(req, member);
-        reportRepository.save(report);
+        reportRepository.save(req.toEntity(req, member));
     }
 
     @Transactional
