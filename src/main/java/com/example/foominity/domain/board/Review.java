@@ -16,7 +16,7 @@ public class Review {
 
     @JoinColumn(name = "member_id")
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    private Member memberId;
+    private Member member;
 
     @Column(nullable = false)
     private String title;
@@ -26,4 +26,11 @@ public class Review {
 
     @Column(name = "star_point")
     private float starPoint;
+
+    public Review(String title, String content, Member member, float starPoint) {
+        this.title = title;
+        this.content = content;
+        this.member = member;
+        this.starPoint = starPoint;
+    }
 }

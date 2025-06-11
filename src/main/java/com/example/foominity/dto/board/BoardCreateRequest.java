@@ -23,6 +23,6 @@ public class BoardCreateRequest {
     private String content;
 
     public Board toEntity(BoardCreateRequest req, Member member) {
-        return new Board(req.getTitle(), req.title, member);
+        return new Board(req.getTitle(), req.getContent(), member);
     }
 }

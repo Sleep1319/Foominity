@@ -2,10 +2,10 @@ package com.example.foominity.controller.board;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.foominity.dto.board.BoardCreateRequest;
 import com.example.foominity.dto.board.BoardResponse;
+import com.example.foominity.dto.board.BoardUpdateRequest;
 import com.example.foominity.service.board.BoardService;
-import com.example.reactbootserver.dto.board.BoardCreateRequest;
-import com.example.reactbootserver.dto.board.BoardUpdateRequest;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;

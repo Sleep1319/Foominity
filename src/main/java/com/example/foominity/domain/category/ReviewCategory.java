@@ -10,16 +10,17 @@ import lombok.ToString;
 @Getter
 @ToString
 @Entity
-public class BoardCategory {
+public class ReviewCategory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @JoinColumn(name = "review_id")
-    private Review reviewId;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    private Review review;
 
     @JoinColumn(name = "category_id")
-    private Category categoryId;
-
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    private Category category;
 }

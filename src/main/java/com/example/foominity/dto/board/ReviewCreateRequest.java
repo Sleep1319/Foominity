@@ -1,7 +1,8 @@
-package com.example.foominity.dto.board;
 
-import com.example.reactbootserver.domain.Member;
-import com.example.reactbootserver.domain.board.Board;
+import org.springframework.lang.Nullable;
+
+import com.example.foominity.domain.board.Review;
+import com.example.foominity.domain.member.Member;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class ReviewCreateRequest {
 
     @NotNull
-    private Long memberId;
+    private Member memberId;
 
     @NotNull
     private String title;
@@ -21,10 +22,13 @@ public class ReviewCreateRequest {
     @NotNull
     private String content;
 
+    @Nullable
     private float starPoint;
 
-    public Board toEntity(ReviewCreateRequest req, Member member) {
-        return new Board(req.getTitle(), req.title, member);
+    private String Category;
+
+    public Review toEntity(ReviewCreateRequest req, Member member) {
+        return new Review(title, content, null, starPoint);
     }
 
 }

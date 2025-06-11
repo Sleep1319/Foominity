@@ -16,14 +16,14 @@ import com.example.foominity.dto.board.BoardResponse;
 import com.example.foominity.dto.board.BoardUpdateRequest;
 import com.example.foominity.repository.board.BoardRepository;
 import com.example.foominity.repository.member.MemberRepository;
-import com.example.reactbootserver.exception.ForbiddenActionException;
-import com.example.reactbootserver.exception.NotFoundBoardException;
-import com.example.reactbootserver.exception.UnauthorizedException;
 
 import jakarta.servlet.http.HttpServletRequest;
 
 import com.example.foominity.dto.board.BoardCreateRequest;
+import com.example.foominity.exception.ForbiddenActionException;
+import com.example.foominity.exception.NotFoundBoardException;
 import com.example.foominity.exception.NotFoundMemberException;
+import com.example.foominity.exception.UnauthorizedException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.val;
