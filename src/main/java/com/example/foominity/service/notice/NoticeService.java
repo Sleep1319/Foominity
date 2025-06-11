@@ -47,7 +47,7 @@ public class NoticeService {
     }
 
     // public void createNotice(NoticeCreateRequest req) {
-    // Notice notice = noticeRepository.findById(req.get)
+    // Notice notice = noticeRepository.findById(req)
     // }
 
 }

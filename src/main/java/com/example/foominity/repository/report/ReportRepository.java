@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.example.foominity.domain.board.Report;
+import com.example.foominity.domain.report.Report;
 
 @Repository
 public interface ReportRepository extends JpaRepository<Report, Long> {

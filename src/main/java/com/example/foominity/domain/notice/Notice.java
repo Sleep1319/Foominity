@@ -1,5 +1,7 @@
 package com.example.foominity.domain.notice;
 
+import com.example.foominity.domain.member.Member;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -24,7 +26,7 @@ public class Notice {
     @Column(nullable = false)
     private String content;
 
-    public Notice(String title, String content) {
+    public Notice(String title, String content, Member member) {
         this.title = title;
         this.content = content;
     }

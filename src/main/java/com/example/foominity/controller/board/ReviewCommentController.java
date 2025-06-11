@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.foominity.dto.comment.ReviewCommentRequest;
 import com.example.foominity.dto.comment.ReviewCommentResponse;
+import com.example.foominity.dto.comment.ReviewCommentUpdateRequest;
 import com.example.foominity.service.board.ReviewCommentService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,33 +29,35 @@ import org.springframework.web.bind.annotation.PutMapping;
 public class ReviewCommentController {
     private final ReviewCommentService reviewCommentService;
 
-    @GetMapping("/api/boards/{id}/comments")
-    public ResponseEntity<List<ReviewCommentResponse>> findAll(@PathVariable Long id) {
-        List<ReviewCommentResponse> res = reviewCommentService.getList(id);
+    // 전체 조회
+    @GetMapping("/api/reviews/{reviewId}/comments")
+    public ResponseEntity<List<ReviewCommentResponse>> findAll(@PathVariable Long reviewId) {
+        List<ReviewCommentResponse> res = reviewCommentService.getList(reviewId);
         return ResponseEntity.ok(res);
     }
 
-    @PostMapping("/api/comments")
-    public ResponseEntity<String> createReviewComment(@Valid @RequestBody ReviewCommentRequest req) {
-        reviewCommentService.createReviewComment(req);
+    // 생성
+    @PostMapping("/api/reviews/{reviewId}/comments")
+    public ResponseEntity<String> createReviewComment(@PathVariable Long reviewId, HttpServletRequest tokenRequest,
+            @Valid @RequestBody ReviewCommentRequest req) {
+        reviewCommentService.createReviewComment(reviewId, tokenRequest, req);
         return ResponseEntity.ok().build();
     }
 
-    // id 토큰 필요
+    // 수정
+    @PutMapping("/api/comments/{id}")
+    public ResponseEntity<String> updateReviewComment(@PathVariable Long commentId, HttpServletRequest tokenRequest,
+            @Valid @RequestBody ReviewCommentUpdateRequest req) {
+        reviewCommentService.updateReviewComment(commentId, tokenRequest, req);
+        return ResponseEntity.ok().build();
+    }
 
-    // @PutMapping("/api/comments/{id}")
-    // public ResponseEntity<String> updateReviewComment(@PathVariable Long id,
-    // @Valid @RequestBody ReviewCommentRequest req, HttpServletRequest
-    // tokenRequest) {
-    // reviewCommentService.updateReviewComment(id, req, tokenRequest);
-    // return ResponseEntity.ok().build();
-    // }
-
-    // @DeleteMapping("/api/comments/{id}")
-    // public ResponseEntity<String> deleteReviewComment(@PathVariable Long id,
-    // HttpServletRequest tokenRequest) {
-    // reviewCommentService.deleteReviewComment(id, tokenRequest);
-    // return ResponseEntity.ok().build();
-    // }
+    // 삭제
+    @DeleteMapping("/api/comments/{id}")
+    public ResponseEntity<String> deleteReviewComment(@PathVariable Long commentId,
+            HttpServletRequest tokenRequest) {
+        reviewCommentService.deleteReviewComment(commentId, tokenRequest);
+        return ResponseEntity.ok().build();
+    }
 
 }

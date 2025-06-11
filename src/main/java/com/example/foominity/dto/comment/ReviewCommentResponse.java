@@ -25,7 +25,7 @@ public class ReviewCommentResponse {
     public static ReviewCommentResponse fromEntity(ReviewComment comment) {
         return new ReviewCommentResponse(
                 comment.getId(),
-                comment.getMember().getNickName(),
+                comment.getMember().getNickname(),
                 comment.getContent(),
                 null,
                 null);

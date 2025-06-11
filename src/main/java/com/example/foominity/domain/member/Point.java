@@ -13,11 +13,11 @@ public class Point {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "content_count")
-    private String contentCount;
+    @Column(name = "comment_count")
+    private int commentCount;
 
     @Column(name = "like_count")
-    private String likeCount;
+    private int likeCount;
 
     @OneToOne
     @JoinColumn(name = "member_id")

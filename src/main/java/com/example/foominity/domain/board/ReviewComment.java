@@ -32,7 +32,7 @@ public class ReviewComment {
         this.member = member;
     }
 
-    public void changeContent(String content) {
+    public void changeComment(String content) {
         this.content = content;
     }
 }
