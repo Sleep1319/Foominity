@@ -56,6 +56,20 @@ public class PointService {
 
     }
 
+    @Transactional
+    public void updateReviewCount(Long memberId) {
+        Point point = pointRepository.findByMemberId(memberId).orElseThrow(NotFoundPointException::new);
+
+        point.addReviewCount();
+    }
+
+    @Transactional
+    public void updateLikeCount(Long memberId) {
+        Point point = pointRepository.findByMemberId(memberId).orElseThrow(NotFoundPointException::new);
+
+        point.addLikeCount();
+    }
+
     private int calPoint(Point point) {
         return (point.getReviewCount() * 10) + (point.getLikeCount() * 2);
     }
