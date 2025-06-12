@@ -29,7 +29,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SignService {
 
-    // private final SignRepository signRepository;
+    private final SignRepository signRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
@@ -81,7 +81,7 @@ public class SignService {
 
         req.setPassword(passwordEncoder.encode(req.getPassword()));
         //
-        memberRepository
+        signRepository
                 .save(req.toEntity(req.getEmail(), req.getPassword(), req.getUsername(),
                         req.getNickname()));
     }
@@ -93,7 +93,7 @@ public class SignService {
     // 로그인
     public SignInResponse signIn(SignInRequest req) {
         //
-        Member member = memberRepository.findByEmail(req.getEmail()).orElseThrow(
+        Member member = signRepository.findByEmail(req.getEmail()).orElseThrow(
                 () -> new SignInFailureException("이메일을 다시 확인해주세요."));
 
         validateSignInPassword(req.getPassword(), member.getPassword());
