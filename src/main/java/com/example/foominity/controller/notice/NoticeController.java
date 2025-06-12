@@ -37,7 +37,7 @@ public class NoticeController {
         return ResponseEntity.ok(noticeService.findByID(id));
     }
 
-    @PostMapping("/api/notice")
+    @PostMapping("/api/notice/add")
     public ResponseEntity<String> createNotice(@Valid @RequestBody NoticeRequest req) {
         noticeService.createNotice(req);
         return ResponseEntity.ok().build();
