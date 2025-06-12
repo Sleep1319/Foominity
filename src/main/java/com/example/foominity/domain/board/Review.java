@@ -33,4 +33,9 @@ public class Review {
         this.member = member;
         this.starPoint = starPoint;
     }
+
+    public void update(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
 }

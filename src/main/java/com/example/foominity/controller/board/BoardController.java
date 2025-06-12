@@ -43,7 +43,7 @@ public class BoardController {
     @PostMapping("/api/boards")
     public ResponseEntity<String> createBoard(@Valid @RequestBody BoardCreateRequest req,
             HttpServletRequest tokenRequest) {
-        boardService.createBoard(null, tokenRequest);
+        boardService.createBoard(req, tokenRequest);
         return ResponseEntity.ok().build();
     }
 

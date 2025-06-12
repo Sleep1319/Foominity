@@ -6,11 +6,15 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.foominity.config.jwt.JwtTokenProvider;
 import com.example.foominity.domain.board.Review;
 import com.example.foominity.domain.member.Member;
+import com.example.foominity.domain.member.Point;
+import com.example.foominity.dto.board.ReviewCreateRequest;
+import com.example.foominity.dto.board.ReviewUpdateRequest;
 import com.example.foominity.exception.ForbiddenActionException;
 import com.example.foominity.exception.NotFoundMemberException;
 import com.example.foominity.exception.UnauthorizedException;
 import com.example.foominity.repository.board.ReviewRepository;
 import com.example.foominity.repository.member.MemberRepository;
+import com.example.foominity.repository.member.PointRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -23,31 +27,36 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
-
-    // @Transactional
-    // public void createReview(ReviewCreateRequest req, HttpServletRequest
-    // tokenRequest) {
-    // String token = jwtTokenProvider.resolveTokenFromCookie(tokenRequest);
-
-    // if (!jwtTokenProvider.validateToken(token)) {
-    // throw new UnauthorizedException();
-    // }
-
-    // Long memberId = jwtTokenProvider.getUserIdFromToken(token);
-    // Member member =
-    // memberRepository.findById(memberId).orElseThrow(NotFoundMemberException::new);
-
-    // reviewRepository.save(req.toEntity(req, member));
-    // }
+    private final PointRepository pointRepository;
 
     @Transactional
-    public void updateReview(Long id, HttpServletRequest tokenRequest) {
+    public void createReview(ReviewCreateRequest req, HttpServletRequest tokenRequest) {
+        String token = jwtTokenProvider.resolveTokenFromCookie(tokenRequest);
 
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw new UnauthorizedException();
+        }
+
+        Long memberId = jwtTokenProvider.getUserIdFromToken(token);
+        Member member = memberRepository.findById(memberId).orElseThrow(NotFoundMemberException::new);
+
+        // 리뷰카운트 증가
+        Point point = pointRepository.findByMemberId(memberId).orElseThrow();
+        point.increaseReviewCount();
+
+        reviewRepository.save(req.toEntity(req, member));
+    }
+
+    @Transactional
+    public void updateReview(Long id, ReviewUpdateRequest req, HttpServletRequest tokenRequest) {
+        Review review = validateReviewOwnership(id, tokenRequest);
+        review.update(req.getTitle(), req.getContent());
     }
 
     @Transactional
     public void deleteReview(Long id, HttpServletRequest tokenRequest) {
-
+        Review review = validateReviewOwnership(id, tokenRequest);
+        reviewRepository.delete(review);
     }
 
     @Transactional
