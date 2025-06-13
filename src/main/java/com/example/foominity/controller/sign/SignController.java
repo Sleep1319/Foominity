@@ -2,18 +2,22 @@ package com.example.foominity.controller.sign;
 
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.foominity.config.jwt.JwtTokenProvider;
+import com.example.foominity.dto.member.MemberRequest;
 import com.example.foominity.dto.sign.SignInRequest;
 import com.example.foominity.dto.sign.SignInResponse;
 import com.example.foominity.dto.sign.SignUpRequest;
 import com.example.foominity.service.sign.SignService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +36,21 @@ public class SignController {
     public ResponseEntity<String> signUp(@Valid @RequestBody SignUpRequest req) {
         // ResponseEntity = java 클래스, 객체로 사용하는 것이고 일반 String return보다 다양한 기능 있음
         signService.signUp(req);
+        return ResponseEntity.ok().build();
+    }
+
+    // 회원탈퇴
+    @DeleteMapping("/api/delete-member")
+    public ResponseEntity<Void> deleteMember(HttpServletRequest request, @RequestBody @Valid MemberRequest req) {
+        signService.deleteMember(request, req);
+        return ResponseEntity.noContent().build(); // noContent = 상태 코드 204를 응답
+        // 클라이언트에게 "요청은 성공했지만 응답 본문은 없음"을 의미하는 HTTP 204 응답을 보내기 위해
+    }
+
+    // 닉네임 변경
+    @PostMapping("/api/change-nickname")
+    public ResponseEntity<Void> changeNickname(HttpServletRequest request, @RequestBody @Valid MemberRequest req) {
+        signService.changeNickname(request, req);
         return ResponseEntity.ok().build();
     }
 
