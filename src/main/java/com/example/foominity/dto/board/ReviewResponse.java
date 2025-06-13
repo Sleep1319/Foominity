@@ -1,6 +1,7 @@
 package com.example.foominity.dto.board;
 
 import java.time.LocalDateTime;
+import java.util.Locale.Category;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,7 +17,8 @@ public class ReviewResponse {
     private Long memberId;
     private String nickname;
     private float starPoint;
+    private String Category;
 
-    private LocalDateTime createDate;
-    private LocalDateTime updateDate;
+    private LocalDateTime createdDate;
+    private LocalDateTime updatedDate;
 }

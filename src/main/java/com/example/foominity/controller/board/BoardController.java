@@ -54,7 +54,7 @@ public class BoardController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/api/board/{id}")
+    @DeleteMapping("/api/boards/{id}")
     public ResponseEntity<String> deleteBoard(@PathVariable Long id, HttpServletRequest tokenRequest) {
         boardService.deleteBoard(id, tokenRequest);
         return ResponseEntity.ok().build();

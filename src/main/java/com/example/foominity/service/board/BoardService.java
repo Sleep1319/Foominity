@@ -26,7 +26,6 @@ import com.example.foominity.exception.NotFoundMemberException;
 import com.example.foominity.exception.UnauthorizedException;
 
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 
 @Service
 @RequiredArgsConstructor

@@ -1,5 +1,7 @@
 package com.example.foominity.dto.board;
 
+import java.util.List;
+
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,4 +19,7 @@ public class ReviewUpdateRequest {
     private String content;
 
     private float starPoint;
+
+    private String category;
+
 }

@@ -1,5 +1,7 @@
 package com.example.foominity.domain.board;
 
+import com.example.foominity.domain.BaseEntity;
+import com.example.foominity.domain.category.ReviewCategory;
 import com.example.foominity.domain.member.Member;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -8,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 @Entity
-public class Review {
+public class Review extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,8 +36,9 @@ public class Review {
         this.starPoint = starPoint;
     }
 
-    public void update(String title, String content) {
+    public void update(String title, String content, Float starPoint) {
         this.title = title;
         this.content = content;
+        this.starPoint = starPoint;
     }
 }

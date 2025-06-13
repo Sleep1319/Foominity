@@ -24,11 +24,12 @@ public class ReviewCreateRequest {
     private String content;
 
     @Nullable
-    private float starPoint;
+    private Float starPoint;
 
+    @Nullable
     private String Category;
 
-    public Review toEntity(ReviewCreateRequest req, Member member) {
+    public Review toEntityReview(ReviewCreateRequest req, Member member) {
         return new Review(req.getTitle(), req.getContent(), member, req.getStarPoint());
     }
 
