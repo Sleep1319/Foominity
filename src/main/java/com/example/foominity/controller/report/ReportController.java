@@ -38,7 +38,7 @@ public class ReportController {
         return ResponseEntity.ok(reportService.findById(id));
     }
 
-    @PostMapping("/api/report")
+    @PostMapping("/api/report/add")
     public ResponseEntity<String> createReport(@Valid @RequestBody ReportCreateRequest req) {
         reportService.createReport(req);
         return ResponseEntity.ok().build();
