@@ -1,5 +1,7 @@
 package com.example.foominity.dto.board;
 
+import java.util.List;
+
 import org.springframework.lang.Nullable;
 
 import com.example.foominity.domain.board.Review;
@@ -26,8 +28,9 @@ public class ReviewCreateRequest {
     @Nullable
     private Float starPoint;
 
+    // List? String?
     @Nullable
-    private String Category;
+    private List<Long> Category;
 
     public Review toEntityReview(ReviewCreateRequest req, Member member) {
         return new Review(req.getTitle(), req.getContent(), member, req.getStarPoint());

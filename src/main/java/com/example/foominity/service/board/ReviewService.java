@@ -42,37 +42,41 @@ public class ReviewService {
     private final JwtTokenProvider jwtTokenProvider;
     private final PointRepository pointRepository;
 
-    public Page<ReviewResponse> findAll(int page) {
-        PageRequest pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC,
-                "id"));
-        Page<ReviewCategory> reviewCategorys = reviewCategoryRepository.findAll(pageable);
+    // public Page<ReviewResponse> findAll(int page) {
+    // PageRequest pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC,
+    // "id"));
+    // Page<ReviewCategory> reviewCategorys =
+    // reviewCategoryRepository.findAll(pageable);
 
-        List<ReviewResponse> reviewResponseList = reviewCategorys.stream().map(reviewCategory -> new ReviewResponse(
-                reviewCategory.getReview().getId(),
-                reviewCategory.getReview().getTitle(),
-                reviewCategory.getReview().getContent(),
-                reviewCategory.getReview().getMember().getId(),
-                reviewCategory.getReview().getMember().getNickname(),
-                reviewCategory.getReview().getStarPoint(),
-                reviewCategory.getCategory().getCategoryName(),
-                reviewCategory.getCreatedDate(),
-                reviewCategory.getUpdatedDate())).toList();
-        return new PageImpl<>(reviewResponseList, pageable, reviewCategorys.getTotalElements());
-    }
+    // List<ReviewResponse> reviewResponseList =
+    // reviewCategorys.stream().map(reviewCategory -> new ReviewResponse(
+    // reviewCategory.getReview().getId(),
+    // reviewCategory.getReview().getTitle(),
+    // reviewCategory.getReview().getContent(),
+    // reviewCategory.getReview().getMember().getId(),
+    // reviewCategory.getReview().getMember().getNickname(),
+    // reviewCategory.getReview().getStarPoint(),
+    // reviewCategory.getCategory().getCategoryName(),
+    // reviewCategory.getCreatedDate(),
+    // reviewCategory.getUpdatedDate())).toList();
+    // return new PageImpl<>(reviewResponseList, pageable,
+    // reviewCategorys.getTotalElements());
+    // }
 
-    public ReviewResponse findById(Long id) {
-        ReviewCategory reviewCategory = reviewCategoryRepository.findById(id).orElseThrow();
-        return new ReviewResponse(
-                reviewCategory.getReview().getId(),
-                reviewCategory.getReview().getTitle(),
-                reviewCategory.getReview().getContent(),
-                reviewCategory.getReview().getMember().getId(),
-                reviewCategory.getReview().getMember().getNickname(),
-                reviewCategory.getReview().getStarPoint(),
-                reviewCategory.getCategory().getCategoryName(),
-                reviewCategory.getCreatedDate(),
-                reviewCategory.getUpdatedDate());
-    }
+    // public ReviewResponse findById(Long id) {
+    // ReviewCategory reviewCategory =
+    // reviewCategoryRepository.findById(id).orElseThrow();
+    // return new ReviewResponse(
+    // reviewCategory.getReview().getId(),
+    // reviewCategory.getReview().getTitle(),
+    // reviewCategory.getReview().getContent(),
+    // reviewCategory.getReview().getMember().getId(),
+    // reviewCategory.getReview().getMember().getNickname(),
+    // reviewCategory.getReview().getStarPoint(),
+    // reviewCategory.getCategory().getCategoryName(),
+    // reviewCategory.getCreatedDate(),
+    // reviewCategory.getUpdatedDate());
+    // }
 
     @Transactional
     public void createReview(ReviewCreateRequest req, HttpServletRequest tokenRequest) {
@@ -92,23 +96,21 @@ public class ReviewService {
         // 리뷰 따로 카테고리 따로 세이브 하고 싶다. 시도 중
         reviewRepository.save(req.toEntityReview(req, member));
 
-        /*
-         * 미완성
-         * // categoryRepository.save(req.toEntity(req, member));
-         * 
-         */
+        // List<Category> categories = categoryRepository
+        // // categoryRepository.save(req.toEntity(req, member));
 
     }
 
-    @Transactional
-    public void updateReview(Long id, ReviewUpdateRequest req, HttpServletRequest tokenRequest) {
-        ReviewCategory reviewCategory = validateReviewOwnership(id, tokenRequest);
-        Review review = reviewCategory.getReview();
-        review.update(req.getTitle(), req.getContent(), req.getStarPoint());
+    // @Transactional
+    // public void updateReview(Long id, ReviewUpdateRequest req, HttpServletRequest
+    // tokenRequest) {
+    // ReviewCategory reviewCategory = validateReviewOwnership(id, tokenRequest);
+    // Review review = reviewCategory.getReview();
+    // review.update(req.getTitle(), req.getContent(), req.getStarPoint());
 
-        Category category = reviewCategory.getCategory();
-        category.update(req.getCategory());
-    }
+    // Category category = reviewCategory.getCategory();
+    // category.update(req.getCategory());
+    // }
 
     @Transactional
     public void deleteReview(Long id, HttpServletRequest tokenRequest) {

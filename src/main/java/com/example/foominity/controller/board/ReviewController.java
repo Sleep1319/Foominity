@@ -27,38 +27,42 @@ import org.springframework.web.bind.annotation.PathVariable;
 @RequiredArgsConstructor
 public class ReviewController {
 
-    private final ReviewService reviewService;
+    // private final ReviewService reviewService;
 
-    @GetMapping("/api/reviews/page")
-    public ResponseEntity<?> findAll(@RequestParam(defaultValue = "0") int page) {
-        Page<ReviewResponse> res = reviewService.findAll(page);
-        return ResponseEntity.ok(res);
-    }
+    // @GetMapping("/api/reviews/page")
+    // public ResponseEntity<?> findAll(@RequestParam(defaultValue = "0") int page)
+    // {
+    // Page<ReviewResponse> res = reviewService.findAll(page);
+    // return ResponseEntity.ok(res);
+    // }
 
-    @GetMapping("/api/reviews/{id}")
-    public ResponseEntity<ReviewResponse> findById(@PathVariable Long id) {
-        return ResponseEntity.ok(reviewService.findById(id));
-    }
+    // @GetMapping("/api/reviews/{id}")
+    // public ResponseEntity<ReviewResponse> findById(@PathVariable Long id) {
+    // return ResponseEntity.ok(reviewService.findById(id));
+    // }
 
-    @PostMapping("/api/reviews")
-    public ResponseEntity<String> createReview(@Valid @RequestBody ReviewCreateRequest req,
-            HttpServletRequest tokenRequest) {
-        reviewService.createReview(req, tokenRequest);
-        return ResponseEntity.ok().build();
-    }
+    // @PostMapping("/api/reviews")
+    // public ResponseEntity<String> createReview(@Valid @RequestBody
+    // ReviewCreateRequest req,
+    // HttpServletRequest tokenRequest) {
+    // reviewService.createReview(req, tokenRequest);
+    // return ResponseEntity.ok().build();
+    // }
 
-    @PutMapping("/api/reviews/{id}")
-    public ResponseEntity<String> updateReview(@PathVariable Long id, @Valid @RequestBody ReviewUpdateRequest req,
-            HttpServletRequest tokenRequest) {
-        reviewService.updateReview(id, req, tokenRequest);
-        return ResponseEntity.ok().build();
-    }
+    // @PutMapping("/api/reviews/{id}")
+    // public ResponseEntity<String> updateReview(@PathVariable Long id, @Valid
+    // @RequestBody ReviewUpdateRequest req,
+    // HttpServletRequest tokenRequest) {
+    // reviewService.updateReview(id, req, tokenRequest);
+    // return ResponseEntity.ok().build();
+    // }
 
-    @DeleteMapping("/api/reviews/{id}")
-    public ResponseEntity<String> deleteReview(@PathVariable Long id, HttpServletRequest tokenRequest) {
-        reviewService.deleteReview(id, tokenRequest);
-        return ResponseEntity.ok().build();
+    // @DeleteMapping("/api/reviews/{id}")
+    // public ResponseEntity<String> deleteReview(@PathVariable Long id,
+    // HttpServletRequest tokenRequest) {
+    // reviewService.deleteReview(id, tokenRequest);
+    // return ResponseEntity.ok().build();
 
-    }
+    // }
 
 }

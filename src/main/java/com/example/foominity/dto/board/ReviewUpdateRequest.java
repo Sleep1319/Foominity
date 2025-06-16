@@ -20,6 +20,7 @@ public class ReviewUpdateRequest {
 
     private float starPoint;
 
-    private String category;
+    // List? String?
+    private List<Long> category;
 
 }
