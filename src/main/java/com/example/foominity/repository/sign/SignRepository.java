@@ -12,16 +12,14 @@ import java.util.Optional;
 @Repository
 public interface SignRepository extends JpaRepository<Member, Long> {
 
-    // *의문=> SignRepository 필요한가?? 엔티티도 테이블도 없는데?
+    // 기능 구현 후 참고 및 사용
 
-    // // 기능 구현 후 참고 및 사용
+    Optional<Member> findById(int id);
 
-    // Optional<Member> findById(int id);
+    // 이메일로 찾기
+    public Optional<Member> findByEmail(String email);
 
-    // // 이메일로 찾기
-    // public Optional<Member> findByEmail(String email);
-
-    // // 넥네임으로 찾기
-    // public Optional<Member> findByNickname(String nickname);
+    // 넥네임으로 찾기
+    public Optional<Member> findByNickname(String nickname);
 
 }

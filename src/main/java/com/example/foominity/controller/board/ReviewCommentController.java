@@ -45,7 +45,7 @@ public class ReviewCommentController {
     }
 
     // 수정
-    @PutMapping("/api/comments/{id}")
+    @PutMapping("/api/comments/{commentId}")
     public ResponseEntity<String> updateReviewComment(@PathVariable Long commentId, HttpServletRequest tokenRequest,
             @Valid @RequestBody ReviewCommentUpdateRequest req) {
         reviewCommentService.updateReviewComment(commentId, tokenRequest, req);
@@ -53,7 +53,7 @@ public class ReviewCommentController {
     }
 
     // 삭제
-    @DeleteMapping("/api/comments/{id}")
+    @DeleteMapping("/api/comments/{commentId}")
     public ResponseEntity<String> deleteReviewComment(@PathVariable Long commentId,
             HttpServletRequest tokenRequest) {
         reviewCommentService.deleteReviewComment(commentId, tokenRequest);

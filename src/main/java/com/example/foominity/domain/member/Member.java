@@ -7,9 +7,12 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -44,13 +47,23 @@ public class Member extends BaseEntity {
     @Column(name = "provider_id")
     private String providerId;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "role_id")
+    private Role role;
+
     public Member(String email, String password, String userName, String nickname) {
         this.email = email;
         this.password = password;
         this.userName = userName;
         this.nickname = nickname;
+        this.role = new Role(RoleType.BRONZE, 0);
         socialType = "NORMAL";
         providerId = null;
+    }
+
+    // RoleService에 사용
+    public void updateRole(Role newRole) {
+        this.role = newRole;
     }
 
     // setter가 아닌 도메인 메서드 쓰는 이유

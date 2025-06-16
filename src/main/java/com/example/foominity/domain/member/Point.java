@@ -28,6 +28,14 @@ public class Point {
         this.likeCount = 0;
     }
 
+    public void addReviewCount() {
+        this.reviewCount++;
+    }
+
+    public void addLikeCount() {
+        this.likeCount++;
+    }
+
     public void increaseReviewCount() {
         this.reviewCount++;
     }
