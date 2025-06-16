@@ -19,6 +19,8 @@ public class Point {
     @Column(name = "like_count")
     private int likeCount;
 
+    @Column
+
     @OneToOne
     @JoinColumn(name = "member_id")
     private Member member;
@@ -26,6 +28,10 @@ public class Point {
     public void resetPoint() {
         this.reviewCount = 0;
         this.likeCount = 0;
+    }
+
+    public Point (Member member) {
+        this.member = member;
     }
 
     public void addReviewCount() {

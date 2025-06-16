@@ -1,14 +1,14 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import Blog from "./view/Blog.jsx";
+import React from 'react'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import AppNavbar from './components/AppNavbar'
+import Home from './view/Home.jsx'
 
 function App() {
     return (
-        <Blog></Blog>
-
-
+        <BrowserRouter>
+            <AppNavbar />
+            <Home />
+        </BrowserRouter>
     )
 }
 export default App;

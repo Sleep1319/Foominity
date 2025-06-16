@@ -1,7 +1,6 @@
 package com.example.foominity.config.jwt;
 
 import com.example.foominity.domain.member.Member;
-import com.example.foominity.domain.member.MemberRole;
 import com.example.foominity.exception.NotFoundRoleIdException;
 import com.example.foominity.repository.member.MemberRoleRepository;
 import com.example.foominity.repository.member.RoleRepository;

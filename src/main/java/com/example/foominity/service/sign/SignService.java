@@ -2,6 +2,8 @@ package com.example.foominity.service.sign;
 
 import java.util.Optional;
 
+import com.example.foominity.domain.member.Point;
+import com.example.foominity.repository.member.PointRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +35,7 @@ public class SignService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
+    private final PointRepository pointRepository;
 
     // 회원 탈퇴
     @Transactional
@@ -80,10 +83,12 @@ public class SignService {
         validateSignUp(req.getEmail(), req.getNickname());
 
         req.setPassword(passwordEncoder.encode(req.getPassword()));
-        //
+        Member member = req.toEntity(req.getEmail(), req.getPassword(), req.getUsername(),
+                req.getNickname());
         signRepository
-                .save(req.toEntity(req.getEmail(), req.getPassword(), req.getUsername(),
-                        req.getNickname()));
+                .save(member);
+        Point point = new Point(member);
+        pointRepository.save(point);
     }
 
     public boolean existsNickname(String nickname) {
