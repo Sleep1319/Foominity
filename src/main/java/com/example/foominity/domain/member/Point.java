@@ -42,4 +42,8 @@ public class Point {
         this.likeCount++;
     }
 
+    public void increaseReviewCount() {
+        this.reviewCount++;
+    }
+
 }

@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BoardUpdateRequest {
+public class ReviewUpdateRequest {
 
     @NotNull
     private String title;
@@ -18,10 +18,9 @@ public class BoardUpdateRequest {
     @NotNull
     private String content;
 
-    public class ReviewUpdateRequest {
-        private String title;
-        private String content;
-        private Float starPoint;
-        private List<Long> categoryIds;
-    }
+    private float starPoint;
+
+    // List? String?
+    private List<Long> category;
+
 }

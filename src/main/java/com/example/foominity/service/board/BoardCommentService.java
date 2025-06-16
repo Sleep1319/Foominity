@@ -27,13 +27,14 @@ import jakarta.validation.constraints.Null;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Log4j2
 @Service
 public class BoardCommentService {
 
-    private final BoardCommentRepository boardCommentRepository;
     private final BoardRepository boardRepository;
+    private final BoardCommentRepository boardCommentRepository;
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
 
