@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReviewCreateRequest {
+public class ReviewRequest {
 
     @NotNull
     private Member memberId;
@@ -25,14 +25,12 @@ public class ReviewCreateRequest {
     @NotNull
     private String content;
 
+    private List<Long> categoryIds;
+
     @Nullable
     private Float starPoint;
 
-    // List? String?
-    @Nullable
-    private List<Long> Category;
-
-    public Review toEntityReview(ReviewCreateRequest req, Member member) {
+    public Review toEntityReview(ReviewRequest req, Member member) {
         return new Review(req.getTitle(), req.getContent(), member, req.getStarPoint());
     }
 

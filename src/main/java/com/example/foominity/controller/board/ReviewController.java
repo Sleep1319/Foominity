@@ -2,7 +2,7 @@ package com.example.foominity.controller.board;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.foominity.dto.board.ReviewCreateRequest;
+import com.example.foominity.dto.board.ReviewRequest;
 import com.example.foominity.dto.board.ReviewResponse;
 import com.example.foominity.dto.board.ReviewUpdateRequest;
 import com.example.foominity.service.board.ReviewService;

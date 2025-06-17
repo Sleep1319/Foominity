@@ -19,7 +19,7 @@ import com.example.foominity.repository.member.MemberRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-import com.example.foominity.dto.board.BoardCreateRequest;
+import com.example.foominity.dto.board.BoardRequest;
 import com.example.foominity.exception.ForbiddenActionException;
 import com.example.foominity.exception.NotFoundBoardException;
 import com.example.foominity.exception.NotFoundMemberException;
@@ -68,7 +68,7 @@ public class BoardService {
     }
 
     @Transactional
-    public void createBoard(BoardCreateRequest req, HttpServletRequest tokenRequest) {
+    public void createBoard(BoardRequest req, HttpServletRequest tokenRequest) {
         String token = jwtTokenProvider.resolveTokenFromCookie(tokenRequest);
 
         if (!jwtTokenProvider.validateToken(token)) {

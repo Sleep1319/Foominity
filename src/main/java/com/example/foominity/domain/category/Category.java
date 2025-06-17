@@ -13,10 +13,8 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // 카테고리 명
     @Column(nullable = false, name = "category_name")
     private String categoryName;
 
-    public void update(String categoryName) {
-        this.categoryName = categoryName;
-    }
 }
