@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.foominity.config.jwt.JwtTokenProvider;
 import com.example.foominity.domain.member.Member;
 import com.example.foominity.dto.member.MemberRequest;
+import com.example.foominity.dto.member.NicknameChangeRequest;
 import com.example.foominity.dto.sign.SignInRequest;
 import com.example.foominity.dto.sign.SignInResponse;
 import com.example.foominity.dto.sign.SignUpRequest;
@@ -59,7 +60,7 @@ public class SignService {
 
     // 닉네임 변경
     @Transactional
-    public void changeNickname(HttpServletRequest toekRequest, MemberRequest req) {
+    public void changeNickname(HttpServletRequest toekRequest, NicknameChangeRequest req) {
 
         String token = jwtTokenProvider.resolveTokenFromCookie(toekRequest);
 

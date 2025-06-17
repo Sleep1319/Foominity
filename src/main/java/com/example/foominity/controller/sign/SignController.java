@@ -2,6 +2,7 @@ package com.example.foominity.controller.sign;
 
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.foominity.config.jwt.JwtTokenProvider;
 import com.example.foominity.dto.member.MemberRequest;
+import com.example.foominity.dto.member.NicknameChangeRequest;
 import com.example.foominity.dto.sign.SignInRequest;
 import com.example.foominity.dto.sign.SignInResponse;
 import com.example.foominity.dto.sign.SignUpRequest;
@@ -26,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
+// @RequestMapping("/api")
 public class SignController {
 
     private final SignService signService;
@@ -48,8 +51,10 @@ public class SignController {
     }
 
     // 닉네임 변경
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/api/change-nickname")
-    public ResponseEntity<Void> changeNickname(HttpServletRequest request, @RequestBody @Valid MemberRequest req) {
+    public ResponseEntity<Void> changeNickname(HttpServletRequest request,
+            @RequestBody @Valid NicknameChangeRequest req) {
         signService.changeNickname(request, req);
         return ResponseEntity.ok().build();
     }
