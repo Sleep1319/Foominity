@@ -1,6 +1,7 @@
 import { Box, HStack, Heading, Button, IconButton, Spacer } from '@chakra-ui/react';
 import { MoonIcon, SunIcon } from '@chakra-ui/icons';
 import { useColorMode } from '@chakra-ui/react';
+import { Link as RouterLink } from 'react-router-dom';
 import React from 'react';
 
 const AppNavbar = () => {
@@ -19,18 +20,23 @@ const AppNavbar = () => {
             zIndex="1000"
         >
             <HStack>
-                <Heading size="md">HIPHOPLE</Heading>
+                <Heading as={RouterLink} to="/home" size="md">FOOMINITY</Heading>
 
                 <Spacer />
 
                 {/* 네비 메뉴 버튼 */}
-                <Button variant="ghost">Review</Button>
-                <Button variant="ghost">FreeBoard</Button>
-                <Button variant="ghost">Notice</Button>
-                <Button variant="ghost">Report</Button>
-                <Button variant="ghost">Discussion</Button>
-                <Button variant="ghost">Workspace</Button>
-                <Button variant="ghost">Shop</Button>
+                <Button as={RouterLink} to="/review" variant="ghost">
+                    Review
+                </Button>
+                <Button as={RouterLink} to="/freeboard" variant="ghost">
+                    FreeBoard
+                </Button>
+                <Button as={RouterLink} to="/notice" variant="ghost">
+                    Notice
+                </Button>
+                <Button as={RouterLink} to="/report" variant="ghost">
+                    Report
+                </Button>
 
                 <Spacer />
 
