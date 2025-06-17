@@ -1,6 +1,5 @@
 import React from "react";
 import { Box, Text } from "@chakra-ui/react";
-import { Table, Thead, Tbody, Tfoot, Tr, Th, Td, TableCaption, TableContainer } from "@chakra-ui/react";
 import ReportTable from "../components/ReportTable";
 
 const Report = () => {

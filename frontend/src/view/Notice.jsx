@@ -1,4 +1,6 @@
 import React from "react";
+import { Box, Text } from "@chakra-ui/react";
+import NoticeTable from "../components/NoticeTable";
 
 const Notice = () => {
   return (
@@ -7,7 +9,7 @@ const Notice = () => {
         <Text fontSize="3xl" fontWeight="medium" borderBottom="2px solid gray" pb={2}>
           Notice📌
         </Text>
-        <ReportTable />
+        <NoticeTable />
       </Box>
     </div>
   );
