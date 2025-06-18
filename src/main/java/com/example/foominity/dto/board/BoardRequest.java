@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class BoardCreateRequest {
+public class BoardRequest {
 
     @NotNull
     private Long memberId;
@@ -21,7 +21,7 @@ public class BoardCreateRequest {
     @NotNull
     private String content;
 
-    public Board toEntity(BoardCreateRequest req, Member member) {
+    public Board toEntity(BoardRequest req, Member member) {
         return new Board(req.getTitle(), req.getContent(), member);
     }
 }

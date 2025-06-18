@@ -30,7 +30,7 @@ public class Point {
         this.likeCount = 0;
     }
 
-    public Point (Member member) {
+    public Point(Member member) {
         this.member = member;
     }
 
@@ -40,10 +40,6 @@ public class Point {
 
     public void addLikeCount() {
         this.likeCount++;
-    }
-
-    public void increaseReviewCount() {
-        this.reviewCount++;
     }
 
 }

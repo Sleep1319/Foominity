@@ -2,7 +2,7 @@ package com.example.foominity.controller.board;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.foominity.dto.board.BoardCreateRequest;
+import com.example.foominity.dto.board.BoardRequest;
 import com.example.foominity.dto.board.BoardResponse;
 import com.example.foominity.dto.board.BoardUpdateRequest;
 import com.example.foominity.service.board.BoardService;
@@ -41,16 +41,16 @@ public class BoardController {
     }
 
     @PostMapping("/api/boards")
-    public ResponseEntity<String> createBoard(@Valid @RequestBody BoardCreateRequest req,
+    public ResponseEntity<String> createBoard(@Valid @RequestBody BoardRequest req,
             HttpServletRequest tokenRequest) {
         boardService.createBoard(req, tokenRequest);
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/api/boards{id}")
+    @PutMapping("/api/boards/{id}")
     public ResponseEntity<String> updateBoard(@PathVariable Long id, @Valid @RequestBody BoardUpdateRequest req,
             HttpServletRequest tokenRequest) {
-        boardService.updateBoard(id, null, tokenRequest);
+        boardService.updateBoard(id, req, tokenRequest);
         return ResponseEntity.ok().build();
     }
 

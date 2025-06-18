@@ -1,14 +1,17 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import AppNavbar from "./components/AppNavbar";
+
+import AppNavBar from "./components/AppNavBar";
 import AppRoutes from "@/routes/Routes.jsx";
-import Home from "./view/Home.jsx";
+import { UserProvider } from "@/context/UserContext.jsx";
 
 function App() {
   return (
     <BrowserRouter>
-      <AppNavbar />
-      <AppRoutes />
+      <UserProvider>
+        <AppNavBar />
+        <AppRoutes />
+      </UserProvider>
     </BrowserRouter>
   );
 }

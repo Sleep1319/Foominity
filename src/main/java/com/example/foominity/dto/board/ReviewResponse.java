@@ -2,7 +2,8 @@ package com.example.foominity.dto.board;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Locale.Category;
+
+import com.example.foominity.dto.category.ReviewCategoryResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,9 +19,8 @@ public class ReviewResponse {
     private Long memberId;
     private String nickname;
     private float starPoint;
-    // List? String?
-    private List<Long> Category;
 
+    private List<ReviewCategoryResponse> categories;
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
 }
