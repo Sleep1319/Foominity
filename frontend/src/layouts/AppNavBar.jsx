@@ -32,7 +32,7 @@ const AppNavbar = () => {
         <NavMenu/>
 
         <Spacer />
-        {state ? <UserSection/> : <AuthButtons/>}
+        {state && state.nickname ? <UserSection/> : <AuthButtons/>}
 
         <ColorModeToggle/>
       </HStack>
