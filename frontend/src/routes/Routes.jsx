@@ -1,13 +1,13 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import Home from "../view/Home.jsx";
-import Report from "../view/Report.jsx";
-import Login from "./../view/Login";
-import Register from "./../view/Register";
-import Notice from "@/view/Notice.jsx";
+import Home from "../view/home/Home.jsx";
+import Report from "../view/report/Report.jsx";
+import Login from "../view/Sign/Login.jsx";
+import Register from "../view/Sign/Register.jsx";
+import Notice from "@/view/notice/Notice.jsx";
 import ProtectedRoute from "./ProtectedRoute";
-import Profile from "../view/Profile.jsx";
-import EditProfile from "../view/EditProfile.jsx";
+import Profile from "../view/member/Profile.jsx";
+import EditProfile from "../view/member/EditProfile.jsx";
 
 function AppRoutes() {
   return (

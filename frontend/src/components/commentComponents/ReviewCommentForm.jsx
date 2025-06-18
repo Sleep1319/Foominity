@@ -1,5 +1,5 @@
 // components/ReviewCommentForm.jsx
-import CommentForm from "./CommentForm";
+import CommentForm from "./CommentForm.jsx";
 import axios from "axios";
 
 const ReviewCommentForm = ({ reviewId, onSuccess }) => {

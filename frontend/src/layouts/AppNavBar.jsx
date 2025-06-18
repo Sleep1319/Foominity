@@ -3,10 +3,10 @@ import { Link as RouterLink } from "react-router-dom";
 import React from "react";
 import { useUser } from "@/context/UserContext";
 import { useColorMode } from "@chakra-ui/react";
-import NavMenu from "@/components/NavComponents/NavMenu.jsx";
-import AuthButtons from "@/components/NavComponents/AuthButtons.jsx";
-import UserSection from "@/components/NavComponents/UserSection.jsx";
-import ColorModeToggle from "@/components/NavComponents/ColorModeToggle.jsx";
+import NavMenu from "@/components/navComponents/NavMenu.jsx";
+import AuthButtons from "@/components/navComponents/AuthButtons.jsx";
+import UserSection from "@/components/navComponents/UserSection.jsx";
+import ColorModeToggle from "@/components/navComponents/ColorModeToggle.jsx";
 
 const AppNavbar = () => {
   const {state} = useUser();

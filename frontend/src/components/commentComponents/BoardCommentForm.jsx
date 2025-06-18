@@ -1,4 +1,4 @@
-import CommentForm from "./CommentForm";
+import CommentForm from "./CommentForm.jsx";
 import axios from "axios";
 
 const BoardCommentForm = ({ boardId, onSuccess }) => {

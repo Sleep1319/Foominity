@@ -1,6 +1,6 @@
 import { Avatar, Box, HStack, Text, VStack, Flex, Button } from "@chakra-ui/react";
 import React from "react";
-import DefaultTable from "../components/DefaultTable";
+import DefaultTable from "../../components/reportComponents/DefaultTable.jsx";
 import { useNavigate } from "react-router-dom";
 
 const Profile = ({ nickname, userName, userGrade, userPoints }) => {
