@@ -14,7 +14,7 @@ function AppRoutes() {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/report" element={<Report />} />
-      <Route path="/notie" element={<Notice />} />
+      <Route path="/notice" element={<Notice />} />
       <Route element={<ProtectedRoute requireAuth={false} />}>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />

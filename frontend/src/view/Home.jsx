@@ -49,7 +49,7 @@ function Home() {
           <Tab>Review</Tab>
           <Tab>FreeBoard</Tab>
           <Tab>Notice</Tab>
-          <Tab>Report</Tab>8<Tab>Discussion</Tab>
+          <Tab>Report</Tab><Tab>Discussion</Tab>
           <Tab>Workspace</Tab>
           <Tab>Shop</Tab>
         </TabList>
