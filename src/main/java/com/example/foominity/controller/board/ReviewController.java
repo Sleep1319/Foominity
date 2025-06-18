@@ -2,6 +2,8 @@ package com.example.foominity.controller.board;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.foominity.dto.board.BoardRequest;
+import com.example.foominity.dto.board.BoardUpdateRequest;
 import com.example.foominity.dto.board.ReviewRequest;
 import com.example.foominity.dto.board.ReviewResponse;
 import com.example.foominity.dto.board.ReviewUpdateRequest;
@@ -27,42 +29,44 @@ import org.springframework.web.bind.annotation.PathVariable;
 @RequiredArgsConstructor
 public class ReviewController {
 
-    // private final ReviewService reviewService;
+    private final ReviewService reviewService;
 
-    // @GetMapping("/api/reviews/page")
-    // public ResponseEntity<?> findAll(@RequestParam(defaultValue = "0") int page)
-    // {
-    // Page<ReviewResponse> res = reviewService.findAll(page);
-    // return ResponseEntity.ok(res);
-    // }
+    // 전체 조회
+    @GetMapping("/api/reviews/page")
+    public ResponseEntity<?> findAll(@RequestParam(defaultValue = "0") int page) {
+        Page<ReviewResponse> res = reviewService.findAll(page);
+        return ResponseEntity.ok(res);
+    }
 
-    // @GetMapping("/api/reviews/{id}")
-    // public ResponseEntity<ReviewResponse> findById(@PathVariable Long id) {
-    // return ResponseEntity.ok(reviewService.findById(id));
-    // }
+    // 개별 조회
+    @GetMapping("/api/reviews/{id}")
+    public ResponseEntity<ReviewResponse> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(reviewService.readReview(id));
+    }
 
-    // @PostMapping("/api/reviews")
-    // public ResponseEntity<String> createReview(@Valid @RequestBody
-    // ReviewCreateRequest req,
-    // HttpServletRequest tokenRequest) {
-    // reviewService.createReview(req, tokenRequest);
-    // return ResponseEntity.ok().build();
-    // }
+    // 생성
+    @PostMapping("/api/reviews")
+    public ResponseEntity<String> createReview(@Valid @RequestBody ReviewRequest req,
+            HttpServletRequest tokenRequest) {
+        reviewService.createReview(req, tokenRequest);
 
-    // @PutMapping("/api/reviews/{id}")
-    // public ResponseEntity<String> updateReview(@PathVariable Long id, @Valid
-    // @RequestBody ReviewUpdateRequest req,
-    // HttpServletRequest tokenRequest) {
-    // reviewService.updateReview(id, req, tokenRequest);
-    // return ResponseEntity.ok().build();
-    // }
+        return ResponseEntity.ok().build();
+    }
 
-    // @DeleteMapping("/api/reviews/{id}")
-    // public ResponseEntity<String> deleteReview(@PathVariable Long id,
-    // HttpServletRequest tokenRequest) {
-    // reviewService.deleteReview(id, tokenRequest);
-    // return ResponseEntity.ok().build();
+    // 수정
+    @PutMapping("/api/reviews/{id}")
+    public ResponseEntity<String> updateReview(@PathVariable Long id, @Valid @RequestBody ReviewUpdateRequest req,
+            HttpServletRequest tokenRequest) {
+        reviewService.updateReview(id, req, tokenRequest);
 
-    // }
+        return ResponseEntity.ok().build();
+    }
+
+    // 삭제
+    @DeleteMapping("/api/reviews/{id}")
+    public ResponseEntity<String> deleteReview(@PathVariable Long id, HttpServletRequest tokenRequest) {
+        reviewService.deleteReview(id, tokenRequest);
+        return ResponseEntity.ok().build();
+    }
 
 }

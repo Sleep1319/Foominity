@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ReviewCategoryResponse {
 
+    private Long categoryId;
     private String categoryName;
 
 }
