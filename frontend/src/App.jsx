@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import AppNavBar from "./components/AppNavBar";
+import AppNavBar from "./layouts/AppNavBar.jsx";
 import AppRoutes from "@/routes/Routes.jsx";
 import {UserProvider} from "@/context/UserContext.jsx";
 
