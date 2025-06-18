@@ -3,11 +3,12 @@ import { MoonIcon, SunIcon } from "@chakra-ui/icons";
 
 const ColorModeToggle = () => {
     const { colorMode, toggleColorMode } = useColorMode();
-    const icon = colorMode === "light" ? <MoonIcon /> : <SunIcon />;
+
+    const iconElement = colorMode === "light" ? <MoonIcon /> : <SunIcon />;
 
     return (
         <IconButton
-            icon={icon}
+            icon={iconElement}
             onClick={toggleColorMode}
             aria-label="Toggle color mode"
             variant="ghost"

@@ -1,5 +1,5 @@
 import { Button } from "@chakra-ui/react";
-import { Links as RouterLink  } from "react-router-dom";
+import { Link as RouterLink  } from "react-router-dom";
 import React from "react";
 
 const NavMenu = () => (

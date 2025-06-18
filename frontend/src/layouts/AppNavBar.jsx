@@ -1,12 +1,16 @@
-import { Box, HStack, Heading, Button, IconButton, Spacer } from "@chakra-ui/react";
-import { MoonIcon, SunIcon } from "@chakra-ui/icons";
-import { useColorMode } from "@chakra-ui/react";
+import { Box, HStack, Heading, Spacer } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
 import React from "react";
+import { useUser } from "@/context/UserContext";
+import { useColorMode } from "@chakra-ui/react";
+import NavMenu from "@/components/NavComponents/NavMenu.jsx";
+import AuthButtons from "@/components/NavComponents/AuthButtons.jsx";
+import UserSection from "@/components/NavComponents/UserSection.jsx";
+import ColorModeToggle from "@/components/NavComponents/ColorModeToggle.jsx";
 
 const AppNavbar = () => {
-  const { colorMode, toggleColorMode } = useColorMode();
-  const iconElement = colorMode === "light" ? <MoonIcon /> : <SunIcon />;
+  const {state} = useUser();
+  const { colorMode } = useColorMode();
 
   return (
     <Box
@@ -25,33 +29,12 @@ const AppNavbar = () => {
         </Heading>
 
         <Spacer />
-
-        {/* 네비 메뉴 버튼 */}
-        <Button as={RouterLink} to="/review" variant="ghost">
-          Review
-        </Button>
-        <Button as={RouterLink} to="/freeboard" variant="ghost">
-          FreeBoard
-        </Button>
-        <Button as={RouterLink} to="/notice" variant="ghost">
-          Notice
-        </Button>
-        <Button as={RouterLink} to="/report" variant="ghost">
-          Report
-        </Button>
+        <NavMenu/>
 
         <Spacer />
+        {state ? <UserSection/> : <AuthButtons/>}
 
-        {/* 로그인, 회원가입 버튼 */}
-        <Button as={RouterLink} to="/login" variant="ghost">
-          로그인
-        </Button>
-        <Button as={RouterLink} to="/register" colorScheme="teal">
-          회원가입
-        </Button>
-
-        {/* 다크모드 토글 */}
-        <IconButton icon={iconElement} onClick={toggleColorMode} aria-label="Toggle color mode" />
+        <ColorModeToggle/>
       </HStack>
     </Box>
   );
