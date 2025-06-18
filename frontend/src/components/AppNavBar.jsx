@@ -20,7 +20,7 @@ const AppNavbar = () => {
       zIndex="1000"
     >
       <HStack>
-        <Heading as={RouterLink} to="/home" size="md">
+        <Heading as={RouterLink} to="/" size="md">
           FOOMINITY
         </Heading>
 

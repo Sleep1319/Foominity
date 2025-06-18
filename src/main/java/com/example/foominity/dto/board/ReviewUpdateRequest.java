@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.example.foominity.dto.category.ReviewCategoryResponse;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,10 +15,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ReviewUpdateRequest {
 
-    @NotNull
+    @NotBlank
     private String title;
 
-    @NotNull
+    @NotBlank
     private String content;
 
     private List<Long> categoryIds;

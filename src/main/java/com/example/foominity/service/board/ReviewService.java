@@ -58,6 +58,7 @@ public class ReviewService {
 
                     List<ReviewCategoryResponse> categoryResponses = reviewCategories.stream()
                             .map(rc -> new ReviewCategoryResponse(
+                                    rc.getCategory().getId(),
                                     rc.getCategory().getCategoryName()))
                             .toList();
 
@@ -86,6 +87,7 @@ public class ReviewService {
 
         List<ReviewCategoryResponse> categoryResponses = reviewCategory.stream()
                 .map(rc -> new ReviewCategoryResponse(
+                        rc.getCategory().getId(),
                         rc.getCategory().getCategoryName()))
                 .toList();
 
@@ -115,8 +117,15 @@ public class ReviewService {
         // 리뷰카운트 증가
         pointService.updateReviewCount(memberId);
 
-        // 리뷰저장 & 리뷰 변수
-        Review review = reviewRepository.save(req.toEntityReview(req, member));
+        // 리뷰변수
+        Review review = new Review(
+                req.getTitle(),
+                req.getContent(),
+                member,
+                req.getStarPoint());
+
+        // 리뷰저장
+        review = reviewRepository.save(review);
 
         // 카테고리 저장
         List<Category> categories = categoryRepository.findAllById(req.getCategoryIds());
@@ -128,7 +137,7 @@ public class ReviewService {
 
     @Transactional
     public void updateReview(Long reviewId, ReviewUpdateRequest req, HttpServletRequest tokenRequest) {
-        Review review = validateReviewownership(reviewId, tokenRequest);
+        Review review = validateReviewOwnership(reviewId, tokenRequest);
         review.update(req.getTitle(), req.getContent(), req.getStarPoint());
 
         // 기존 연결된 카테고리 삭제
@@ -144,7 +153,7 @@ public class ReviewService {
     // 리뷰글 삭제
     @Transactional
     public void deleteReview(Long reviewId, HttpServletRequest tokenRequest) {
-        Review review = validateReviewownership(reviewId, tokenRequest);
+        Review review = validateReviewOwnership(reviewId, tokenRequest);
 
         reviewCategoryRepository.deleteByReviewId(reviewId);
 
@@ -152,7 +161,7 @@ public class ReviewService {
     }
 
     // 리뷰 작성자 검증 메서드
-    public Review validateReviewownership(Long reviewId, HttpServletRequest tokenRequest) {
+    public Review validateReviewOwnership(Long reviewId, HttpServletRequest tokenRequest) {
         String token = jwtTokenProvider.resolveTokenFromCookie(tokenRequest);
 
         // 유효성검증
