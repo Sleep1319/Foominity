@@ -8,6 +8,7 @@ import Notice from "@/view/notice/Notice.jsx";
 import ProtectedRoute from "./ProtectedRoute";
 import Profile from "../view/member/Profile.jsx";
 import EditProfile from "../view/member/EditProfile.jsx";
+import MyPage from "../view/member/MyPage.jsx";
 
 function AppRoutes() {
   return (
@@ -21,8 +22,7 @@ function AppRoutes() {
       </Route>
       <Route element={<ProtectedRoute requireAuth={true} />}>
         {/* 로그인 필수 페이지 */}
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/editprofile" element={<EditProfile />} />
+        <Route path="/mypage/*" element={<MyPage />} />
       </Route>
     </Routes>
   );
