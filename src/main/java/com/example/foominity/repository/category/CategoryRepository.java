@@ -1,4 +1,4 @@
-package com.example.foominity.repository.board;
+package com.example.foominity.repository.category;
 
 import com.example.foominity.domain.category.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
