@@ -47,10 +47,10 @@ public class BoardController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/api/boards{id}")
+    @PutMapping("/api/boards/{id}")
     public ResponseEntity<String> updateBoard(@PathVariable Long id, @Valid @RequestBody BoardUpdateRequest req,
             HttpServletRequest tokenRequest) {
-        boardService.updateBoard(id, null, tokenRequest);
+        boardService.updateBoard(id, req, tokenRequest);
         return ResponseEntity.ok().build();
     }
 
