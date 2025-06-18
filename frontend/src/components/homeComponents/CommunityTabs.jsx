@@ -1,9 +1,14 @@
-import { Box, Tabs, TabList, TabPanels, Tab,
-    TabPanel, Text, List, ListItem } from "@chakra-ui/react";
+import {
+    Box, Tabs, TabList, TabPanels, Tab,
+    TabPanel, Text, List, ListItem, Heading
+} from "@chakra-ui/react";
 
 const CommunityTabs = () => (
     <Box mb={8}>
         <Tabs variant="line" colorScheme="red">
+            <Heading size="md" mb={4}>
+                최신 글
+            </Heading>
             <TabList>
                 <Tab>Review</Tab>
                 <Tab>FreeBoard</Tab>

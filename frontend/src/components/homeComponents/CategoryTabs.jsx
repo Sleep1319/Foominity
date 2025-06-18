@@ -1,10 +1,10 @@
 import { Box, Tabs, TabList, TabPanels, Tab, TabPanel,
     SimpleGrid, Image, Heading, Text } from "@chakra-ui/react";
-
+// 추후 카테고리로 바뀔곳
 const CategoryTabs = () => (
     <Tabs variant="soft-rounded" colorScheme="red" mb={8}>
         <TabList>
-            <Tab>Review</Tab>
+            <Tab>카테고리별 보여주기로 바뀔곳</Tab>
             <Tab>FreeBoard</Tab>
             <Tab>Notice</Tab>
             <Tab>Report</Tab><Tab>Discussion</Tab>
