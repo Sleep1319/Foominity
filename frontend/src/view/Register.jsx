@@ -43,7 +43,7 @@ const Register = () => {
 
           <Text fontSize="sm">
             이미 계정이 있으신가요?{" "}
-            <Link color="skyblue" onClick={() => navigate("/")}>
+            <Link color="skyblue" onClick={() => navigate("/login")}>
               로그인
             </Link>
           </Text>
