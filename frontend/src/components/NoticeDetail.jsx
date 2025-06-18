@@ -1,7 +1,7 @@
 import { Box, Text, Heading } from "@chakra-ui/react";
 import React from "react";
 
-const ReportDetail = () => {
+const NoticeDetail = () => {
   return (
     <Box p={6}>
       <Text fontSize="2xl" fontWeight="medium" pb={2} textAlign="left">
@@ -15,15 +15,8 @@ const ReportDetail = () => {
         <Text px={4}>date</Text>
         <Text px={4}>commentCount</Text>
       </Box>
-      <Box mt={18}>
-        <Text fontSize="md" whiteSpace="pre-wrap" textAlign="left">
-          TextTextTextTextTextTextTextTextTextTextTextTextTextTextTextTextTextTextTextTextTextTextTextText
-          {"\n"}
-          TextTextTextTextTextText
-        </Text>
-      </Box>
     </Box>
   );
 };
 
-export default ReportDetail;
+export default NoticeDetail;

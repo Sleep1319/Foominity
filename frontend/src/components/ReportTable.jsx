@@ -1,5 +1,17 @@
 import React from "react";
-import { Table, Thead, Tbody, Tfoot, Tr, Th, Td, TableCaption, TableContainer } from "@chakra-ui/react";
+import {
+  Table,
+  Thead,
+  Tbody,
+  Tfoot,
+  Tr,
+  Th,
+  Td,
+  TableCaption,
+  TableContainer,
+  Link as ChakraLink,
+} from "@chakra-ui/react";
+import { Link as RouterLink } from "react-router-dom";
 
 const ReportTable = () => {
   return (
@@ -11,6 +23,7 @@ const ReportTable = () => {
           "th, td": {
             borderBottom: "1px solid",
             borderColor: "gray.300",
+            textAlign: "center",
           },
         }}
       >
@@ -33,10 +46,14 @@ const ReportTable = () => {
         </Thead>
         <Tbody>
           <Tr bg="pink.50">
-            <Td></Td>
-            <Td></Td>
-            <Td></Td>
-            <Td></Td>
+            <Td>1</Td>
+            <Td>
+              <Link as={RouterLink} to="/report-details">
+                test
+              </Link>
+            </Td>
+            <Td>author</Td>
+            <Td>date</Td>
           </Tr>
           <Tr bg="pink.50">
             <Td></Td>
