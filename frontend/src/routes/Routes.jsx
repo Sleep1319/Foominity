@@ -10,6 +10,7 @@ import Profile from "../view/member/Profile.jsx";
 import EditProfile from "../view/member/EditProfile.jsx";
 import MyPage from "../view/member/MyPage.jsx";
 import ReportDetails from "../view/report/ReportDetails.jsx";
+import NoticeDetails from "../view/notice/NoticeDetails.jsx";
 
 function AppRoutes() {
   return (
@@ -18,6 +19,7 @@ function AppRoutes() {
       <Route path="/report" element={<Report />} />
       <Route path="/report/report-details" element={<ReportDetails />} />
       <Route path="/notice" element={<Notice />} />
+      <Route path="/notice/notice-details" element={<NoticeDetails />} />
       <Route element={<ProtectedRoute requireAuth={false} />}>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
