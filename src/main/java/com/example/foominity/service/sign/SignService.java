@@ -103,6 +103,11 @@ public class SignService {
         Member member = signRepository.findByEmail(req.getEmail()).orElseThrow(
                 () -> new SignInFailureException("이메일을 다시 확인해주세요."));
 
+        //직접 박은 비 인코더 패스워드 변환용
+        if(!member.getPassword().startsWith("$2a$")) {
+             member.changePassword(passwordEncoder.encode(member.getPassword()));
+        }
+
         validateSignInPassword(req.getPassword(), member.getPassword());
         String accessToken = jwtTokenProvider.createAccessToken(member.getId(), member.getEmail(), member.getUserName(),
                 member.getNickname(), RoleType.BRONZE);

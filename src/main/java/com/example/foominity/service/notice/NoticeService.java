@@ -60,7 +60,7 @@ public class NoticeService {
     }
 
     public List<NoticeResponse> getLatest() {
-        List<Notice> noticeList = noticeRepository.findTop4ByOrderByDesc().orElseThrow(NotFoundNoticeException::new);
+        List<Notice> noticeList = noticeRepository.findTop4ByOrderByIdDesc().orElseThrow(NotFoundNoticeException::new);
 
         return noticeList.stream()
                 .map(notice -> new NoticeResponse(
