@@ -9,6 +9,7 @@ import lombok.ToString;
 @Getter
 @ToString
 @Entity
+@Table(name = "roles")
 public class Role {
 
     @Id

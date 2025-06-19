@@ -3,6 +3,7 @@ package com.example.foominity.service.sign;
 import java.util.Optional;
 
 import com.example.foominity.domain.member.Point;
+import com.example.foominity.domain.member.RoleType;
 import com.example.foominity.repository.member.PointRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -102,9 +103,14 @@ public class SignService {
         Member member = signRepository.findByEmail(req.getEmail()).orElseThrow(
                 () -> new SignInFailureException("이메일을 다시 확인해주세요."));
 
+        //직접 박은 비 인코더 패스워드 변환용
+        if(!member.getPassword().startsWith("$2a$")) {
+             member.changePassword(passwordEncoder.encode(member.getPassword()));
+        }
+
         validateSignInPassword(req.getPassword(), member.getPassword());
         String accessToken = jwtTokenProvider.createAccessToken(member.getId(), member.getEmail(), member.getUserName(),
-                member.getNickname(), null);
+                member.getNickname(), RoleType.BRONZE);
         String refreshToken = jwtTokenProvider.createRefreshToken(member.getId());
 
         return new SignInResponse(accessToken, refreshToken);

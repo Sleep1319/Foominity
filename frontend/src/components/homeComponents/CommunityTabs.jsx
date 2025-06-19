@@ -13,6 +13,7 @@ const CommunityTabs = () => {
 
     const fetchPosts = async (category) => {
         try {
+            console.log("요청 시작")
             const response = await axios.get(`/api/${category}/latest`);
             const data = response.data;
             setPosts(Array.isArray(data) ? data : []);
