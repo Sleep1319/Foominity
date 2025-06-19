@@ -19,7 +19,6 @@ public class Point {
     @Column(name = "like_count")
     private int likeCount;
 
-    @Column
 
     @OneToOne
     @JoinColumn(name = "member_id")
