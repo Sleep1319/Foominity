@@ -5,10 +5,10 @@ const CategoryTabs = () => (
     <Tabs variant="soft-rounded" colorScheme="red" mb={8}>
         <TabList>
             <Tab>카테고리별 보여주기로 바뀔곳</Tab>
-            <Tab>FreeBoard</Tab>
-            <Tab>Notice</Tab>
-            <Tab>Report</Tab><Tab>Discussion</Tab>
-            <Tab>Workspace</Tab>
+            <Tab>일식</Tab>
+            <Tab>양식</Tab>
+            <Tab>중식</Tab>
+            <Tab>기타</Tab>
             <Tab>Shop</Tab>
         </TabList>
 

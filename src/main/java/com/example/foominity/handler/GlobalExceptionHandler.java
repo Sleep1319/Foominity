@@ -76,6 +76,13 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(NotFoundPostCategory.class)
+    public ResponseEntity<?> handleNotFoundPostCategory() {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                Map.of("error", "잘못된 종류의 게시판 요청 입니다.")
+        );
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleGenericException(Exception ex) {
         ex.printStackTrace();

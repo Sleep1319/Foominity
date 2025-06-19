@@ -1,5 +1,6 @@
 package com.example.foominity.repository.board;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -13,4 +14,6 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     Page<Board> findAll(Pageable pageable);
 
     Optional<Board> findById(Long id);
+
+    Optional<List<Board>> findTop4ByOrderByCreatedDateDesc();
 }

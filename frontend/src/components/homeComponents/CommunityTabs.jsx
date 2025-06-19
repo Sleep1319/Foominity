@@ -3,35 +3,38 @@ import {
     TabPanel, Text, List, ListItem, Heading
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
+import axios from "axios";
 
-const categories = [
-    "Review", "FreeBoard", "Notice", "Report", "Discussion", "Workspace", "Shop"
-];
-
-const dummyData = {
-    Review: [
-        { id: 1, title: "리뷰 글 1", author: "userA" },
-        { id: 2, title: "리뷰 글 2", author: "userB" },
-    ],
-    FreeBoard: [],
-    Notice: [
-        { id: 3, title: "공지사항", author: "admin" },
-    ],
-    // 나머지도 유사하게 세팅
-};
+const categories = ["Review", "FreeBoard", "Notice"];
 
 const CommunityTabs = () => {
-    const [postsByCategory, setPostsByCategory] = useState({});
+    const [selectedCategory, setSelectedCategory] = useState("Review");
+    const [posts, setPosts] = useState([]);
+
+    const fetchPosts = async (category) => {
+        try {
+            const response = await axios.get(`/api/${category}/latest`);
+            const data = response.data;
+            setPosts(Array.isArray(data) ? data : []);
+        } catch (error) {
+            console.error("최신글 가져오기 실패", error);
+            setPosts([]);
+        }
+    };
 
     useEffect(() => {
-        //요청식 필요
-        setPostsByCategory(dummyData); // 가상 데이터 세팅
-    }, []);
+        fetchPosts(selectedCategory);
+    }, [selectedCategory]);
+
     return (
         <Box mb={8}>
-            <Tabs variant="line" colorScheme="red">
+            <Tabs
+                variant="line"
+                colorScheme="red"
+                onChange={(index) => setSelectedCategory(categories[index])}
+            >
                 <Heading size="md" mb={4}>
-                    최신 글
+                    게시판 종류
                 </Heading>
                 <TabList>
                     {categories.map((cat) => (
@@ -41,26 +44,28 @@ const CommunityTabs = () => {
                 <TabPanels>
                     {categories.map((cat) => (
                         <TabPanel key={cat}>
-                            {postsByCategory[cat]?.length > 0 ? (
-                                <List spacing={2}>
-                                    {postsByCategory[cat].slice(0, 4).map((post) => (
-                                        <ListItem key={post.id}>
-                                            <Text fontWeight="semibold">{post.title}</Text>
-                                            <Text fontSize="sm" color="gray.500">
-                                                by {post.author}
-                                            </Text>
-                                        </ListItem>
-                                    ))}
-                                </List>
-                            ) : (
-                                <Text color="gray.400">등록된 글이 없습니다.</Text>
-                            )}
+                            {selectedCategory === cat ? (
+                                posts.length > 0 ? (
+                                    <List spacing={2}>
+                                        {posts.map((post) => (
+                                            <ListItem key={post.id}>
+                                                <Text fontWeight="semibold">{post.title}</Text>
+                                                <Text fontSize="sm" color="gray.500">
+                                                    by {post.nickname}
+                                                </Text>
+                                            </ListItem>
+                                        ))}
+                                    </List>
+                                ) : (
+                                    <Text color="gray.400">등록된 글이 없습니다.</Text>
+                                )
+                            ) : null}
                         </TabPanel>
                     ))}
                 </TabPanels>
             </Tabs>
         </Box>
     );
-}
+};
 
 export default CommunityTabs;

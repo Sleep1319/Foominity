@@ -2,6 +2,8 @@ package com.example.foominity.service.board;
 
 import java.util.List;
 
+import com.example.foominity.domain.board.Review;
+import com.example.foominity.dto.board.ReviewResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -109,5 +111,19 @@ public class BoardService {
             throw new ForbiddenActionException();
         }
         return board;
+    }
+
+    public List<BoardResponse> getLatest() {
+        List<Board> boardList = boardRepository.findTop4ByOrderByCreatedDateDesc().orElseThrow(NotFoundBoardException::new);
+
+        return boardList.stream()
+                .map(board -> new BoardResponse(
+                        board.getId(),
+                        board.getTitle(),
+                        board.getMember().getNickname(),
+                        board.getCreatedDate(),
+                        board.getUpdatedDate()
+                )).toList();
+    }
     }
 }

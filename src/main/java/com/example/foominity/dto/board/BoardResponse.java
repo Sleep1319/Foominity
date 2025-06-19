@@ -18,4 +18,12 @@ public class BoardResponse {
 
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
+
+    public BoardResponse(Long id, String title, String nickname, LocalDateTime createdDate, LocalDateTime updatedDate) {
+        this.id = id;
+        this.title = title;
+        this.nickname = nickname;
+        this.createDate = createdDate;
+        this.updateDate = updatedDate;
+    }
 }
