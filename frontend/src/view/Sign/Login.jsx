@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Box, Button, Input, FormControl, FormLabel, Heading, VStack, Text, Link, useToast } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
+import {useUser} from "@/context/UserContext.jsx";
 import axios from "axios";
 
 const Login = () => {
@@ -8,6 +9,7 @@ const Login = () => {
   // Toast = 로그인 성공/실패 알림창
   const toast = useToast();
   const navigate = useNavigate();
+  const { setState } = useUser();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -16,12 +18,15 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
+      console.log("보내는 데이터:", form);
       await axios.post("/api/sign-in", form, {
         withCredentials: true, // 이거 쿠키 받기 위해 중요하다고 지피티가 그럼
         headers: { "Content-Type": "application/json" },
       });
 
       toast({ title: "로그인 성공", status: "success", duration: 2000, isClosable: true });
+      const userRes = await axios.get("/api/user", { withCredentials: true });
+      setState(userRes.data);
       navigate("/");
     } catch (error) {
       const message = error.response?.data?.message || "이메일/비밀번호를 확인해주세요.";
