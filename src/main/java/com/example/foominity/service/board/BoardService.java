@@ -125,5 +125,4 @@ public class BoardService {
                         board.getUpdatedDate()
                 )).toList();
     }
-    }
 }
