@@ -112,7 +112,6 @@ public class SignService {
 
         validateSignInPassword(req.getPassword(), member.getPassword());
 
-        // ✅ 문자열 Role.name 사용
         String roleName = member.getRole().getName();
         String accessToken = jwtTokenProvider.createAccessToken(
                 member.getId(),

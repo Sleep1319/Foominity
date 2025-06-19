@@ -1,7 +1,7 @@
 package com.example.foominity.config.jwt;
 
 import com.example.foominity.domain.member.Member;
-import com.example.foominity.domain.member.RoleType;
+import com.example.foominity.domain.member.Role;
 import com.example.foominity.dto.member.UserInfoResponse;
 import com.example.foominity.exception.NotFoundRoleIdException;
 import com.example.foominity.repository.member.RoleRepository;
@@ -44,7 +44,7 @@ public class JwtTokenProvider {
     }
 
     // Assess토큰 생성
-    public String createAccessToken(Long memberId, String email, String username, String nickname, RoleType role) {
+    public String createAccessToken(Long memberId, String email, String username, String nickname, String role) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + accessTokenValidity);
 
@@ -55,7 +55,7 @@ public class JwtTokenProvider {
                 .add("email", email)
                 .add("username", username)
                 .add("nickname", nickname)
-                .add("role", role.name())
+                .add("role", role)
                 .and()
                 .issuedAt(now)
                 .expiration(expiry)
