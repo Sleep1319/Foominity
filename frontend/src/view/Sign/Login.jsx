@@ -16,7 +16,7 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:8084/api/sign-in", form, {
+      await axios.post("/api/sign-in", form, {
         withCredentials: true, // 이거 쿠키 받기 위해 중요하다고 지피티가 그럼
         headers: { "Content-Type": "application/json" },
       });
