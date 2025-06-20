@@ -1,7 +1,7 @@
 import React from "react";
 import { Table, Thead, Tbody, Tfoot, Tr, Th, Td, TableCaption, TableContainer } from "@chakra-ui/react";
 
-const NoticeTable = () => {
+const ReportTable = () => {
   return (
     <TableContainer>
       <Table
@@ -32,13 +32,13 @@ const NoticeTable = () => {
           </Tr>
         </Thead>
         <Tbody>
-          <Tr bg="pink.50">
+          <Tr>
             <Td></Td>
             <Td></Td>
             <Td></Td>
             <Td></Td>
           </Tr>
-          <Tr bg="pink.50">
+          <Tr>
             <Td></Td>
             <Td></Td>
             <Td></Td>
@@ -76,4 +76,4 @@ const NoticeTable = () => {
   );
 };
 
-export default NoticeTable;
+export default ReportTable;

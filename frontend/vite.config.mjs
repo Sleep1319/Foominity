@@ -9,6 +9,13 @@ const __dirname = path.dirname(__filename)
 
 export default defineConfig({
   server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8084', // ✅ Spring Boot 서버 주소
+        changeOrigin: true,
+        secure: false,
+      }
+    },
     open: true,
   },
   plugins: [react()],

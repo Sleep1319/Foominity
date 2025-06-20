@@ -9,21 +9,21 @@ import lombok.ToString;
 @Getter
 @ToString
 @Entity
+@Table(name = "roles")
 public class Role {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private RoleType name;
+    private String name;
 
     @Column(nullable = false, name = "required_point")
     private int requiredPoint;
 
     // Role 객체 쓸 수도 있으니까 생성자 생성
-    public Role(RoleType name, int requiredPoint) {
+    public Role(String name, int requiredPoint) {
         this.name = name;
         this.requiredPoint = requiredPoint;
     }

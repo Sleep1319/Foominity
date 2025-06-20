@@ -1,5 +1,6 @@
 package com.example.foominity.controller.sign;
 
+import com.example.foominity.dto.member.UserInfoResponse;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -60,11 +61,11 @@ public class SignController {
     }
 
     // 닉네임 중복 체크
-    @GetMapping("/api/check-nickname")
-    public ResponseEntity<Boolean> checkNickname(@RequestParam String nickname) {
-        boolean exists = signService.existsNickname(nickname);
-        return ResponseEntity.ok(exists);
-    }
+//    @GetMapping("/api/check-nickname")
+//    public ResponseEntity<Boolean> checkNickname(@RequestParam String nickname) {
+//        boolean exists = signService.existsNickname(nickname);
+//        return ResponseEntity.ok(exists);
+//    }
 
     // 로그인
     @PostMapping("/api/sign-in")
@@ -76,6 +77,26 @@ public class SignController {
         // 위에서 만든 쿠키 응답의 헤더로 추가해서 클라이언트쪽에 쿠키 저장시킴
         return ResponseEntity.ok().body(res);
         // body에 res 넣어서 보냄
+    }
+
+    @GetMapping("/api/user")
+    public ResponseEntity<UserInfoResponse> getUserInfo(HttpServletRequest request) {
+        String token = null;
+        if (request.getCookies() != null) {
+            for (var cookie : request.getCookies()) {
+                if (cookie.getName().equals("token")) {
+                    token = cookie.getValue();
+                    break;
+                }
+            }
+        }
+
+        if (token == null || !jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity.status(401).build(); // 인증 실패
+        }
+
+        UserInfoResponse userInfo = jwtTokenProvider.getUserInfoFromToken(token);
+        return ResponseEntity.ok(userInfo);
     }
 
     // 로그아웃

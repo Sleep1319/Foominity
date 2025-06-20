@@ -1,8 +1,13 @@
 package com.example.foominity.config.jwt;
 
 import com.example.foominity.domain.member.Member;
+import com.example.foominity.domain.member.Role;
+import com.example.foominity.dto.member.UserInfoResponse;
 import com.example.foominity.exception.NotFoundRoleIdException;
+<<<<<<< HEAD
 // import com.example.foominity.repository.member.MemberRoleRepository;
+=======
+>>>>>>> 9d1ac4bc96d2eb214d0eba49d90f401340a1de47
 import com.example.foominity.repository.member.RoleRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -125,6 +130,18 @@ public class JwtTokenProvider {
                 .maxAge(0) // 즉시 만료
                 .sameSite("Strict")
                 .build();
+    }
+
+    public UserInfoResponse getUserInfoFromToken(String token) {
+        Claims claims = getClaims(token);
+
+        Long id = claims.get("id", Long.class);
+        String email = claims.getSubject();
+        String username = claims.get("username", String.class);
+        String nickname = claims.get("nickname", String.class);
+        String role = claims.get("role", String.class);
+
+        return new UserInfoResponse(id, email, username, nickname, role);
     }
 
     // 인증용

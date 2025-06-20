@@ -1,5 +1,5 @@
 import React from "react";
-import ReportDetail from "../components/ReportDetail";
+import ReportDetail from "../../components/reportComponents/ReportDetail.jsx";
 
 const ReportDetails = () => {
   return (
