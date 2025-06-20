@@ -1,13 +1,4 @@
-import {
-  Avatar,
-  Box,
-  Button,
-  Flex,
-  HStack,
-  Input,
-  Text,
-  VStack,
-} from "@chakra-ui/react";
+import { Avatar, Box, Button, Flex, HStack, Input, Text, VStack } from "@chakra-ui/react";
 import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 // props로 받은 nickname과 혼용되지 않도록 initialNickname로 변경하여 사용하는 것
@@ -53,13 +44,7 @@ const EditProfile = ({ nickname: initialNickname }) => {
               사진 수정
             </Button>
             {/* 숨겨진 파일 input */}
-            <Input
-              type="file"
-              accept="image/*"
-              ref={fileInputRef}
-              display="none"
-              onChange={handleFileChange}
-            />
+            <Input type="file" accept="image/*" ref={fileInputRef} display="none" onChange={handleFileChange} />
           </VStack>
 
           <VStack align="start" spacing={4} flex="1">
@@ -67,11 +52,7 @@ const EditProfile = ({ nickname: initialNickname }) => {
               <Text fontWeight="bold" w="120px">
                 닉네임 변경
               </Text>
-              <Input
-                value={nickname}
-                onChange={handleNicknameChange}
-                placeholder="닉네임을 입력하세요"
-              />
+              <Input value={nickname} onChange={handleNicknameChange} placeholder="닉네임을 입력하세요" />
             </HStack>
           </VStack>
         </HStack>
