@@ -1,17 +1,10 @@
-import {
-  Avatar,
-  Box,
-  Button,
-  Flex,
-  HStack,
-  Input,
-  Text,
-  VStack,
-} from "@chakra-ui/react";
+import { Avatar, Box, Button, Flex, HStack, Input, Text, VStack } from "@chakra-ui/react";
 import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+
 // props로 받은 nickname과 혼용되지 않도록 initialNickname로 변경하여 사용하는 것
-const EditProfile = ({ nickname: initialNickname }) => {
+const EditProfile = ({ nickname: initialNickname, onNicknameChange }) => {
   const navigate = useNavigate();
   const [nickname, setNickname] = useState(initialNickname);
   const [avatarPreview, setAvatarPreview] = useState(null);
@@ -26,21 +19,43 @@ const EditProfile = ({ nickname: initialNickname }) => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const previewUrl = URL.createObjectURL(file);
-      setAvatarPreview(previewUrl);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatarPreview(reader.result); // base64 이미지 미리보기
+      };
+      reader.readAsDataURL(file);
     }
   };
 
   // 수정 완료 버튼 클릭 시 닉네임과 사진 데이터 서버에 보내는 로직 (예시)
-  const handleSubmit = () => {
-    let message = `수정 완료!\n닉네임: ${nickname}`;
-    if (avatarPreview) {
-      message += "\n프로필 사진이 변경되었습니다.";
-    }
-    alert(message);
+  // const handleSubmit = () => {
+  //   let message = `수정 완료!\n닉네임: ${nickname}`;
+  //   if (avatarPreview) {
+  //     message += "\n프로필 사진이 변경되었습니다.";
+  //   }
+  //   alert(message);
 
-    // 완료 후 프로필 페이지 이동
-    navigate("/mypage");
+  //   // 완료 후 프로필 페이지 이동
+  //   navigate("/mypage");
+  // };
+  // 이미지 변경사항은 아직 반영 안 됨
+  const handleSubmit = async () => {
+    try {
+      await axios.post("/api/change-nickname", { nickname }, { withCredentials: true });
+
+      onNicknameChange(nickname);
+      alert("닉네임이 수정되었습니다!");
+      navigate("/mypage");
+    } catch (err) {
+      console.error("닉네임 업데이트 실패:", err);
+
+      if (err.response && err.response.data) {
+        // 서버가 보낸 에러 메시지 출력
+        alert(err.response.data);
+      } else {
+        alert("닉네임 변경에 실패하였습니다.");
+      }
+    }
   };
 
   return (
@@ -53,13 +68,7 @@ const EditProfile = ({ nickname: initialNickname }) => {
               사진 수정
             </Button>
             {/* 숨겨진 파일 input */}
-            <Input
-              type="file"
-              accept="image/*"
-              ref={fileInputRef}
-              display="none"
-              onChange={handleFileChange}
-            />
+            <Input type="file" accept="image/*" ref={fileInputRef} display="none" onChange={handleFileChange} />
           </VStack>
 
           <VStack align="start" spacing={4} flex="1">
@@ -67,11 +76,7 @@ const EditProfile = ({ nickname: initialNickname }) => {
               <Text fontWeight="bold" w="120px">
                 닉네임 변경
               </Text>
-              <Input
-                value={nickname}
-                onChange={handleNicknameChange}
-                placeholder="닉네임을 입력하세요"
-              />
+              <Input value={nickname} onChange={handleNicknameChange} placeholder="닉네임을 입력하세요" />
             </HStack>
           </VStack>
         </HStack>
