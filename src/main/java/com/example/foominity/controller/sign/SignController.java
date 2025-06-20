@@ -61,11 +61,11 @@ public class SignController {
     }
 
     // 닉네임 중복 체크
-    @GetMapping("/api/check-nickname")
-    public ResponseEntity<Boolean> checkNickname(@RequestParam String nickname) {
-        boolean exists = signService.existsNickname(nickname);
-        return ResponseEntity.ok(exists);
-    }
+//    @GetMapping("/api/check-nickname")
+//    public ResponseEntity<Boolean> checkNickname(@RequestParam String nickname) {
+//        boolean exists = signService.existsNickname(nickname);
+//        return ResponseEntity.ok(exists);
+//    }
 
     // 로그인
     @PostMapping("/api/sign-in")

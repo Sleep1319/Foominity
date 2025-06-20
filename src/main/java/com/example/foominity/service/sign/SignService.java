@@ -3,8 +3,10 @@ package com.example.foominity.service.sign;
 import java.util.Optional;
 
 import com.example.foominity.domain.member.Point;
-import com.example.foominity.domain.member.RoleType;
+import com.example.foominity.domain.member.Role;
 import com.example.foominity.repository.member.PointRepository;
+import com.example.foominity.repository.member.RoleRepository;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +40,7 @@ public class SignService {
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
     private final PointRepository pointRepository;
+    private final RoleRepository roleRepository;
 
     // 회원 탈퇴
     @Transactional
@@ -84,33 +87,38 @@ public class SignService {
     public void signUp(SignUpRequest req) {
         validateSignUp(req.getEmail(), req.getNickname());
 
-        req.setPassword(passwordEncoder.encode(req.getPassword()));
-        Member member = req.toEntity(req.getEmail(), req.getPassword(), req.getUsername(),
-                req.getNickname());
-        signRepository
-                .save(member);
+        String encodedPassword = passwordEncoder.encode(req.getPassword());
+        Role defaultRole = roleRepository.findByName("BRONZE")
+                .orElseThrow(() -> new RuntimeException("기본 등급 없음"));
+
+        Member member = new Member(req.getEmail(), encodedPassword, req.getUsername(),
+                req.getNickname(), defaultRole);
+
+        signRepository.save(member);
+
         Point point = new Point(member);
         pointRepository.save(point);
     }
 
-    public boolean existsNickname(String nickname) {
-        return memberRepository.existsByNickname(nickname);
-    }
-
     // 로그인
     public SignInResponse signIn(SignInRequest req) {
-        //
         Member member = signRepository.findByEmail(req.getEmail()).orElseThrow(
                 () -> new SignInFailureException("이메일을 다시 확인해주세요."));
 
-        //직접 박은 비 인코더 패스워드 변환용
-        if(!member.getPassword().startsWith("$2a$")) {
-             member.changePassword(passwordEncoder.encode(member.getPassword()));
+        // 직접 박은 비 인코더 패스워드 변환용
+        if (!member.getPassword().startsWith("$2a$")) {
+            member.changePassword(passwordEncoder.encode(member.getPassword()));
         }
 
         validateSignInPassword(req.getPassword(), member.getPassword());
-        String accessToken = jwtTokenProvider.createAccessToken(member.getId(), member.getEmail(), member.getUserName(),
-                member.getNickname(), RoleType.BRONZE);
+
+        String roleName = member.getRole().getName();
+        String accessToken = jwtTokenProvider.createAccessToken(
+                member.getId(),
+                member.getEmail(),
+                member.getUserName(),
+                member.getNickname(),
+                roleName);
         String refreshToken = jwtTokenProvider.createRefreshToken(member.getId());
 
         return new SignInResponse(accessToken, refreshToken);
