@@ -78,3 +78,4 @@ src/main/java/com/example/reactbootserver/repository/SignRepository.java
 src/main/java/com/example/reactbootserver/service/BoardService.java
 src/main/java/com/example/reactbootserver/service/CommentService.java
 src/main/java/com/example/reactbootserver/service/SignService.java
+node_modules
