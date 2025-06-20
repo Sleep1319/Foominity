@@ -1,5 +1,7 @@
 import React from "react";
-import { Table, Thead, Tbody, Tfoot, Tr, Th, Td, TableCaption, TableContainer } from "@chakra-ui/react";
+import { Table, Thead, Tbody, Tfoot, Tr, Th, Td, TableContainer } from "@chakra-ui/react";
+import { Link as ChakraLink } from "@chakra-ui/react";
+import { Link as RouterLink } from "react-router-dom";
 
 const ReportTable = () => {
   return (
@@ -11,16 +13,16 @@ const ReportTable = () => {
           "th, td": {
             borderBottom: "1px solid",
             borderColor: "gray.300",
+            textAlign: "center",
           },
         }}
       >
-        <TableCaption>Imperial to metric conversion factors</TableCaption>
         <Thead>
           <Tr>
             <Th w="5%" textAlign="center" fontSize="md" fontWeight="medium">
               번호
             </Th>
-            <Th w="65%" textAlign="center" pl={4} fontSize="md" fontWeight="medium">
+            <Th w="65%" textAlign="center" fontSize="md" fontWeight="medium">
               제목
             </Th>
             <Th w="15%" textAlign="center" fontSize="md" fontWeight="medium">
@@ -33,10 +35,14 @@ const ReportTable = () => {
         </Thead>
         <Tbody>
           <Tr bg="pink.50">
-            <Td></Td>
-            <Td></Td>
-            <Td></Td>
-            <Td></Td>
+            <Td>1</Td>
+            <Td>
+              <ChakraLink as={RouterLink} to="/report/report-details">
+                test
+              </ChakraLink>
+            </Td>
+            <Td>writer</Td>
+            <Td>date</Td>
           </Tr>
           <Tr bg="pink.50">
             <Td></Td>

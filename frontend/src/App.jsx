@@ -1,15 +1,16 @@
 import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import AppNavBar from "./components/AppNavBar";
+import AppNavBar from "./layouts/AppNavBar.jsx";
 import AppRoutes from "@/routes/Routes.jsx";
-import Home from "./view/Home.jsx";
+import AppFooter from "@/layouts/AppFooter.jsx";
+import {UserProvider} from "@/context/UserContext.jsx";
 
 function App() {
   return (
-    <BrowserRouter>
-      <AppNavBar />
-      <AppRoutes />
-    </BrowserRouter>
+        <UserProvider>
+            <AppNavBar />
+            <AppRoutes />
+            <AppFooter />
+        </UserProvider>
   );
 }
 export default App;

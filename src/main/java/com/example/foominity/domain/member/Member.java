@@ -51,12 +51,12 @@ public class Member extends BaseEntity {
     @JoinColumn(name = "role_id")
     private Role role;
 
-    public Member(String email, String password, String userName, String nickname) {
+    public Member(String email, String password, String userName, String nickname, Role role) {
         this.email = email;
         this.password = password;
         this.userName = userName;
         this.nickname = nickname;
-        this.role = new Role(RoleType.BRONZE, 0);
+        this.role = role;
         socialType = "NORMAL";
         providerId = null;
     }
@@ -72,4 +72,7 @@ public class Member extends BaseEntity {
         this.nickname = nickname;
     }
 
+    public void changePassword(String password) {
+        this.password = password;
+    }
 }

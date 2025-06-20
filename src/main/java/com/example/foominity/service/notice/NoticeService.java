@@ -2,6 +2,9 @@ package com.example.foominity.service.notice;
 
 import java.util.List;
 
+import com.example.foominity.domain.board.Review;
+import com.example.foominity.dto.board.ReviewResponse;
+import com.example.foominity.exception.NotFoundReviewException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -56,4 +59,13 @@ public class NoticeService {
         noticeRepository.delete(noticeRepository.findById(id).orElseThrow(NotFoundNoticeException::new));
     }
 
+    public List<NoticeResponse> getLatest() {
+        List<Notice> noticeList = noticeRepository.findTop4ByOrderByIdDesc().orElseThrow(NotFoundNoticeException::new);
+
+        return noticeList.stream()
+                .map(notice -> new NoticeResponse(
+                        notice.getId(),
+                        notice.getTitle()
+                )).toList();
+    }
 }

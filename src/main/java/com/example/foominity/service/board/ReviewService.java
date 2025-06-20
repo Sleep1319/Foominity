@@ -181,4 +181,16 @@ public class ReviewService {
         return review;
     }
 
+    public List<ReviewResponse> getLatest() {
+        List<Review> reviewList = reviewRepository.findTop4ByOrderByCreatedDateDesc().orElseThrow(NotFoundReviewException::new);
+
+        return reviewList.stream()
+                .map(review -> new ReviewResponse(
+                        review.getId(),
+                        review.getTitle(),
+                        review.getMember().getNickname(),
+                        review.getCreatedDate(),
+                        review.getUpdatedDate()
+                )).toList();
+    }
 }

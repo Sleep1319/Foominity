@@ -23,4 +23,12 @@ public class ReviewResponse {
     private List<ReviewCategoryResponse> categories;
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
+
+    public ReviewResponse(Long id, String title, String nickname, LocalDateTime createdDate, LocalDateTime updatedDate) {
+        this.id = id;
+        this.title = title;
+        this.nickname = nickname;
+        this.createdDate = createdDate;
+        this.updatedDate = updatedDate;
+    }
 }
