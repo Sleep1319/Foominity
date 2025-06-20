@@ -1,16 +1,16 @@
-package com.example.foominity.repository.member;
+// package com.example.foominity.repository.member;
 
-import com.example.foominity.domain.member.MemberRole;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+// import com.example.foominity.domain.member.MemberRole;
+// import org.springframework.data.jpa.repository.JpaRepository;
+// import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+// import java.util.Optional;
 
-@Repository
-public interface MemberRoleRepository extends JpaRepository<MemberRole, Long> {
+// @Repository
+// public interface MemberRoleRepository extends JpaRepository<MemberRole, Long>
+// {
 
-    Optional<MemberRole> findMemberRoleByMemberId(Long memberId);
+// Optional<MemberRole> findMemberRoleByMemberId(Long memberId);
 
-
-    Optional<MemberRole> findMemberRoleByRoleId(Long roleId);
-}
+// Optional<MemberRole> findMemberRoleByRoleId(Long roleId);
+// }
