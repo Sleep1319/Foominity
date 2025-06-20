@@ -2,6 +2,9 @@ package com.example.foominity.service.notice;
 
 import java.util.List;
 
+import com.example.foominity.domain.board.Review;
+import com.example.foominity.dto.board.ReviewResponse;
+import com.example.foominity.exception.NotFoundReviewException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -10,7 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.foominity.domain.notice.Notice;
-import com.example.foominity.dto.notice.NoticeCreateRequest;
+import com.example.foominity.dto.notice.NoticeRequest;
 import com.example.foominity.dto.notice.NoticeResponse;
 import com.example.foominity.dto.notice.NoticeUpdateRequest;
 import com.example.foominity.exception.NotFoundNoticeException;
@@ -46,6 +49,38 @@ public class NoticeService {
                 notice.getContent());
     }
 
-    
+    @Transactional
+    public void createNotice(NoticeRequest req) {
+        noticeRepository.save(req.toEntity(req));
+    }
+
+    @Transactional
+    public void deleteNotice(Long id) {
+        noticeRepository.delete(noticeRepository.findById(id).orElseThrow(NotFoundNoticeException::new));
+    }
+
+    @Transactional
+    public void changeMainNotice(Long newMainNoticeId) {
+        noticeRepository.findByMainNoticeTrue().ifPresent(mainNotice -> {
+            mainNotice.cancelNotice();
+            noticeRepository.save(mainNotice);
+        });
+        noticeRepository.findById(newMainNoticeId)
+                .map(newMain -> {
+                    newMain.changeNotice();
+                    return noticeRepository.save(newMain);
+                })
+                .orElseThrow(NotFoundNoticeException::new);
+    }
+
+    public List<NoticeResponse> getLatest() {
+        List<Notice> noticeList = noticeRepository.findTop4ByOrderByIdDesc().orElseThrow(NotFoundNoticeException::new);
+
+        return noticeList.stream()
+                .map(notice -> new NoticeResponse(
+                        notice.getId(),
+                        notice.getTitle()))
+                .toList();
+    }
 
 }
