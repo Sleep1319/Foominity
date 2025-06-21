@@ -2,6 +2,8 @@ package com.example.foominity.dto.comment;
 
 import java.time.LocalDateTime;
 
+import com.example.foominity.domain.board.ReviewComment;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,4 +21,14 @@ public class ReviewCommentResponse {
 
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
+
+    public static ReviewCommentResponse fromEntity(ReviewComment comment) {
+        return new ReviewCommentResponse(
+                comment.getId(),
+                comment.getMember().getNickname(),
+                comment.getContent(),
+                null,
+                null);
+    }
+
 }

@@ -13,14 +13,32 @@ public class Point {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "content_count")
-    private String contentCount;
+    @Column(name = "review_count")
+    private int reviewCount;
 
     @Column(name = "like_count")
-    private String likeCount;
+    private int likeCount;
+
 
     @OneToOne
     @JoinColumn(name = "member_id")
     private Member member;
+
+    public void resetPoint() {
+        this.reviewCount = 0;
+        this.likeCount = 0;
+    }
+
+    public Point(Member member) {
+        this.member = member;
+    }
+
+    public void addReviewCount() {
+        this.reviewCount++;
+    }
+
+    public void addLikeCount() {
+        this.likeCount++;
+    }
 
 }

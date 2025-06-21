@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.awt.*;
 import java.util.Map;
 
 @RestControllerAdvice
@@ -65,6 +66,20 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleUnauthorizedException() {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                 Map.of("error", "유효하지 않는 토큰입니다.")
+        );
+    }
+
+    @ExceptionHandler(ImageUploadException.class)
+    public ResponseEntity<?> handleImageUploadException() {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                Map.of("error", "이미지 업로드 실패.")
+        );
+    }
+
+    @ExceptionHandler(NotFoundPostCategory.class)
+    public ResponseEntity<?> handleNotFoundPostCategory() {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                Map.of("error", "잘못된 종류의 게시판 요청 입니다.")
         );
     }
 

@@ -26,8 +26,19 @@ public class Notice {
     @Column(nullable = false)
     private String content;
 
-    public Notice(String title, String content, Member member) {
+    @Column(nullable = false)
+    private boolean mainNotice = false;
+
+    public Notice(String title, String content) {
         this.title = title;
         this.content = content;
+    }
+
+    public void changeNotice() {
+        this.mainNotice = true;
+    }
+
+    public void cancelNotice() {
+        this.mainNotice = false;
     }
 }

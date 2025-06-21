@@ -21,4 +21,8 @@ public class NoticeResponse {
     @NotNull
     private String content;
 
+    public NoticeResponse(Long id, String title) {
+        this.id = id;
+        this.title = title;
+    }
 }

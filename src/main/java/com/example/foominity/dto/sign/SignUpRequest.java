@@ -35,12 +35,11 @@ public class SignUpRequest {
     @Pattern(regexp = "^[A-Za-z가-힣]+$", message = "닉네임은 한글 또는 알파벳만 입력해주세요.")
     private String nickname;
 
-    public Member toEntity(String email, String password, String userName, String nickName, Role role) {
-        return new Member(
-                email,
-                password,
-                userName,
-                nickName,
-                role);
-    }
+//    public Member toEntity(String email, String password, String userName, String nickname) {
+//        return new Member(
+//                email,
+//                password,
+//                userName,
+//                nickname);
+//    }
 }
