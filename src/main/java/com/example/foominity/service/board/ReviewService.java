@@ -2,10 +2,7 @@ package com.example.foominity.service.board;
 
 import java.util.List;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -183,6 +180,20 @@ public class ReviewService {
 
     public List<ReviewResponse> getLatest() {
         List<Review> reviewList = reviewRepository.findTop4ByOrderByCreatedDateDesc().orElseThrow(NotFoundReviewException::new);
+
+        return reviewList.stream()
+                .map(review -> new ReviewResponse(
+                        review.getId(),
+                        review.getTitle(),
+                        review.getMember().getNickname(),
+                        review.getCreatedDate(),
+                        review.getUpdatedDate()
+                )).toList();
+    }
+
+    public List<ReviewResponse> getTop3LikeReviews(int top3) {
+        Pageable pageable = PageRequest.of(0, top3);
+        List<Review> reviewList = reviewRepository.getTop3LikeReviews(pageable).orElseThrow(NotFoundReviewException::new);
 
         return reviewList.stream()
                 .map(review -> new ReviewResponse(
