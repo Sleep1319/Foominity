@@ -59,13 +59,28 @@ public class NoticeService {
         noticeRepository.delete(noticeRepository.findById(id).orElseThrow(NotFoundNoticeException::new));
     }
 
+    @Transactional
+    public void changeMainNotice(Long newMainNoticeId) {
+        noticeRepository.findByMainNoticeTrue().ifPresent(mainNotice -> {
+            mainNotice.cancelNotice();
+            noticeRepository.save(mainNotice);
+        });
+        noticeRepository.findById(newMainNoticeId)
+                .map(newMain -> {
+                    newMain.changeNotice();
+                    return noticeRepository.save(newMain);
+                })
+                .orElseThrow(NotFoundNoticeException::new);
+    }
+
     public List<NoticeResponse> getLatest() {
         List<Notice> noticeList = noticeRepository.findTop4ByOrderByIdDesc().orElseThrow(NotFoundNoticeException::new);
 
         return noticeList.stream()
                 .map(notice -> new NoticeResponse(
                         notice.getId(),
-                        notice.getTitle()
-                )).toList();
+                        notice.getTitle()))
+                .toList();
     }
+
 }

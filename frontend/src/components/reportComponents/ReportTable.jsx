@@ -34,7 +34,7 @@ const ReportTable = () => {
           </Tr>
         </Thead>
         <Tbody>
-          <Tr bg="pink.50">
+          <Tr>
             <Td>1</Td>
             <Td>
               <ChakraLink as={RouterLink} to="/report/report-details">
@@ -44,7 +44,7 @@ const ReportTable = () => {
             <Td>writer</Td>
             <Td>date</Td>
           </Tr>
-          <Tr bg="pink.50">
+          <Tr>
             <Td></Td>
             <Td></Td>
             <Td></Td>

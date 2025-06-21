@@ -18,4 +18,6 @@ public interface NoticeRepository extends JpaRepository<Notice, Long> {
     Optional<Notice> findById(Long id);
 
     Optional<List<Notice>> findTop4ByOrderByIdDesc();
+
+    Optional<Notice> findByMainNoticeTrue();
 }

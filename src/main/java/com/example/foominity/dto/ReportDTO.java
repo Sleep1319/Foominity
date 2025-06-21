@@ -21,4 +21,13 @@ public class ReportDTO {
 
     private LocalDateTime updatedDate;
 
+    // public Report toEntity(Long id, Long memberId, Long targetId, String
+    // targetType) {
+    // return new Report(
+    // id,
+    // memberId,
+    // targetId,
+    // targetType
+    // );
 }
+// }
