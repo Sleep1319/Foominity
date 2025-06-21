@@ -4,6 +4,10 @@ import com.example.foominity.domain.member.Member;
 import com.example.foominity.domain.member.Role;
 import com.example.foominity.dto.member.UserInfoResponse;
 import com.example.foominity.exception.NotFoundRoleIdException;
+<<<<<<< HEAD
+// import com.example.foominity.repository.member.MemberRoleRepository;
+=======
+>>>>>>> 9d1ac4bc96d2eb214d0eba49d90f401340a1de47
 import com.example.foominity.repository.member.RoleRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
