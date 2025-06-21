@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.util.List;
+
 @RestController
 @Slf4j
 @RequiredArgsConstructor
@@ -44,6 +46,11 @@ public class ReviewController {
         return ResponseEntity.ok(reviewService.readReview(id));
     }
 
+    @GetMapping("/api/reviews/top")
+    public ResponseEntity<List<ReviewResponse>> getTop3LikeReviews() {
+        return ResponseEntity.ok(reviewService.getTop3LikeReviews(3));
+    }
+
     // 생성
     @PostMapping("/api/reviews")
     public ResponseEntity<String> createReview(@Valid @RequestBody ReviewRequest req,
@@ -58,7 +65,6 @@ public class ReviewController {
     public ResponseEntity<String> updateReview(@PathVariable Long id, @Valid @RequestBody ReviewUpdateRequest req,
             HttpServletRequest tokenRequest) {
         reviewService.updateReview(id, req, tokenRequest);
-
         return ResponseEntity.ok().build();
     }
 
