@@ -43,12 +43,7 @@ const MyPage = () => {
       <Route
         path="editprofile"
         element={
-          <EditProfile
-            nickname={nickname}
-            avatar={avatar}
-            onNicknameChange={setNickname}
-            onAvatarChange={setAvatar}
-          />
+          <EditProfile nickname={nickname} avatar={avatar} onNicknameChange={setNickname} onAvatarChange={setAvatar} />
         }
       />
     </Routes>

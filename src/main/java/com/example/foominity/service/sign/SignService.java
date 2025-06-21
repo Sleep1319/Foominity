@@ -64,9 +64,9 @@ public class SignService {
 
     // 닉네임 변경
     @Transactional
-    public void changeNickname(HttpServletRequest toekRequest, NicknameChangeRequest req) {
+    public void changeNickname(HttpServletRequest tokenRequest, NicknameChangeRequest req) {
 
-        String token = jwtTokenProvider.resolveTokenFromCookie(toekRequest);
+        String token = jwtTokenProvider.resolveTokenFromCookie(tokenRequest);
 
         // 유효성검증
         if (!jwtTokenProvider.validateToken(token)) {
