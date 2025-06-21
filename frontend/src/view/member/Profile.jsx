@@ -1,4 +1,12 @@
-import { Avatar, Box, HStack, Text, VStack, Flex, Button } from "@chakra-ui/react";
+import {
+  Avatar,
+  Box,
+  HStack,
+  Text,
+  VStack,
+  Flex,
+  Button,
+} from "@chakra-ui/react";
 import React from "react";
 import DefaultTable from "../../components/reportComponents/DefaultTable.jsx";
 import { useNavigate } from "react-router-dom";
@@ -7,7 +15,14 @@ const Profile = ({ nickname, userName, userGrade, userPoints }) => {
   const navigate = useNavigate();
   return (
     <>
-      <Text fontSize="3xl" fontWeight="medium" borderBottom="2px solid gray" pb={2} mt={4} ml={5}>
+      <Text
+        fontSize="3xl"
+        fontWeight="medium"
+        borderBottom="2px solid gray"
+        pb={2}
+        mt={4}
+        ml={5}
+      >
         내 프로필
       </Text>
 
@@ -32,7 +47,11 @@ const Profile = ({ nickname, userName, userGrade, userPoints }) => {
               </VStack>
             </HStack>
 
-            <Button ml={6} mr={7} onClick={() => navigate("/mypage/editprofile")}>
+            <Button
+              ml={6}
+              mr={7}
+              onClick={() => navigate("/mypage/editprofile")}
+            >
               편집
             </Button>
           </Flex>
