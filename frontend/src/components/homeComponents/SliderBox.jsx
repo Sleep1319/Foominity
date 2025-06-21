@@ -1,26 +1,94 @@
-import { Box, Text } from "@chakra-ui/react";
+import { Box, Image  } from "@chakra-ui/react";
+import { BsChevronLeft, BsChevronRight } from "react-icons/bs";
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
+import React, { useRef } from 'react';
+import Slider from 'react-slick';
 
-const SliderBox = () => (
-        <Box mb={8}>
-            {/*
-        <Image
-          src="https://source.unsplash.com/random/1200x400?music"
-          alt="Main Slider"
-          borderRadius="md"
+const images = [
+  "/images/img1.jpg",
+  "/images/img2.jpg",
+  "/images/img3.jpg",
+];
+
+const SliderBox = () => {
+  const sliderRef = useRef(null);
+
+  const settings = {
+    autoplay: true,
+    autoplaySpeed: 3000,
+    fade: false,
+    infinite: true,
+    speed: 800,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    arrows: false,
+    dots: true,
+    pauseOnHover: false,
+  };
+
+  return (
+    <Box
+      w="100vw"
+      h="100vh"
+      overflow="hidden"
+      position="relative"
+    >
+      {/* 왼쪽 화살표 – 흰색 + 짙은 회색 네온 */}
+      <Box
+        position="absolute"
+        top="50%"
+        left="24px"
+        transform="translateY(-50%)"
+        zIndex="9999"
+        cursor="pointer"
+        onClick={() => sliderRef.current?.slickPrev()}
+      >
+        <BsChevronLeft
+          size={36}
+          color="white"
+          style={{
+            filter: "drop-shadow(0 0 6px #888) drop-shadow(0 0 12px #888) drop-shadow(0 0 20px #888)",
+          }}
         />
-        */}
-            {/* 임시 백그라운드 색상 박스 */}
-            <Box display="flex" gap={4} borderRadius="md" overflow="hidden" h="400px">
-                <Box flex="1" bg="red.400" />
-                <Box flex="1" bg="green.400" />
-                <Box flex="1" bg="blue.400" />
-                <Box flex="1" bg="yellow.400" />
-                <Box flex="1" bg="purple.400" />
-            </Box>
-            <Text mt={2} fontWeight="bold" fontSize="xl">
-                test1
-            </Text>
-        </Box>
-)
+      </Box>
+
+      {/* 오른쪽 화살표 – 흰색 + 짙은 회색 네온 */}
+      <Box
+        position="absolute"
+        top="50%"
+        right="24px"
+        transform="translateY(-50%)"
+        zIndex="9999"
+        cursor="pointer"
+        onClick={() => sliderRef.current?.slickNext()}
+      >
+        <BsChevronRight
+          size={36}
+          color="white"
+          style={{
+            filter: "drop-shadow(0 0 6px #888) drop-shadow(0 0 12px #888) drop-shadow(0 0 20px #888)",
+          }}
+        />
+      </Box>
+
+      <Slider ref={sliderRef} {...settings}>
+        {images.map((src, idx) => (
+          <Box key={idx} w="100%" h="100%">
+            <Image
+              src={src}
+              alt={`slide-${idx}`}
+              w="100%"
+              h="100%"
+              objectFit="cover"
+              userSelect="none"
+              draggable={false}
+            />
+          </Box>
+        ))}
+      </Slider>
+    </Box>
+  );
+};
 
 export default SliderBox;
