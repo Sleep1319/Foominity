@@ -1,4 +1,4 @@
-import { Box, Image  } from "@chakra-ui/react";
+import { Box, Image } from "@chakra-ui/react";
 import { BsChevronLeft, BsChevronRight } from "react-icons/bs";
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
@@ -28,19 +28,14 @@ const SliderBox = () => {
   };
 
   return (
-    <Box
-      w="100vw"
-      h="100vh"
-      overflow="hidden"
-      position="relative"
-    >
-      {/* 왼쪽 화살표 – 흰색 + 짙은 회색 네온 */}
+    <Box w="100vw" h="100vh" overflow="hidden" position="relative">
+      {/* 왼쪽 화살표 */}
       <Box
         position="absolute"
         top="50%"
         left="24px"
         transform="translateY(-50%)"
-        zIndex="9999"
+        zIndex="999"
         cursor="pointer"
         onClick={() => sliderRef.current?.slickPrev()}
       >
@@ -48,18 +43,19 @@ const SliderBox = () => {
           size={36}
           color="white"
           style={{
-            filter: "drop-shadow(0 0 6px #888) drop-shadow(0 0 12px #888) drop-shadow(0 0 20px #888)",
+            filter:
+              "drop-shadow(0 0 6px #888) drop-shadow(0 0 12px #888) drop-shadow(0 0 20px #888)",
           }}
         />
       </Box>
 
-      {/* 오른쪽 화살표 – 흰색 + 짙은 회색 네온 */}
+      {/* 오른쪽 화살표 */}
       <Box
         position="absolute"
         top="50%"
         right="24px"
         transform="translateY(-50%)"
-        zIndex="9999"
+        zIndex="999"
         cursor="pointer"
         onClick={() => sliderRef.current?.slickNext()}
       >
@@ -67,11 +63,13 @@ const SliderBox = () => {
           size={36}
           color="white"
           style={{
-            filter: "drop-shadow(0 0 6px #888) drop-shadow(0 0 12px #888) drop-shadow(0 0 20px #888)",
+            filter:
+              "drop-shadow(0 0 6px #888) drop-shadow(0 0 12px #888) drop-shadow(0 0 20px #888)",
           }}
         />
       </Box>
 
+      {/* 슬라이더 */}
       <Slider ref={sliderRef} {...settings}>
         {images.map((src, idx) => (
           <Box key={idx} w="100%" h="100%">

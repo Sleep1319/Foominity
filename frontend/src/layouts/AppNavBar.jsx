@@ -1,40 +1,38 @@
-import { Box, HStack, Heading, Spacer } from "@chakra-ui/react";
+import { Box, HStack, Spacer, Image } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
-import React from "react";
 import { useUser } from "@/context/UserContext";
-import { useColorMode } from "@chakra-ui/react";
-import NavMenu from "@/components/navComponents/NavMenu.jsx";
 import AuthButtons from "@/components/navComponents/AuthButtons.jsx";
 import UserSection from "@/components/navComponents/UserSection.jsx";
-import ColorModeToggle from "@/components/navComponents/ColorModeToggle.jsx";
+
+import logoImage from "@/assets/images/doremiSOL_logo.png";
 
 const AppNavbar = () => {
-  const {state} = useUser();
-  const { colorMode } = useColorMode();
+  const { state } = useUser();
 
   return (
     <Box
       as="header"
       px={6}
-      py={4}
-      borderBottom="1px solid #eee"
-      position="sticky"
+      py={1}
+      position="absolute"
       top="0"
-      bg={colorMode === "light" ? "white" : "gray.800"}
-      zIndex="1000"
+      left="0"
+      w="100%"
+      bg="transparent"
+      zIndex="9999"
     >
-      <HStack>
-        <Heading as={RouterLink} to="/" size="md">
-          FOOMINITY
-        </Heading>
+      <HStack align="center" justify="space-between">
+        <Box as={RouterLink} to="/">
+          <Image
+            src={logoImage}
+            alt="doremiSOL Logo"
+            boxSize="72px"
+            objectFit="contain"
+          />
+        </Box>
 
         <Spacer />
-        <NavMenu/>
-
-        <Spacer />
-        {state && state.nickname ? <UserSection/> : <AuthButtons/>}
-
-        <ColorModeToggle/>
+        {state && state.nickname ? <UserSection /> : <AuthButtons />}
       </HStack>
     </Box>
   );
