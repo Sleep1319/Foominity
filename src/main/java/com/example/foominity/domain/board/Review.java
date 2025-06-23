@@ -1,7 +1,11 @@
 package com.example.foominity.domain.board;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.example.foominity.domain.BaseEntity;
-import com.example.foominity.domain.category.ReviewCategory;
+import com.example.foominity.domain.artist.Artist;
 import com.example.foominity.domain.member.Member;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -16,29 +20,28 @@ public class Review extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JoinColumn(name = "member_id")
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    private Member member;
-
+    // 앨범명
     @Column(nullable = false)
     private String title;
 
+    // 발매일
     @Column(nullable = false)
-    private String content;
+    private LocalDate released;
 
-    @Column(name = "star_point")
-    private float starPoint;
+    @ElementCollection
+    @CollectionTable(name = "review_tracklist", joinColumns = @JoinColumn(name = "review_id"))
+    @Column(name = "track_name")
+    private List<String> tracklist = new ArrayList<>();
 
-    public Review(String title, String content, Member member, float starPoint) {
+    public Review(String title, LocalDate released, List<String> tracklist) {
         this.title = title;
-        this.content = content;
-        this.member = member;
-        this.starPoint = starPoint;
+        this.released = released;
+        this.tracklist = tracklist;
     }
 
-    public void update(String title, String content, float starPoint) {
+    public void update(String title, LocalDate released, List<String> tracklist) {
         this.title = title;
-        this.content = content;
-        this.starPoint = starPoint;
+        this.released = released;
+        this.tracklist = tracklist;
     }
 }
