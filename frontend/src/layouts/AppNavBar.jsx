@@ -10,25 +10,10 @@ const AppNavbar = () => {
   const { state } = useUser();
 
   return (
-    <Box
-      as="header"
-      px={6}
-      py={1}
-      position="absolute"
-      top="0"
-      left="0"
-      w="100%"
-      bg="transparent"
-      zIndex="9999"
-    >
+    <Box as="header" px={6} py={1} position="absolute" top="0" left="0" w="100%" bg="transparent" zIndex="9999">
       <HStack align="center" justify="space-between">
         <Box as={RouterLink} to="/">
-          <Image
-            src={logoImage}
-            alt="doremiSOL Logo"
-            boxSize="72px"
-            objectFit="contain"
-          />
+          <Image src={logoImage} alt="doremiSOL Logo" boxSize="72px" objectFit="contain" />
         </Box>
 
         <Spacer />

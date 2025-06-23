@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Box } from "@chakra-ui/react";
 import SliderBox from "@/components/homeComponents/SliderBox.jsx";
-import CategoryTabs from "@/components/homeComponents/CategoryTabs.jsx";
+import CategoryTabs from "@/components/homeComponents/CategoryTabs.jsx"; // 필요 시 NavMenu로 교체
 import PopularPosts from "@/components/homeComponents/PopularPosts.jsx";
 import CommunityTabs from "@/components/homeComponents/CommunityTabs.jsx";
 import { motion } from "framer-motion";
@@ -11,8 +11,8 @@ const MotionBox = motion(Box);
 function Home() {
   const categoryRef = useRef(null);
   const lastScrollY = useRef(0);
-  const scrollLock = useRef(false); // ✅ 스크롤 중복 방지용 상태
-  const [showTabs, setShowTabs] = useState(false); // 애니메이션 제어용
+  const scrollLock = useRef(false);
+  const [showTabs, setShowTabs] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -24,7 +24,6 @@ function Home() {
 
       const snapThreshold = window.innerHeight * 0.15;
 
-      // 아래로 → 카테고리 전환
       if (direction === "down" && currentY > snapThreshold && !showTabs) {
         scrollLock.current = true;
         const target = categoryRef.current;
@@ -37,7 +36,6 @@ function Home() {
         }
       }
 
-      // 위로 → 슬라이더 복귀
       if (direction === "up" && currentY < snapThreshold && showTabs) {
         scrollLock.current = true;
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -56,7 +54,6 @@ function Home() {
     <>
       <SliderBox />
 
-      {/* 카테고리 영역 */}
       <Box ref={categoryRef}>
         <MotionBox
           initial={{ opacity: 0, y: 40 }}
@@ -68,10 +65,17 @@ function Home() {
             top="0"
             zIndex={999}
             bg="white"
-            boxShadow="md"
+            boxShadow="none" // 🔥 그림자 제거
           >
-            <Box maxW="1200px" mx="auto" px={4} py={6}>
-              <CategoryTabs />
+            <Box
+              maxW="1200px"
+              mx="auto"
+              px={4}
+              py={6}
+              display="flex"
+              justifyContent="center" // ✅ 가운데 정렬
+            >
+              <CategoryTabs /> {/* NavMenu 로 교체도 가능 */}
             </Box>
           </Box>
         </MotionBox>
@@ -79,8 +83,6 @@ function Home() {
         <Box maxW="1200px" mx="auto" px={4} py={6}>
           <PopularPosts />
           <CommunityTabs />
-
-          {/* 아래 공간 확보해서 위로 복귀 가능하게 */}
           <Box h="600px" />
         </Box>
       </Box>

@@ -1,66 +1,30 @@
-import { Box, Tabs, TabList, TabPanels, Tab, TabPanel,
-    SimpleGrid, Image, Heading, Text } from "@chakra-ui/react";
-// 추후 카테고리로 바뀔곳
+import { Box, Button, HStack } from "@chakra-ui/react";
+import { Link as RouterLink } from "react-router-dom";
+import React from "react";
+
 const CategoryTabs = () => (
-    <Tabs variant="soft-rounded" colorScheme="red" mb={8}>
-        <TabList>
-            <Tab>카테고리별 보여주기로 바뀔곳</Tab>
-            <Tab>일식</Tab>
-            <Tab>양식</Tab>
-            <Tab>중식</Tab>
-            <Tab>기타</Tab>
-            <Tab>Shop</Tab>
-        </TabList>
-
-        <TabPanels>
-            <TabPanel>
-                <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
-                    <Box borderWidth="1px" borderRadius="md" overflow="hidden">
-                        <Image src="https://source.unsplash.com/random/600x400?fire" />
-                        <Box p={4}>
-                            <Text fontSize="sm" color="gray.500">
-                                test1
-                            </Text>
-                            <Heading size="md" mt={2}>
-                                test2
-                            </Heading>
-                        </Box>
-                    </Box>
-                    <Box borderWidth="1px" borderRadius="md" overflow="hidden">
-                        <Image src="https://source.unsplash.com/random/600x400?street" />
-                        <Box p={4}>
-                            <Text fontSize="sm" color="gray.500">
-                                test3
-                            </Text>
-                            <Heading size="md" mt={2}>
-                                test4
-                            </Heading>
-                        </Box>
-                    </Box>
-                </SimpleGrid>
-            </TabPanel>
-
-            {/* 각 탭 패널에 임시 텍스트 넣음 */}
-            <TabPanel>
-                <Text>test1</Text>
-            </TabPanel>
-            <TabPanel>
-                <Text>test2</Text>
-            </TabPanel>
-            <TabPanel>
-                <Text>testTest</Text>
-            </TabPanel>
-            <TabPanel>
-                <Text>abcd</Text>
-            </TabPanel>
-            <TabPanel>
-                <Text>test1</Text>
-            </TabPanel>
-            <TabPanel>
-                <Text>test2</Text>
-            </TabPanel>
-        </TabPanels>
-    </Tabs>
-)
+  <Box mb={8}>
+    <HStack spacing={4}>
+      <Button
+        as={RouterLink}
+        to="/review"
+        bg="white"
+        color="black"
+        _hover={{ bg: "white" }} // ✅ hover 시 색 유지
+      >
+        Review
+      </Button>
+      <Button as={RouterLink} to="/freeboard" bg="white" color="black" _hover={{ bg: "white" }}>
+        FreeBoard
+      </Button>
+      <Button as={RouterLink} to="/notice" bg="white" color="black" _hover={{ bg: "white" }}>
+        Notice
+      </Button>
+      <Button as={RouterLink} to="/report" bg="white" color="black" _hover={{ bg: "white" }}>
+        Report
+      </Button>
+    </HStack>
+  </Box>
+);
 
 export default CategoryTabs;
