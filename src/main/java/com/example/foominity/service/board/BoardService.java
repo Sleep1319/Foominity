@@ -1,6 +1,7 @@
 package com.example.foominity.service.board;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.example.foominity.domain.board.Review;
 import com.example.foominity.dto.board.ReviewResponse;
@@ -55,6 +56,27 @@ public class BoardService {
                 .toList();
         return new PageImpl<>(boardResponseList, pageable,
                 boards.getTotalElements());
+    }
+
+    public List<BoardResponse> findByTitle(String keyword) {
+        List<Board> boards;
+
+        if (keyword == null || keyword.trim().isEmpty()) {
+            boards = boardRepository.findAll();
+        } else {
+            boards = boardRepository.findByTitleContainingIgnoreCase(keyword);
+        }
+
+        return boards.stream()
+                .map(board -> new BoardResponse(
+                        board.getId(),
+                        board.getTitle(),
+                        board.getContent(),
+                        board.getMember().getId(),
+                        board.getMember().getNickname(),
+                        board.getCreatedDate(),
+                        board.getUpdatedDate()))
+                .collect(Collectors.toList());
     }
 
     public BoardResponse findByid(Long id) {
@@ -114,7 +136,8 @@ public class BoardService {
     }
 
     public List<BoardResponse> getLatest() {
-        List<Board> boardList = boardRepository.findTop4ByOrderByCreatedDateDesc().orElseThrow(NotFoundBoardException::new);
+        List<Board> boardList = boardRepository.findTop4ByOrderByCreatedDateDesc()
+                .orElseThrow(NotFoundBoardException::new);
 
         return boardList.stream()
                 .map(board -> new BoardResponse(
@@ -122,7 +145,7 @@ public class BoardService {
                         board.getTitle(),
                         board.getMember().getNickname(),
                         board.getCreatedDate(),
-                        board.getUpdatedDate()
-                )).toList();
+                        board.getUpdatedDate()))
+                .toList();
     }
 }
