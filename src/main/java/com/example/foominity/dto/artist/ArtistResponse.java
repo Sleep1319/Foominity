@@ -1,0 +1,27 @@
+package com.example.foominity.dto.artist;
+
+import java.time.LocalDate;
+import java.util.List;
+
+import com.example.foominity.dto.category.ArtistCategoryResponse;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class ArtistResponse {
+    private Long id;
+    private String name;
+    private LocalDate born;
+    private String nationality;
+    private List<ArtistCategoryResponse> categories;
+
+    public ArtistResponse(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+}
