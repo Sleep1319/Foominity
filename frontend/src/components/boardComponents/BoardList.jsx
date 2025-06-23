@@ -25,7 +25,7 @@ import { SearchIcon } from "@chakra-ui/icons";
 // 페이지 갯수
 const BOARDS_PER_PAGE = 7;
 
-const FreeBoardList = () => {
+const BoardList = () => {
   const [boards, setBoards] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchKeyword, setSearchKeyword] = useState("");
@@ -167,4 +167,4 @@ const FreeBoardList = () => {
   );
 };
 
-export default FreeBoardList;
+export default BoardList;
