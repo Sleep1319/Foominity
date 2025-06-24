@@ -94,14 +94,14 @@ const BoardDetail = () => {
           mb={6}
           display="inline-block"
           cursor="pointer"
-          onClick={() => navigate("/board")}
+          onClick={() => navigate("/boards")}
         >
           목록
         </Text>
 
         {/* 수정 버튼 조건부 표시 */}
         {String(loginMemberId) === String(board.memberId) && (
-          <Button colorScheme="teal" size="sm" ml={2} onClick={() => navigate(`/board/update/${board.id}`)}>
+          <Button colorScheme="teal" size="sm" ml={2} onClick={() => navigate(`/boards/update/${board.id}`)}>
             수정
           </Button>
         )}
