@@ -15,7 +15,7 @@ const UserSection = () => {
           <Avatar size="sm" />
         </MenuButton>
         <MenuList>
-          <MenuItem as={RouterLink} to="/" fontWeight="bold" height="25px">
+          <MenuItem as={RouterLink} to="/" fontWeight="bold" height="25px" fontSize={17} padding={0} pl={3}>
             {/* Home 🏚 */}# Home
           </MenuItem>
           <MenuDivider />
