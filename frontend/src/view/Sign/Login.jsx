@@ -62,36 +62,35 @@ const Login = () => {
   };
 
   return (
-    <>
-      <Box maxW="xl" mx="auto" mt={100} p={5} borderWidth={1} borderRadius="lg" mb={291}>
-        <Heading mb={5} textAlign="center">
-          로그인
-        </Heading>
-        <form onSubmit={handleLogin}>
-          <VStack spacing={4}>
-            <FormControl isRequired>
-              <FormLabel>이메일</FormLabel>
-              <Input type="email" name="email" placeholder="email@example.com" onChange={handleChange} />
-            </FormControl>
-            <FormControl isRequired>
-              <FormLabel>비밀번호</FormLabel>
-              <Input type="password" name="password" placeholder="비밀번호 입력" onChange={handleChange} />
-            </FormControl>
-            <Button
-              type="submit"
-              bg="black"
-              width="full"
-              color="white"
-              _hover={
-                {
-                  // bg: "gray",
-                }
+    <Box maxW="xl" mx="auto" mt={100} p={5} borderWidth={1} borderRadius="lg" mb={291}>
+      <Heading mb={5} textAlign="center">
+        로그인
+      </Heading>
+      <form onSubmit={handleLogin}>
+        <VStack spacing={4}>
+          <FormControl isRequired>
+            <FormLabel>이메일</FormLabel>
+            <Input type="email" name="email" placeholder="email@example.com" onChange={handleChange} />
+          </FormControl>
+          <FormControl isRequired>
+            <FormLabel>비밀번호</FormLabel>
+            <Input type="password" name="password" placeholder="비밀번호 입력" onChange={handleChange} />
+          </FormControl>
+          <Button
+            type="submit"
+            bg="black"
+            width="full"
+            color="white"
+            _hover={
+              {
+                // bg: "gray",
               }
-            >
-              로그인
-            </Button>
+            }
+          >
+            로그인
+          </Button>
 
-            <Divider />
+          <Divider />
 
           <Text fontSize="sm">
             계정이 없으신가요?{" "}
