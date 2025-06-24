@@ -32,7 +32,7 @@ public class PointController {
 
     @PutMapping("/api/point/review/{memberId}")
     public ResponseEntity<String> updateReviewCount(@PathVariable Long memberId) {
-        pointService.updateReviewCount(memberId);
+        pointService.updateReviewCommentCount(memberId);
 
         return ResponseEntity.ok().build();
     }

@@ -15,8 +15,4 @@ public class PointResponse {
 
     private int totalPoint;
 
-    // private int calPoint(Point point) {
-    // return (point.getReviewCount() * 10) + (point.getLikeCount() * 2);
-    // }
-
 }
