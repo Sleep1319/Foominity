@@ -4,7 +4,7 @@ import com.example.foominity.config.jwt.JwtAccessDeniedHandler;
 import com.example.foominity.config.jwt.JwtAuthenticationEntryPoint;
 import com.example.foominity.config.jwt.JwtAuthenticationFilter;
 import com.example.foominity.config.jwt.JwtTokenProvider;
-import com.nimbusds.oauth2.sdk.auth.JWTAuthentication;
+import com.example.foominity.config.social.CustomOAuth2SuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

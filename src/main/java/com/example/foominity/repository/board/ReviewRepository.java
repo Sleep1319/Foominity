@@ -13,6 +13,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     Optional<List<Review>> findTop4ByOrderByCreatedDateDesc();
 
-    @Query(" select r from Review r left join Like l on r.id = l.review.id group by r.id order by COUNT(l) desc ")
-    Optional<List<Review>> getTop3LikeReviews(Pageable pageable);
+//    @Query(" select r from Review r left join Like l on r.id = l.review.id group by r.id order by COUNT(l) desc ")
+//    Optional<List<Review>> getTop3LikeReviews(Pageable pageable);
 }

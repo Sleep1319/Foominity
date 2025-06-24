@@ -1,4 +1,4 @@
-package com.example.foominity.config;
+package com.example.foominity.config.social;
 
 import com.example.foominity.config.jwt.JwtTokenProvider;
 import com.example.foominity.domain.member.Member;
