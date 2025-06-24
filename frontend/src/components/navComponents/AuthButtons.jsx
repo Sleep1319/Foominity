@@ -1,72 +1,64 @@
-import { Button, Avatar, HStack } from "@chakra-ui/react";
+import React, { useState } from "react";
+import { Button, HStack, Avatar, IconButton } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
+import AuthModal from "../../view/Sign/AuthModal";
+import { SearchIcon } from "@chakra-ui/icons";
+import SearchNavbar from "./SearchNavBar";
 
-const glassShadow = `
-  0 0 0 1px rgba(255, 255, 255, 0.1),
-  0 4px 30px rgba(0, 0, 0, 0.1),
-  0 0 8px rgba(255, 255, 255, 0.05)
+const whiteNeonText = `
+  -1px -1px 0 white,
+   1px -1px 0 white,
+  -1px  1px 0 white,
+   1px  1px 0 white,
+   0 0 4px white,
+   0 0 8px white
 `;
 
-const textShadow = `
-  -1px -1px 0 black,
-   1px -1px 0 black,
-  -1px  1px 0 black,
-   1px  1px 0 black,
-   0 0 4px black,
-   0 0 8px black
-`;
+const AuthButtons = () => {
+  const [isLoginOpen, setLoginOpen] = useState(false);
+  const [isNavVisible, setIsNavVisible] = useState(false);
 
-const AuthButtons = () => (
-  <HStack spacing={4}>
-    <Button
-      as={RouterLink}
-      to="/login"
-      variant="ghost"
-      color="white"
-      px={4}
-      py={2}
-      bg="rgba(255, 255, 255, 0.1)"
-      backdropFilter="blur(8px)"
-      borderRadius="lg"
-      boxShadow={glassShadow}
-      textShadow={textShadow}
-      _hover={{
-        bg: "rgba(255, 255, 255, 0.18)",
-        boxShadow: `
-          0 0 0 1px rgba(255, 255, 255, 0.2),
-          0 6px 40px rgba(0, 0, 0, 0.15),
-          0 0 12px rgba(255, 255, 255, 0.1)
-        `
-      }}
-    >
-      login
-    </Button>
+  const showNav = () => setIsNavVisible(true);
+  const hideNav = () => setIsNavVisible(false);
 
-    <Button
-      as={RouterLink}
-      to="/register"
-      color="white"
-      px={4}
-      py={2}
-      bg="rgba(255, 255, 255, 0.1)"
-      backdropFilter="blur(8px)"
-      borderRadius="lg"
-      boxShadow={glassShadow}
-      textShadow={textShadow}
-      _hover={{
-        bg: "rgba(255, 255, 255, 0.18)",
-        boxShadow: `
-          0 0 0 1px rgba(255, 255, 255, 0.2),
-          0 6px 40px rgba(0, 0, 0, 0.15),
-          0 0 12px rgba(255, 255, 255, 0.1)
-        `
-      }}
-    >
-      sign up
-    </Button>
+  return (
+    <>
+      {/* 상단 네브바  */}
+      <SearchNavbar isVisible={isNavVisible} onMouseEnter={showNav} onMouseLeave={hideNav} />
 
-    <Avatar as={RouterLink} to="/mypage" size="sm" />
-  </HStack>
-);
+      <HStack spacing={4} align="center">
+        {/* 돋보기 버튼 */}
+        <IconButton
+          aria-label="Search"
+          icon={<SearchIcon />}
+          variant="ghost"
+          onMouseEnter={showNav}
+          bg="transparent"
+          _hover={{ bg: "transparent" }}
+        />
+
+        <Button
+          variant="ghost"
+          color="black"
+          px={4}
+          py={2}
+          bg="transparent"
+          borderRadius="lg"
+          textShadow={whiteNeonText}
+          _hover={{
+            textDecoration: "underline",
+            bg: "transparent",
+          }}
+          onClick={() => setLoginOpen(true)} // 클릭 시 모달 열기
+        >
+          SIGN
+        </Button>
+      </HStack>
+
+      {/*  로그인/회원가입 탭 전환형 모달 */}
+      <AuthModal isOpen={isLoginOpen} onClose={() => setLoginOpen(false)} />
+    </>
+  );
+};
 
 export default AuthButtons;
