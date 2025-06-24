@@ -1,15 +1,30 @@
 import React, { useState } from "react";
-import { Box, Button, Input, FormControl, FormLabel, Heading, VStack, Text, Link, useToast } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Input,
+  FormControl,
+  FormLabel,
+  Heading,
+  VStack,
+  Text,
+  Link,
+  useToast,
+  Divider,
+} from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-import {useUser} from "@/context/UserContext.jsx";
+import { useUser } from "@/context/UserContext.jsx";
 import axios from "axios";
 
 const Login = () => {
   const [form, setForm] = useState({ email: "", password: "" });
-  // Toast = 로그인 성공/실패 알림창
   const toast = useToast();
   const navigate = useNavigate();
   const { setState } = useUser();
+
+  const CLIENT_ID = "637907069308-gj22lc6rllo5voogfgp7961vom90n4gu.apps.googleusercontent.com";
+  const REDIRECT_URI = "http://localhost:5173/auth/redirect";
+  const SCOPE = "email profile openid";
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -20,11 +35,16 @@ const Login = () => {
     try {
       console.log("보내는 데이터:", form);
       await axios.post("/api/sign-in", form, {
-        withCredentials: true, // 이거 쿠키 받기 위해 중요하다고 지피티가 그럼
+        withCredentials: true,
         headers: { "Content-Type": "application/json" },
       });
 
-      toast({ title: "로그인 성공", status: "success", duration: 2000, isClosable: true });
+      toast({
+        title: "로그인 성공",
+        status: "success",
+        duration: 2000,
+        isClosable: true,
+      });
       const userRes = await axios.get("/api/user", { withCredentials: true });
       setState(userRes.data);
       navigate("/");
@@ -58,6 +78,9 @@ const Login = () => {
           <Button type="submit" colorScheme="blue" width="full">
             로그인
           </Button>
+
+          <Divider />
+
           <Text fontSize="sm">
             계정이 없으신가요?{" "}
             <Link color="skyblue" onClick={() => navigate("/register")}>

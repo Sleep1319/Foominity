@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import com.example.foominity.domain.member.Point;
 import com.example.foominity.domain.member.Role;
+import com.example.foominity.dto.sign.SocialSignUpRequest;
 import com.example.foominity.repository.member.PointRepository;
 import com.example.foominity.repository.member.RoleRepository;
 
@@ -82,6 +83,11 @@ public class SignService {
         member.changeNickname(req.getNickname());
     }
 
+    @Transactional(readOnly = true)
+    public boolean existsNickname(String nickname) {
+        return memberRepository.existsByNickname(nickname);
+    }
+
     // 회원가입
     @Transactional
     public void signUp(SignUpRequest req) {
@@ -122,6 +128,22 @@ public class SignService {
         String refreshToken = jwtTokenProvider.createRefreshToken(member.getId());
 
         return new SignInResponse(accessToken, refreshToken);
+    }
+
+    @Transactional
+    public void socialSignUp(SocialSignUpRequest req) {
+        validateSignUp(req.getEmail(), req.getNickname());
+        Role defaultRole = roleRepository.findByName("BRONZE")
+                .orElseThrow(() -> new RuntimeException("기본 등급 없음"));
+        Member member = new Member(
+                req.getEmail(),
+                "", // 소셜 로그인은 비밀번호 없음
+                req.getUsername(),
+                req.getNickname(),
+                defaultRole
+        );
+        member.setSocialProvider(req.getSocialType(), req.getProviderId());
+        signRepository.save(member);
     }
 
     private void validateSignUp(String email, String nickname) {

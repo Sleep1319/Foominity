@@ -1,24 +1,29 @@
-import { Box, Heading, List, ListItem, Text} from "@chakra-ui/react";
+import { Box, Heading, List, ListItem, Text, Spinner } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-
-const dummyPopularPosts = [
-    { id: 1, title: "🔥 인기글 1", author: "user1" },
-    { id: 2, title: "🔥 인기글 2", author: "user2" },
-    { id: 3, title: "🔥 인기글 3", author: "user3" },
-];
+import axios from "axios";
 
 const PopularPosts = () => {
     const [popularPosts, setPopularPosts] = useState([]);
+    const [state, setState] = useState(true)
 
     useEffect(() => {
-        //오늘자 리뷰 인기글 5개
-        setPopularPosts(dummyPopularPosts); // 가상 데이터 세팅
+        const fetchPopularPosts = async () => {
+            try {
+                const response = await axios.get("/api/reviews/top");
+                setPopularPosts(response.data);
+            } catch (error) {
+                console.log()
+            } finally {
+                setState(false)
+            }
+        }
+        fetchPopularPosts();
     }, []);
 
     return (
         <Box mb={8}>
             <Heading size="md" mb={4}>오늘의 인기글</Heading>
-            {popularPosts.length > 0 ? (
+            {state ? (
                 <List spacing={2}>
                     {popularPosts.slice(0, 5).map((post) => (
                         <ListItem key={post.id}>

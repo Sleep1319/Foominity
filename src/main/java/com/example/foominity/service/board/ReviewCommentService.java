@@ -1,6 +1,7 @@
 package com.example.foominity.service.board;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,7 @@ import com.example.foominity.dto.comment.ReviewCommentRequest;
 import com.example.foominity.dto.comment.ReviewCommentResponse;
 import com.example.foominity.dto.comment.ReviewCommentUpdateRequest;
 import com.example.foominity.exception.ForbiddenActionException;
+import com.example.foominity.exception.IllegalStateException;
 import com.example.foominity.exception.NotFoundBoardException;
 import com.example.foominity.exception.NotFoundMemberException;
 import com.example.foominity.exception.NotFoundReviewCommentException;
@@ -38,7 +40,6 @@ import lombok.extern.log4j.Log4j2;
 public class ReviewCommentService {
 
     private final ReviewCommentRepository reviewCommentRepository;
-    private final BoardRepository boardRepository;
     private final ReviewRepository reviewRepository;
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
@@ -63,16 +64,20 @@ public class ReviewCommentService {
 
         Long memberId = jwtTokenProvider.getUserIdFromToken(token);
         Member member = memberRepository.findById(memberId).orElseThrow(NotFoundMemberException::new);
-
         Review review = reviewRepository.findById(reviewId).orElseThrow(NotFoundReviewException::new);
-        reviewCommentRepository.save(req.toEntity(req, review, member));
+
+        Optional<ReviewComment> existingComment = reviewCommentRepository.findByReviewIdAndMemberId(reviewId, memberId);
+        if (existingComment.isPresent()) {
+            throw new IllegalStateException();
+        }
+        reviewCommentRepository.save(req.toEntity(review, member));
 
     }
 
     @Transactional
     public void updateReviewComment(Long commentId, HttpServletRequest tokenRequest, ReviewCommentUpdateRequest req) {
         ReviewComment reviewComment = validateReviewCommentOwnership(commentId, tokenRequest);
-        reviewComment.changeComment(req.getComment());
+        reviewComment.changeComment(req.getComment(), req.getStarPoint());
 
     }
 
@@ -102,6 +107,15 @@ public class ReviewCommentService {
         }
 
         return reviewComment;
+    }
+
+    // 평균 별점 계산
+    public float getAverageStarPoint(Long reviewId) {
+        Float avg = reviewCommentRepository.findAverageStarPoint(reviewId);
+        if (avg == null)
+            return 0.0f;
+
+        return Math.round(avg * 100) / 100.0f; // 소수점 둘째 자리까지 반올림
     }
 
 }
