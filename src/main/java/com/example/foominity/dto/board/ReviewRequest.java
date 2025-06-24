@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.lang.Nullable;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.foominity.domain.board.Review;
 import com.example.foominity.domain.member.Member;
@@ -27,4 +28,5 @@ public class ReviewRequest {
     private List<Long> artistIds;
     private List<Long> categoryIds;
 
+    private MultipartFile image;
 }

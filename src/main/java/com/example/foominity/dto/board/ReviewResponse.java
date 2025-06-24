@@ -25,12 +25,16 @@ public class ReviewResponse {
 
     private float averageStarPoint;
 
-    public ReviewResponse(Long id, String title, LocalDate released, List<String> tracklist, float averageStarPoint) {
+    private String imagePath;
+
+    public ReviewResponse(Long id, String title, LocalDate released, List<String> tracklist, float averageStarPoint,
+            String imagePath) {
         this.id = id;
         this.title = title;
         this.released = released;
         this.tracklist = tracklist;
         this.averageStarPoint = averageStarPoint;
+        this.imagePath = imagePath;
     }
 
 }
