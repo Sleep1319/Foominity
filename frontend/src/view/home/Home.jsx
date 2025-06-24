@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { Box } from "@chakra-ui/react";
 import SliderBox from "@/components/homeComponents/SliderBox.jsx";
-import CategoryTabs from "@/components/homeComponents/CategoryTabs.jsx"; // 필요 시 NavMenu로 교체
-import PopularPosts from "@/components/homeComponents/PopularPosts.jsx";
+import CategoryTabs from "@/components/homeComponents/CategoryTabs.jsx";
+// import PopularPosts from "@/components/homeComponents/PopularPosts.jsx";
 import CommunityTabs from "@/components/homeComponents/CommunityTabs.jsx";
 import { motion } from "framer-motion";
+import TopRankedAlbums from "../../components/homeComponents/TopRankedAlbums";
 
 const MotionBox = motion(Box);
 
@@ -22,9 +23,10 @@ function Home() {
       const direction = currentY > lastScrollY.current ? "down" : "up";
       lastScrollY.current = currentY;
 
-      const snapThreshold = window.innerHeight * 0.15;
+      const downThreshold = window.innerHeight * 0.15;
+      const upThreshold = window.innerHeight * 0.3;
 
-      if (direction === "down" && currentY > snapThreshold && !showTabs) {
+      if (direction === "down" && currentY > downThreshold && !showTabs) {
         scrollLock.current = true;
         const target = categoryRef.current;
         if (target) {
@@ -36,7 +38,7 @@ function Home() {
         }
       }
 
-      if (direction === "up" && currentY < snapThreshold && showTabs) {
+      if (direction === "up" && currentY < upThreshold && showTabs) {
         scrollLock.current = true;
         window.scrollTo({ top: 0, behavior: "smooth" });
         setTimeout(() => {
@@ -80,9 +82,11 @@ function Home() {
           </Box>
         </MotionBox>
 
+        <TopRankedAlbums />
+        <Box h="40px" />
+        <CommunityTabs />
         <Box maxW="1200px" mx="auto" px={4} py={6}>
-          <PopularPosts />
-          <CommunityTabs />
+          {/* <PopularPosts /> */}
           <Box h="600px" />
         </Box>
       </Box>
