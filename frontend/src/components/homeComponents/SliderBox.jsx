@@ -27,8 +27,12 @@ const SliderBox = () => {
     afterChange: (index) => setCurrentIndex(index), // 슬라이드 바뀔 때 index 업데이트
   };
 
+  const handleDotClick = (index) => {
+    sliderRef.current?.slickGoTo(index);
+  };
+
   return (
-    <Box w="100vw" h="100vh" overflow="hidden" position="relative">
+    <Box w="100%" h="100vh" overflow="hidden" position="relative">
       {/* 왼쪽 화살표 */}
       <Box
         position="absolute"
@@ -86,7 +90,7 @@ const SliderBox = () => {
       </Slider>
 
       {/* 커스텀 도트 인디케이터 */}
-      <SliderBoxIndicator total={images.length} currentIndex={currentIndex} />
+      <SliderBoxIndicator total={images.length} currentIndex={currentIndex} onDotClick={handleDotClick} />
     </Box>
   );
 };
