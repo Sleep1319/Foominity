@@ -44,7 +44,7 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
         String providerId = oauthUser.getName(); // 구글 고유 ID
 
         // 회원 존재 여부 확인
-        Optional<Member> existing = signRepository.findByEmail(email);
+        Optional<Member> existing = signRepository.findWithRoleByEmail(email);
 
         if (existing.isPresent()) {
             Member member = existing.get();

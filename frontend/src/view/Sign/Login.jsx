@@ -15,6 +15,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useUser } from "@/context/UserContext.jsx";
 import axios from "axios";
+import SocialLoginButton from "@/components/siginComponents/SocialLoginButton.jsx";
 
 const Login = () => {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -87,6 +88,7 @@ const Login = () => {
               회원가입
             </Link>
           </Text>
+          <SocialLoginButton mode="login" />
         </VStack>
       </form>
     </Box>

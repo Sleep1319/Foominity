@@ -5,6 +5,7 @@ import com.example.foominity.dto.member.UserInfoResponse;
 import java.util.Collections;
 import java.util.Map;
 
+import com.example.foominity.dto.sign.SocialSignUpRequest;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -84,6 +85,12 @@ public class SignController {
         // 위에서 만든 쿠키 응답의 헤더로 추가해서 클라이언트쪽에 쿠키 저장시킴
         return ResponseEntity.ok().body(res);
         // body에 res 넣어서 보냄
+    }
+
+    @PostMapping("/api/social-sign-up")
+    public ResponseEntity<?> socialSignUp(@RequestBody SocialSignUpRequest req) {
+        signService.socialSignUp(req);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/api/user")

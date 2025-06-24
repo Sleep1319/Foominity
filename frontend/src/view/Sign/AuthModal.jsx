@@ -19,6 +19,7 @@ import {
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "@/context/UserContext.jsx";
+import SocialLoginButton from "@/components/siginComponents/SocialLoginButton.jsx";
 
 const AuthModal = ({ isOpen, onClose }) => {
   const [mode, setMode] = useState("login"); // 'login' | 'register'
@@ -210,6 +211,7 @@ const AuthModal = ({ isOpen, onClose }) => {
                   </>
                 )}
               </Text>
+              <SocialLoginButton mode={mode}/>
             </VStack>
           </form>
         </ModalBody>

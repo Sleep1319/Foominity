@@ -46,10 +46,10 @@ public class ReviewController {
         return ResponseEntity.ok(reviewService.readReview(id));
     }
 
-    @GetMapping("/api/reviews/top")
-    public ResponseEntity<List<ReviewResponse>> getTop3LikeReviews() {
-        return ResponseEntity.ok(reviewService.getTop3LikeReviews(3));
-    }
+//    @GetMapping("/api/reviews/top")
+//    public ResponseEntity<List<ReviewResponse>> getTop3LikeReviews() {
+//        return ResponseEntity.ok(reviewService.getTop3LikeReviews(3));
+//    }
 
     // 생성
     @PostMapping("/api/reviews")
