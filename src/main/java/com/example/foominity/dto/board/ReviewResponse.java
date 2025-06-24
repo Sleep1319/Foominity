@@ -23,11 +23,14 @@ public class ReviewResponse {
     private List<ArtistResponse> artists;
     private List<ReviewCategoryResponse> categories;
 
-    public ReviewResponse(Long id, String title, LocalDate released, List<String> tracklist) {
+    private float averageStarPoint;
+
+    public ReviewResponse(Long id, String title, LocalDate released, List<String> tracklist, float averageStarPoint) {
         this.id = id;
         this.title = title;
         this.released = released;
         this.tracklist = tracklist;
+        this.averageStarPoint = averageStarPoint;
     }
 
 }

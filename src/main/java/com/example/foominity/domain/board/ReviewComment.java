@@ -18,6 +18,10 @@ public class ReviewComment {
     // 댓글 내용
     private String content;
 
+    // 별점
+    @Column(nullable = false)
+    private float starPoint;
+
     @JoinColumn(name = "member_id")
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private Member member;
@@ -26,13 +30,15 @@ public class ReviewComment {
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private Review review;
 
-    public ReviewComment(String content, Review review, Member member) {
+    public ReviewComment(String content, Review review, Member member, float starPoint) {
         this.content = content;
+        this.starPoint = starPoint;
         this.review = review;
         this.member = member;
     }
 
-    public void changeComment(String content) {
+    public void changeComment(String content, float starPoint) {
         this.content = content;
+        this.starPoint = starPoint;
     }
 }
