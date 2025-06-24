@@ -136,10 +136,10 @@ const AuthModal = ({ isOpen, onClose }) => {
       <ModalContent>
         <ModalHeader textAlign="center">
           <ButtonGroup isAttached variant="outline" w="100%" mt={10}>
-            <Button flex={1} colorScheme={mode === "login" ? "blue" : "gray"} onClick={() => setMode("login")}>
+            <Button flex={1} colorScheme={mode === "login" ? "black" : "gray"} onClick={() => setMode("login")}>
               로그인
             </Button>
-            <Button flex={1} colorScheme={mode === "register" ? "blue" : "gray"} onClick={() => setMode("register")}>
+            <Button flex={1} colorScheme={mode === "register" ? "black" : "gray"} onClick={() => setMode("register")}>
               회원가입
             </Button>
           </ButtonGroup>
@@ -190,7 +190,15 @@ const AuthModal = ({ isOpen, onClose }) => {
                 </FormControl>
               )}
 
-              <Button colorScheme="blue" type="submit" width="full">
+              <Button
+                colorScheme="blue"
+                type="submit"
+                width="full"
+                bg="black"
+                _hover={{
+                  bg: "gray",
+                }}
+              >
                 {mode === "login" ? "로그인" : "회원가입"}
               </Button>
 
@@ -211,7 +219,7 @@ const AuthModal = ({ isOpen, onClose }) => {
                   </>
                 )}
               </Text>
-              <SocialLoginButton mode={mode}/>
+              <SocialLoginButton mode={mode} />
             </VStack>
           </form>
         </ModalBody>
