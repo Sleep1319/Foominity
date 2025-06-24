@@ -19,6 +19,8 @@ public class ReviewCommentResponse {
 
     private String comment;
 
+    private float starPoint;
+
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
 
@@ -27,6 +29,7 @@ public class ReviewCommentResponse {
                 comment.getId(),
                 comment.getMember().getNickname(),
                 comment.getContent(),
+                comment.getStarPoint(),
                 null,
                 null);
     }

@@ -17,11 +17,10 @@ public class ReviewCommentRequest {
     @NotBlank
     private String comment;
 
-    public ReviewComment toEntity(ReviewCommentRequest req, Review review, Member member) {
-        return new ReviewComment(req.getComment(), review, member);
+    private float starPoint;
+
+    public ReviewComment toEntity(Review review, Member member) {
+        return new ReviewComment(this.comment, review, member, this.starPoint);
     }
 
-    // 게시글 정보를 포함할 경우
-    // @NotBlank
-    // private Long reviewId;
 }

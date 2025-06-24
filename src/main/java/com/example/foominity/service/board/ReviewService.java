@@ -47,176 +47,182 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class ReviewService {
 
-    private final ReviewRepository reviewRepository;
-    private final CategoryRepository categoryRepository;
-    private final ReviewCategoryRepository reviewCategoryRepository;
-    private final MemberRepository memberRepository;
-    private final JwtTokenProvider jwtTokenProvider;
-    private final PointRepository pointRepository;
-    private final AlbumArtistRepository albumArtistRepository;
-    private final ArtistRepository artistRepository;
+        private final ReviewRepository reviewRepository;
+        private final CategoryRepository categoryRepository;
+        private final ReviewCategoryRepository reviewCategoryRepository;
+        private final MemberRepository memberRepository;
+        private final JwtTokenProvider jwtTokenProvider;
+        private final PointRepository pointRepository;
+        private final AlbumArtistRepository albumArtistRepository;
+        private final ArtistRepository artistRepository;
 
-    private final PointService pointService;
+        private final PointService pointService;
+        private final ReviewCommentService reviewCommentService;
 
-    public Page<ReviewResponse> findAll(int page) {
-        PageRequest pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "id"));
-        Page<Review> reviews = reviewRepository.findAll(pageable);
+        public Page<ReviewResponse> findAll(int page) {
+                PageRequest pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "id"));
+                Page<Review> reviews = reviewRepository.findAll(pageable);
 
-        List<ReviewResponse> reviewResponsesList = reviews.stream()
-                .map(review -> {
-                    List<ReviewCategory> reviewCategories = reviewCategoryRepository.findByReviewId(review.getId());
+                List<ReviewResponse> reviewResponsesList = reviews.stream()
+                                .map(review -> {
+                                        List<ReviewCategory> reviewCategories = reviewCategoryRepository
+                                                        .findByReviewId(review.getId());
 
-                    List<AlbumArtist> albumArtists = albumArtistRepository.findByReviewId(review.getId());
+                                        List<AlbumArtist> albumArtists = albumArtistRepository
+                                                        .findByReviewId(review.getId());
 
-                    List<ReviewCategoryResponse> categoryResponses = reviewCategories.stream()
-                            .map(rc -> new ReviewCategoryResponse(
-                                    rc.getCategory().getId(),
-                                    rc.getCategory().getCategoryName()))
-                            .toList();
+                                        List<ReviewCategoryResponse> categoryResponses = reviewCategories.stream()
+                                                        .map(rc -> new ReviewCategoryResponse(
+                                                                        rc.getCategory().getId(),
+                                                                        rc.getCategory().getCategoryName()))
+                                                        .toList();
 
-                    List<ArtistResponse> artistResponses = albumArtists.stream().map(
-                            a -> new ArtistResponse(
-                                    a.getArtist().getId(),
-                                    a.getArtist().getName()))
-                            .toList();
+                                        List<ArtistResponse> artistResponses = albumArtists.stream().map(
+                                                        a -> new ArtistResponse(
+                                                                        a.getArtist().getId(),
+                                                                        a.getArtist().getName()))
+                                                        .toList();
 
-                    return new ReviewResponse(
-                            review.getId(),
-                            review.getTitle(),
-                            review.getReleased(),
-                            review.getTracklist(),
-                            artistResponses,
-                            categoryResponses);
+                                        return new ReviewResponse(
+                                                        review.getId(),
+                                                        review.getTitle(),
+                                                        review.getReleased(),
+                                                        review.getTracklist(),
+                                                        artistResponses,
+                                                        categoryResponses,
+                                                        reviewCommentService.getAverageStarPoint(review.getId()));
 
-                })
-                .toList();
+                                })
+                                .toList();
 
-        return new PageImpl<>(reviewResponsesList, pageable, reviews.getTotalElements());
+                return new PageImpl<>(reviewResponsesList, pageable, reviews.getTotalElements());
 
-    }
-
-    public ReviewResponse readReview(Long id) {
-        Review review = reviewRepository.findById(id).orElseThrow(NotFoundReviewException::new);
-
-        List<ReviewCategory> reviewCategory = reviewCategoryRepository.findByReviewId(review.getId());
-
-        List<AlbumArtist> albumArtists = albumArtistRepository.findByReviewId(review.getId());
-
-        List<ReviewCategoryResponse> categoryResponses = reviewCategory.stream()
-                .map(rc -> new ReviewCategoryResponse(
-                        rc.getCategory().getId(),
-                        rc.getCategory().getCategoryName()))
-                .toList();
-
-        List<ArtistResponse> artistResponses = albumArtists.stream().map(
-                a -> new ArtistResponse(
-                        a.getArtist().getId(),
-                        a.getArtist().getName()))
-                .toList();
-
-        return new ReviewResponse(
-                review.getId(),
-                review.getTitle(),
-                review.getReleased(),
-                review.getTracklist(),
-                artistResponses,
-                categoryResponses);
-    }
-
-    @Transactional
-    public void createReview(ReviewRequest req, HttpServletRequest tokenRequest) {
-        String token = jwtTokenProvider.resolveTokenFromCookie(tokenRequest);
-
-        if (!jwtTokenProvider.validateToken(token)) {
-            throw new UnauthorizedException();
         }
 
-        Long memberId = jwtTokenProvider.getUserIdFromToken(token);
-        Member member = memberRepository.findById(memberId).orElseThrow(NotFoundMemberException::new);
+        public ReviewResponse readReview(Long id) {
+                Review review = reviewRepository.findById(id).orElseThrow(NotFoundReviewException::new);
 
-        AuthUtil.validateAdmin(member);
+                List<ReviewCategory> reviewCategory = reviewCategoryRepository.findByReviewId(review.getId());
 
-        // 리뷰변수
-        Review review = new Review(
-                req.getTitle(),
-                req.getReleased(),
-                req.getTracklist());
+                List<AlbumArtist> albumArtists = albumArtistRepository.findByReviewId(review.getId());
 
-        // 리뷰저장
-        review = reviewRepository.save(review);
+                List<ReviewCategoryResponse> categoryResponses = reviewCategory.stream()
+                                .map(rc -> new ReviewCategoryResponse(
+                                                rc.getCategory().getId(),
+                                                rc.getCategory().getCategoryName()))
+                                .toList();
 
-        // 카테고리 저장
-        List<Category> categories = categoryRepository.findAllById(req.getCategoryIds());
-        for (Category category : categories) {
-            reviewCategoryRepository.save(new ReviewCategory(review, category));
+                List<ArtistResponse> artistResponses = albumArtists.stream().map(
+                                a -> new ArtistResponse(
+                                                a.getArtist().getId(),
+                                                a.getArtist().getName()))
+                                .toList();
+
+                return new ReviewResponse(
+                                review.getId(),
+                                review.getTitle(),
+                                review.getReleased(),
+                                review.getTracklist(),
+                                artistResponses,
+                                categoryResponses,
+                                reviewCommentService.getAverageStarPoint(review.getId()));
         }
 
-        // 아티스트 저장
-        List<Artist> artists = artistRepository.findAllById(req.getArtistIds());
-        for (Artist artist : artists) {
-            albumArtistRepository.save(new AlbumArtist(review, artist));
-        }
-    }
+        @Transactional
+        public void createReview(ReviewRequest req, HttpServletRequest tokenRequest) {
+                String token = jwtTokenProvider.resolveTokenFromCookie(tokenRequest);
 
-    @Transactional
-    public void updateReview(Long reviewId, ReviewUpdateRequest req, HttpServletRequest tokenRequest) {
-        Member member = getAdminMember(tokenRequest);
+                if (!jwtTokenProvider.validateToken(token)) {
+                        throw new UnauthorizedException();
+                }
 
-        Review review = reviewRepository.findById(reviewId).orElseThrow(NotFoundReviewException::new);
-        review.update(req.getTitle(), req.getReleased(), req.getTracklist());
+                Long memberId = jwtTokenProvider.getUserIdFromToken(token);
+                Member member = memberRepository.findById(memberId).orElseThrow(NotFoundMemberException::new);
 
-        reviewCategoryRepository.deleteByReviewId(reviewId);
-        albumArtistRepository.deleteByReviewId(reviewId);
+                AuthUtil.validateAdmin(member);
 
-        List<Category> categories = categoryRepository.findAllById(req.getCategoryIds());
-        for (Category category : categories) {
-            reviewCategoryRepository.save(new ReviewCategory(review, category));
-        }
+                // 리뷰변수
+                Review review = new Review(
+                                req.getTitle(),
+                                req.getReleased(),
+                                req.getTracklist());
 
-        List<Artist> artists = artistRepository.findAllById(req.getArtistIds());
-        for (Artist artist : artists) {
-            albumArtistRepository.save(new AlbumArtist(review, artist));
-        }
+                // 리뷰저장
+                review = reviewRepository.save(review);
 
-    }
+                // 카테고리 저장
+                List<Category> categories = categoryRepository.findAllById(req.getCategoryIds());
+                for (Category category : categories) {
+                        reviewCategoryRepository.save(new ReviewCategory(review, category));
+                }
 
-    // 리뷰글 삭제
-    @Transactional
-    public void deleteReview(Long reviewId, HttpServletRequest tokenRequest) {
-        Member member = getAdminMember(tokenRequest);
-
-        Review review = reviewRepository.findById(reviewId).orElseThrow(NotFoundReviewException::new);
-
-        reviewCategoryRepository.deleteByReviewId(reviewId);
-        albumArtistRepository.deleteByReviewId(reviewId);
-        reviewRepository.delete(review);
-    }
-
-    // 관리자 검증 메서드
-    private Member getAdminMember(HttpServletRequest request) {
-        String token = jwtTokenProvider.resolveTokenFromCookie(request);
-        if (!jwtTokenProvider.validateToken(token)) {
-            throw new UnauthorizedException();
+                // 아티스트 저장
+                List<Artist> artists = artistRepository.findAllById(req.getArtistIds());
+                for (Artist artist : artists) {
+                        albumArtistRepository.save(new AlbumArtist(review, artist));
+                }
         }
 
-        Long memberId = jwtTokenProvider.getUserIdFromToken(token);
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(NotFoundMemberException::new);
+        @Transactional
+        public void updateReview(Long reviewId, ReviewUpdateRequest req, HttpServletRequest tokenRequest) {
+                Member member = getAdminMember(tokenRequest);
 
-        AuthUtil.validateAdmin(member);
-        return member;
-    }
+                Review review = reviewRepository.findById(reviewId).orElseThrow(NotFoundReviewException::new);
+                review.update(req.getTitle(), req.getReleased(), req.getTracklist());
 
-    public List<ReviewResponse> getLatest() {
-        List<Review> reviewList = reviewRepository.findTop4ByOrderByCreatedDateDesc()
-                .orElseThrow(NotFoundReviewException::new);
+                reviewCategoryRepository.deleteByReviewId(reviewId);
+                albumArtistRepository.deleteByReviewId(reviewId);
 
-        return reviewList.stream()
-                .map(review -> new ReviewResponse(
-                        review.getId(),
-                        review.getTitle(),
-                        review.getReleased(),
-                        review.getTracklist()))
-                .toList();
-    }
+                List<Category> categories = categoryRepository.findAllById(req.getCategoryIds());
+                for (Category category : categories) {
+                        reviewCategoryRepository.save(new ReviewCategory(review, category));
+                }
+
+                List<Artist> artists = artistRepository.findAllById(req.getArtistIds());
+                for (Artist artist : artists) {
+                        albumArtistRepository.save(new AlbumArtist(review, artist));
+                }
+
+        }
+
+        // 리뷰글 삭제
+        @Transactional
+        public void deleteReview(Long reviewId, HttpServletRequest tokenRequest) {
+                Member member = getAdminMember(tokenRequest);
+
+                Review review = reviewRepository.findById(reviewId).orElseThrow(NotFoundReviewException::new);
+
+                reviewCategoryRepository.deleteByReviewId(reviewId);
+                albumArtistRepository.deleteByReviewId(reviewId);
+                reviewRepository.delete(review);
+        }
+
+        // 관리자 검증 메서드
+        private Member getAdminMember(HttpServletRequest request) {
+                String token = jwtTokenProvider.resolveTokenFromCookie(request);
+                if (!jwtTokenProvider.validateToken(token)) {
+                        throw new UnauthorizedException();
+                }
+
+                Long memberId = jwtTokenProvider.getUserIdFromToken(token);
+                Member member = memberRepository.findById(memberId)
+                                .orElseThrow(NotFoundMemberException::new);
+
+                AuthUtil.validateAdmin(member);
+                return member;
+        }
+
+        public List<ReviewResponse> getLatest() {
+                List<Review> reviewList = reviewRepository.findTop4ByOrderByCreatedDateDesc()
+                                .orElseThrow(NotFoundReviewException::new);
+
+                return reviewList.stream()
+                                .map(review -> new ReviewResponse(
+                                                review.getId(),
+                                                review.getTitle(),
+                                                review.getReleased(),
+                                                review.getTracklist(),
+                                                reviewCommentService.getAverageStarPoint(review.getId())))
+                                .toList();
+        }
 }
