@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
   Box,
@@ -30,6 +31,8 @@ const BoardList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchKeyword, setSearchKeyword] = useState("");
   const [submittedKeyword, setSubmittedKeyword] = useState("");
+
+  const navigate = useNavigate();
 
   // 백엔드에서 게시글 가져오기
   useEffect(() => {
@@ -100,7 +103,16 @@ const BoardList = () => {
             <CardBody>
               <Flex gap={1} align="center">
                 {/* 게시글 제목 */}
-                <Text fontWeight="bold" fontSize="lg" noOfLines={2} flex="1" minWidth="0">
+                <Text
+                  fontWeight="bold"
+                  fontSize="lg"
+                  noOfLines={2}
+                  flex="1"
+                  minWidth="0"
+                  cursor="pointer"
+                  onClick={() => navigate(`/boards/${board.id}`)}
+                  _hover={{ color: "blue.500", textDecoration: "underline" }}
+                >
                   {board.title}
                 </Text>
 

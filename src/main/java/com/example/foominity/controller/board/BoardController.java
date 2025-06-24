@@ -47,21 +47,21 @@ public class BoardController {
         return ResponseEntity.ok(boardService.findByid(id));
     }
 
-    @PostMapping("/api/boards")
+    @PostMapping("/api/boards/create")
     public ResponseEntity<String> createBoard(@Valid @RequestBody BoardRequest req,
             HttpServletRequest tokenRequest) {
         boardService.createBoard(req, tokenRequest);
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/api/boards/{id}")
+    @PutMapping("/api/boards/update/{id}")
     public ResponseEntity<String> updateBoard(@PathVariable Long id, @Valid @RequestBody BoardUpdateRequest req,
             HttpServletRequest tokenRequest) {
         boardService.updateBoard(id, req, tokenRequest);
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/api/boards/{id}")
+    @DeleteMapping("/api/boards/delete/{id}")
     public ResponseEntity<String> deleteBoard(@PathVariable Long id, HttpServletRequest tokenRequest) {
         boardService.deleteBoard(id, tokenRequest);
         return ResponseEntity.ok().build();
