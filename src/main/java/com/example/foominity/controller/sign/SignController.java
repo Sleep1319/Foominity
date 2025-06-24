@@ -114,6 +114,7 @@ public class SignController {
                 member.getUserName(),
                 member.getNickname(), // 최신 nickname
                 member.getRole().getName() // 최신 role
+
         );
 
         // 캐시 무효화 헤더 추가

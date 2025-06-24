@@ -5,48 +5,20 @@ import EditProfile from "./EditProfile";
 import { useUser } from "../../context/UserContext";
 
 const MyPage = () => {
-  const { state, updateUser } = useUser();
+  const { state, updateUser, isLoading } = useUser();
 
-  if (!state) return null; // 아직 유저 로딩 중이면 아무것도 안 보여줌
-
-  const nickname = state.nickname;
-  const avatar = state.avatar; // 확장 가능
-  const userName = state.userName;
-  const userGrade = state.role; // 등급 필드 이름에 따라 수정
-  const userPoints = 0; // 아직 없음
+  if (isLoading || !state) return null;
 
   return (
     <Routes>
-      <Route
-        index
-        element={
-          <Profile
-            nickname={nickname}
-            userName={userName}
-            userGrade={userGrade}
-            userPoints={userPoints}
-            avatar={avatar}
-          />
-        }
-      />
-      <Route
-        path="profile"
-        element={
-          <Profile
-            nickname={nickname}
-            userName={userName}
-            userGrade={userGrade}
-            userPoints={userPoints}
-            avatar={avatar}
-          />
-        }
-      />
+      <Route index element={<Profile />} />
+      <Route path="profile" element={<Profile />} />
       <Route
         path="editprofile"
         element={
           <EditProfile
-            nickname={nickname}
-            avatar={avatar}
+            nickname={state.nickname}
+            avatar={state.avatar}
             onNicknameChange={(newNick) => updateUser({ nickname: newNick })}
             onAvatarChange={(newAvatar) => updateUser({ avatar: newAvatar })}
           />
