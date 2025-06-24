@@ -1,6 +1,10 @@
 package com.example.foominity.controller.sign;
 
 import com.example.foominity.dto.member.UserInfoResponse;
+
+import java.util.Collections;
+import java.util.Map;
+
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,11 +17,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.foominity.config.jwt.JwtTokenProvider;
+import com.example.foominity.domain.member.Member;
 import com.example.foominity.dto.member.MemberRequest;
 import com.example.foominity.dto.member.NicknameChangeRequest;
 import com.example.foominity.dto.sign.SignInRequest;
 import com.example.foominity.dto.sign.SignInResponse;
 import com.example.foominity.dto.sign.SignUpRequest;
+import com.example.foominity.exception.NotFoundMemberException;
+import com.example.foominity.repository.member.MemberRepository;
 import com.example.foominity.service.sign.SignService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,6 +41,7 @@ public class SignController {
 
     private final SignService signService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final MemberRepository memberRepository;
 
     // 회원가입
     @PostMapping("/api/sign-up")
@@ -60,12 +68,11 @@ public class SignController {
         return ResponseEntity.ok().build();
     }
 
-    // 닉네임 중복 체크
-    // @GetMapping("/api/check-nickname")
-    // public ResponseEntity<Boolean> checkNickname(@RequestParam String nickname) {
-    // boolean exists = signService.existsNickname(nickname);
-    // return ResponseEntity.ok(exists);
-    // }
+    @GetMapping("/api/check-nickname")
+    public ResponseEntity<Map<String, Boolean>> checkNickname(@RequestParam String nickname) {
+        boolean exists = signService.existsNickname(nickname);
+        return ResponseEntity.ok(Collections.singletonMap("exists", exists));
+    }
 
     // 로그인
     @PostMapping("/api/sign-in")
@@ -95,8 +102,26 @@ public class SignController {
             return ResponseEntity.status(401).build(); // 인증 실패
         }
 
-        UserInfoResponse userInfo = jwtTokenProvider.getUserInfoFromToken(token);
-        return ResponseEntity.ok(userInfo);
+        Long memberId = jwtTokenProvider.getUserIdFromToken(token);
+
+        // DB에서 사용자 정보 조회
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new NotFoundMemberException());
+
+        UserInfoResponse userInfo = new UserInfoResponse(
+                member.getId(),
+                member.getEmail(),
+                member.getUserName(),
+                member.getNickname(), // 최신 nickname
+                member.getRole().getName() // 최신 role
+        );
+
+        // 캐시 무효화 헤더 추가
+        return ResponseEntity.ok()
+                .header("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
+                .header("Pragma", "no-cache")
+                .header("Expires", "0")
+                .body(userInfo);
     }
 
     // 로그아웃

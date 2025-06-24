@@ -82,6 +82,11 @@ public class SignService {
         member.changeNickname(req.getNickname());
     }
 
+    @Transactional(readOnly = true)
+    public boolean existsNickname(String nickname) {
+        return memberRepository.existsByNickname(nickname);
+    }
+
     // 회원가입
     @Transactional
     public void signUp(SignUpRequest req) {

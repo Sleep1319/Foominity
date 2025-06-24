@@ -11,6 +11,9 @@ frontend/node_modules/
 **/dist/
 **/.gradle/
 
+## application-oauth.yml ##
+src/main/resources/application-oauth.yml
+
 ### STS ###
 .apt_generated
 .classpath

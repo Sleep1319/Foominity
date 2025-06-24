@@ -1,8 +1,9 @@
-import { Button, Avatar, HStack, IconButton } from "@chakra-ui/react";
+import React, { useState } from "react";
+import { Button, HStack, Avatar, IconButton } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
+import AuthModal from "../../view/Sign/AuthModal";
 import { SearchIcon } from "@chakra-ui/icons";
-import { useState } from "react";
-import SearchNavbar from "./SearchNavbar"; // 경로에 맞게 조정
+import SearchNavbar from "./SearchNavBar";
 
 const whiteNeonText = `
   -1px -1px 0 white,
@@ -14,6 +15,7 @@ const whiteNeonText = `
 `;
 
 const AuthButtons = () => {
+  const [isLoginOpen, setLoginOpen] = useState(false);
   const [isNavVisible, setIsNavVisible] = useState(false);
 
   const showNav = () => setIsNavVisible(true);
@@ -21,23 +23,21 @@ const AuthButtons = () => {
 
   return (
     <>
-      {/* 🔻 상단 네브바 (hover 유지) */}
+      {/* 상단 네브바  */}
       <SearchNavbar isVisible={isNavVisible} onMouseEnter={showNav} onMouseLeave={hideNav} />
 
       <HStack spacing={4} align="center">
-        {/* 🔍 돋보기 버튼 */}
+        {/* 돋보기 버튼 */}
         <IconButton
           aria-label="Search"
           icon={<SearchIcon />}
           variant="ghost"
-          onMouseEnter={showNav} // ✅ 이 부분이 핵심!
+          onMouseEnter={showNav}
           bg="transparent"
           _hover={{ bg: "transparent" }}
         />
 
         <Button
-          as={RouterLink}
-          to="/login"
           variant="ghost"
           color="black"
           px={4}
@@ -49,30 +49,14 @@ const AuthButtons = () => {
             textDecoration: "underline",
             bg: "transparent",
           }}
+          onClick={() => setLoginOpen(true)} // 클릭 시 모달 열기
         >
-          login
+          SIGN
         </Button>
-
-        <Button
-          as={RouterLink}
-          to="/register"
-          variant="ghost"
-          color="black"
-          px={4}
-          py={2}
-          bg="transparent"
-          borderRadius="lg"
-          textShadow={whiteNeonText}
-          _hover={{
-            textDecoration: "underline",
-            bg: "transparent",
-          }}
-        >
-          sign up
-        </Button>
-
-        <Avatar as={RouterLink} to="/mypage" size="sm" />
       </HStack>
+
+      {/*  로그인/회원가입 탭 전환형 모달 */}
+      <AuthModal isOpen={isLoginOpen} onClose={() => setLoginOpen(false)} />
     </>
   );
 };

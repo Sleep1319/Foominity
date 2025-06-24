@@ -47,7 +47,7 @@ const Register = () => {
         username: form.username,
         nickname: form.nickname,
       };
-      console.log(submitData)
+      console.log(submitData);
       await axios.post("http://localhost:8084/api/sign-up", submitData, {
         withCredentials: true,
         headers: { "Content-Type": "application/json" },
@@ -61,7 +61,7 @@ const Register = () => {
       });
       navigate("/login");
     } catch (error) {
-      console.log("중복 에러 내용: " + error.response.data.error)
+      console.log("중복 에러 내용: " + error.response.data.error);
       const message = error.response?.data?.error || "회원가입 실패";
       toast({
         title: "회원가입 실패",
