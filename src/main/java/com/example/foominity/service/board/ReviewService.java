@@ -7,11 +7,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.foominity.config.jwt.JwtTokenProvider;
+import com.example.foominity.domain.artist.AlbumArtist;
+import com.example.foominity.domain.artist.Artist;
 import com.example.foominity.domain.board.Review;
+import com.example.foominity.domain.category.ArtistCategory;
 import com.example.foominity.domain.category.Category;
 import com.example.foominity.domain.category.ReviewCategory;
 import com.example.foominity.domain.member.Member;
 import com.example.foominity.domain.member.Point;
+import com.example.foominity.dto.artist.ArtistResponse;
 import com.example.foominity.dto.board.BoardUpdateRequest;
 import com.example.foominity.dto.board.ReviewRequest;
 import com.example.foominity.dto.board.ReviewResponse;
@@ -21,12 +25,16 @@ import com.example.foominity.exception.ForbiddenActionException;
 import com.example.foominity.exception.NotFoundMemberException;
 import com.example.foominity.exception.NotFoundReviewException;
 import com.example.foominity.exception.UnauthorizedException;
+import com.example.foominity.repository.artist.AlbumArtistRepository;
+import com.example.foominity.repository.artist.ArtistRepository;
 import com.example.foominity.repository.board.ReviewRepository;
+import com.example.foominity.repository.category.ArtistCategoryRepository;
 import com.example.foominity.repository.category.CategoryRepository;
 import com.example.foominity.repository.category.ReviewCategoryRepository;
 import com.example.foominity.repository.member.MemberRepository;
 import com.example.foominity.repository.member.PointRepository;
 import com.example.foominity.service.member.PointService;
+import com.example.foominity.util.AuthUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +50,8 @@ public class ReviewService {
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final PointRepository pointRepository;
+    private final AlbumArtistRepository albumArtistRepository;
+    private final ArtistRepository artistRepository;
 
     private final PointService pointService;
 
@@ -53,22 +63,27 @@ public class ReviewService {
                 .map(review -> {
                     List<ReviewCategory> reviewCategories = reviewCategoryRepository.findByReviewId(review.getId());
 
+                    List<AlbumArtist> albumArtists = albumArtistRepository.findByReviewId(review.getId());
+
                     List<ReviewCategoryResponse> categoryResponses = reviewCategories.stream()
                             .map(rc -> new ReviewCategoryResponse(
                                     rc.getCategory().getId(),
                                     rc.getCategory().getCategoryName()))
                             .toList();
 
+                    List<ArtistResponse> artistResponses = albumArtists.stream().map(
+                            a -> new ArtistResponse(
+                                    a.getArtist().getId(),
+                                    a.getArtist().getName()))
+                            .toList();
+
                     return new ReviewResponse(
                             review.getId(),
                             review.getTitle(),
-                            review.getContent(),
-                            review.getMember().getId(),
-                            review.getMember().getNickname(),
-                            review.getStarPoint(),
-                            categoryResponses,
-                            review.getCreatedDate(),
-                            review.getUpdatedDate());
+                            review.getReleased(),
+                            review.getTracklist(),
+                            artistResponses,
+                            categoryResponses);
 
                 })
                 .toList();
@@ -82,22 +97,27 @@ public class ReviewService {
 
         List<ReviewCategory> reviewCategory = reviewCategoryRepository.findByReviewId(review.getId());
 
+        List<AlbumArtist> albumArtists = albumArtistRepository.findByReviewId(review.getId());
+
         List<ReviewCategoryResponse> categoryResponses = reviewCategory.stream()
                 .map(rc -> new ReviewCategoryResponse(
                         rc.getCategory().getId(),
                         rc.getCategory().getCategoryName()))
                 .toList();
 
+        List<ArtistResponse> artistResponses = albumArtists.stream().map(
+                a -> new ArtistResponse(
+                        a.getArtist().getId(),
+                        a.getArtist().getName()))
+                .toList();
+
         return new ReviewResponse(
                 review.getId(),
                 review.getTitle(),
-                review.getContent(),
-                review.getMember().getId(),
-                review.getMember().getNickname(),
-                review.getStarPoint(),
-                categoryResponses,
-                review.getCreatedDate(),
-                review.getUpdatedDate());
+                review.getReleased(),
+                review.getTracklist(),
+                artistResponses,
+                categoryResponses);
     }
 
     @Transactional
@@ -111,15 +131,13 @@ public class ReviewService {
         Long memberId = jwtTokenProvider.getUserIdFromToken(token);
         Member member = memberRepository.findById(memberId).orElseThrow(NotFoundMemberException::new);
 
-        // 리뷰카운트 증가
-        pointService.updateReviewCount(memberId);
+        AuthUtil.validateAdmin(member);
 
         // 리뷰변수
         Review review = new Review(
                 req.getTitle(),
-                req.getContent(),
-                member,
-                req.getStarPoint());
+                req.getReleased(),
+                req.getTracklist());
 
         // 리뷰저장
         review = reviewRepository.save(review);
@@ -130,65 +148,73 @@ public class ReviewService {
             reviewCategoryRepository.save(new ReviewCategory(review, category));
         }
 
+        // 아티스트 저장
+        List<Artist> artists = artistRepository.findAllById(req.getArtistIds());
+        for (Artist artist : artists) {
+            albumArtistRepository.save(new AlbumArtist(review, artist));
+        }
     }
 
     @Transactional
     public void updateReview(Long reviewId, ReviewUpdateRequest req, HttpServletRequest tokenRequest) {
-        Review review = validateReviewOwnership(reviewId, tokenRequest);
-        review.update(req.getTitle(), req.getContent(), req.getStarPoint());
+        Member member = getAdminMember(tokenRequest);
 
-        // 기존 연결된 카테고리 삭제
+        Review review = reviewRepository.findById(reviewId).orElseThrow(NotFoundReviewException::new);
+        review.update(req.getTitle(), req.getReleased(), req.getTracklist());
+
         reviewCategoryRepository.deleteByReviewId(reviewId);
+        albumArtistRepository.deleteByReviewId(reviewId);
 
-        // 새로 받은 카테고리 ID로 연결 다시 생성
         List<Category> categories = categoryRepository.findAllById(req.getCategoryIds());
         for (Category category : categories) {
             reviewCategoryRepository.save(new ReviewCategory(review, category));
         }
+
+        List<Artist> artists = artistRepository.findAllById(req.getArtistIds());
+        for (Artist artist : artists) {
+            albumArtistRepository.save(new AlbumArtist(review, artist));
+        }
+
     }
 
     // 리뷰글 삭제
     @Transactional
     public void deleteReview(Long reviewId, HttpServletRequest tokenRequest) {
-        Review review = validateReviewOwnership(reviewId, tokenRequest);
+        Member member = getAdminMember(tokenRequest);
+
+        Review review = reviewRepository.findById(reviewId).orElseThrow(NotFoundReviewException::new);
 
         reviewCategoryRepository.deleteByReviewId(reviewId);
-
+        albumArtistRepository.deleteByReviewId(reviewId);
         reviewRepository.delete(review);
     }
 
-    // 리뷰 작성자 검증 메서드
-    public Review validateReviewOwnership(Long reviewId, HttpServletRequest tokenRequest) {
-        String token = jwtTokenProvider.resolveTokenFromCookie(tokenRequest);
-
-        // 유효성검증
+    // 관리자 검증 메서드
+    private Member getAdminMember(HttpServletRequest request) {
+        String token = jwtTokenProvider.resolveTokenFromCookie(request);
         if (!jwtTokenProvider.validateToken(token)) {
             throw new UnauthorizedException();
         }
 
         Long memberId = jwtTokenProvider.getUserIdFromToken(token);
-        Member member = memberRepository.findById(memberId).orElseThrow(NotFoundMemberException::new);
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(NotFoundMemberException::new);
 
-        Review review = reviewRepository.findById(reviewId).orElseThrow(NotFoundReviewException::new);
-
-        if (!review.getMember().getId().equals(member.getId())) {
-            throw new ForbiddenActionException();
-        }
-
-        return review;
+        AuthUtil.validateAdmin(member);
+        return member;
     }
 
     public List<ReviewResponse> getLatest() {
-        List<Review> reviewList = reviewRepository.findTop4ByOrderByCreatedDateDesc().orElseThrow(NotFoundReviewException::new);
+        List<Review> reviewList = reviewRepository.findTop4ByOrderByCreatedDateDesc()
+                .orElseThrow(NotFoundReviewException::new);
 
         return reviewList.stream()
                 .map(review -> new ReviewResponse(
                         review.getId(),
                         review.getTitle(),
-                        review.getMember().getNickname(),
-                        review.getCreatedDate(),
-                        review.getUpdatedDate()
-                )).toList();
+                        review.getReleased(),
+                        review.getTracklist()))
+                .toList();
     }
 
     public List<ReviewResponse> getTop3LikeReviews(int top3) {
