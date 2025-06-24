@@ -57,8 +57,11 @@ public class Member extends BaseEntity {
         this.userName = userName;
         this.nickname = nickname;
         this.role = role;
-        socialType = "NORMAL";
-        providerId = null;
+    }
+
+    public void setSocialProvider(String socialType, String providerId) {
+        this.socialType = socialType;
+        this.providerId = providerId;
     }
 
     // RoleService에 사용

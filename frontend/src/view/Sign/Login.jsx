@@ -15,6 +15,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useUser } from "@/context/UserContext.jsx";
 import axios from "axios";
+import SocialLoginButton from "@/components/siginComponents/SocialLoginButton.jsx";
 
 const Login = () => {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -92,16 +93,16 @@ const Login = () => {
 
             <Divider />
 
-            <Text fontSize="sm">
-              계정이 없으신가요?{" "}
-              <Link color="gray:50" onClick={() => navigate("/register")}>
-                회원가입
-              </Link>
-            </Text>
-          </VStack>
-        </form>
-      </Box>
-    </>
+          <Text fontSize="sm">
+            계정이 없으신가요?{" "}
+            <Link color="skyblue" onClick={() => navigate("/register")}>
+              회원가입
+            </Link>
+          </Text>
+          <SocialLoginButton mode="login" />
+        </VStack>
+      </form>
+    </Box>
   );
 };
 

@@ -13,4 +13,6 @@ public class ReviewCommentUpdateRequest {
 
     @NotBlank
     private String comment;
+
+    private float starPoint;
 }

@@ -1,5 +1,6 @@
 package com.example.foominity.dto.board;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.lang.Nullable;
@@ -20,13 +21,10 @@ public class ReviewRequest {
 
     @NotBlank
     private String title;
+    private LocalDate released;
 
-    @NotBlank
-    private String content;
-
+    private List<String> tracklist;
+    private List<Long> artistIds;
     private List<Long> categoryIds;
-
-    @NotNull
-    private float starPoint;
 
 }

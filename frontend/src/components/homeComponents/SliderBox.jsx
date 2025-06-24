@@ -1,18 +1,17 @@
+import React, { useRef, useState } from "react";
 import { Box, Image } from "@chakra-ui/react";
 import { BsChevronLeft, BsChevronRight } from "react-icons/bs";
-import 'slick-carousel/slick/slick.css';
-import 'slick-carousel/slick/slick-theme.css';
-import React, { useRef } from 'react';
-import Slider from 'react-slick';
+import Slider from "react-slick";
 
-const images = [
-  "/images/img1.jpg",
-  "/images/img2.jpg",
-  "/images/img3.jpg",
-];
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import SliderBoxIndicator from "./SliderBoxIndicator"; // 위치에 따라 경로 조정
+
+const images = ["/images/img1.jpg", "/images/img2.jpg", "/images/img3.jpg", "/images/img4.jpg"];
 
 const SliderBox = () => {
   const sliderRef = useRef(null);
+  const [currentIndex, setCurrentIndex] = useState(0); // 현재 인덱스 추적
 
   const settings = {
     autoplay: true,
@@ -23,8 +22,9 @@ const SliderBox = () => {
     slidesToShow: 1,
     slidesToScroll: 1,
     arrows: false,
-    dots: true,
     pauseOnHover: false,
+    accessibility: false,
+    afterChange: (index) => setCurrentIndex(index), // 슬라이드 바뀔 때 index 업데이트
   };
 
   return (
@@ -43,8 +43,7 @@ const SliderBox = () => {
           size={36}
           color="white"
           style={{
-            filter:
-              "drop-shadow(0 0 6px #888) drop-shadow(0 0 12px #888) drop-shadow(0 0 20px #888)",
+            filter: "drop-shadow(0 0 6px #888) drop-shadow(0 0 12px #888) drop-shadow(0 0 20px #888)",
           }}
         />
       </Box>
@@ -63,8 +62,7 @@ const SliderBox = () => {
           size={36}
           color="white"
           style={{
-            filter:
-              "drop-shadow(0 0 6px #888) drop-shadow(0 0 12px #888) drop-shadow(0 0 20px #888)",
+            filter: "drop-shadow(0 0 6px #888) drop-shadow(0 0 12px #888) drop-shadow(0 0 20px #888)",
           }}
         />
       </Box>
@@ -76,6 +74,7 @@ const SliderBox = () => {
             <Image
               src={src}
               alt={`slide-${idx}`}
+              tabIndex={-1}
               w="100%"
               h="100%"
               objectFit="cover"
@@ -85,6 +84,9 @@ const SliderBox = () => {
           </Box>
         ))}
       </Slider>
+
+      {/* 커스텀 도트 인디케이터 */}
+      <SliderBoxIndicator total={images.length} currentIndex={currentIndex} />
     </Box>
   );
 };

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Box, Button, Input, FormControl, FormLabel, Heading, VStack, Text, Link, useToast } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import SocialLoginButton from "@/components/siginComponents/SocialLoginButton.jsx";
 
 const Register = () => {
   const [form, setForm] = useState({
@@ -145,6 +146,7 @@ const Register = () => {
               로그인
             </Link>
           </Text>
+          <SocialLoginButton mode="signup" />
         </VStack>
       </form>
     </Box>
