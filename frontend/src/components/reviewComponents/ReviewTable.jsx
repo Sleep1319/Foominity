@@ -23,7 +23,7 @@ const ReviewTable = () => {
       <Table variant="simple" size="md">
         <Thead>
           <Tr>
-            <Th textAlign="center">번호</Th>
+            <Th textAlign="center">번호.</Th>
             <Th textAlign="center">앨범</Th>
             <Th textAlign="center">아티스트</Th>
             <Th textAlign="center">장르</Th>
