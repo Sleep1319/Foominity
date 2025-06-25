@@ -4,6 +4,7 @@ import com.example.foominity.domain.BaseEntity;
 import com.example.foominity.domain.board.Board;
 import com.example.foominity.domain.board.BoardComment;
 import com.example.foominity.domain.board.ReviewComment;
+import com.example.foominity.domain.image.ImageFile;
 import com.example.foominity.domain.report.Report;
 import com.example.foominity.domain.report.ReportComment;
 import com.example.foominity.domain.sign.SocialType;
@@ -83,6 +84,10 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<ReportComment> reportComment;
 
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "profile_image_id")
+    private ImageFile profileImage;
+
     // ================================================================
     public Member(String email, String password, String userName, String nickname, Role role) {
         this.email = email;
@@ -110,5 +115,10 @@ public class Member extends BaseEntity {
 
     public void changePassword(String password) {
         this.password = password;
+    }
+
+    // 프로필 사진 설정
+    public void setProfileImage(ImageFile profileImage) {
+        this.profileImage = profileImage;
     }
 }

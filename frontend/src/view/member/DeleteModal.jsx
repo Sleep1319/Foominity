@@ -110,10 +110,29 @@ const AuthModal = ({ isOpen, onClose }) => {
         </ModalBody>
 
         <ModalFooter justifyContent="center">
-          <Button mr={3} onClick={onClose} bg="black" color="white" isDisabled={isLoading}>
+          <Button
+            mr={3}
+            onClick={onClose}
+            bg="white"
+            color="black"
+            isDisabled={isLoading}
+            _hover={{
+              bg: "black",
+              color: "white",
+            }}
+          >
             취소
           </Button>
-          <Button colorScheme="red" onClick={handleConfirm} isLoading={isLoading}>
+          <Button
+            color="red"
+            bg="white"
+            onClick={handleConfirm}
+            isLoading={isLoading}
+            _hover={{
+              bg: "red",
+              color: "white",
+            }}
+          >
             회원 탈퇴
           </Button>
         </ModalFooter>

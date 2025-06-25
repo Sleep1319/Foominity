@@ -16,7 +16,7 @@ import axios from "axios";
 import { useUser } from "../../context/UserContext";
 import DefaultTable from "../../components/reportComponents/DefaultTable.jsx";
 
-const EditProfile = ({ nickname: initialNickname, avatar, onNicknameChange, onAvatarChange }) => {
+const EditProfile = ({ nickname: initialNickname, avatar, onNicknameChange }) => {
   const navigate = useNavigate();
   const [nickname, setNickname] = useState(initialNickname);
   const [nicknameError, setNicknameError] = useState("");
@@ -24,6 +24,9 @@ const EditProfile = ({ nickname: initialNickname, avatar, onNicknameChange, onAv
   const fileInputRef = useRef();
   const { state } = useUser();
   const { updateUser } = useUser();
+
+  console.log("🧠 [EditProfile] props.avatar:", avatar);
+  console.log("👀 [EditProfile] avatarPreview:", avatarPreview);
 
   const handleNicknameChange = async (e) => {
     const newNickname = e.target.value;
@@ -48,15 +51,24 @@ const EditProfile = ({ nickname: initialNickname, avatar, onNicknameChange, onAv
     fileInputRef.current.click();
   };
 
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setAvatarPreview(reader.result); // base64로 미리보기
-        onAvatarChange(reader.result); // 상위 상태에도 반영
-      };
-      reader.readAsDataURL(file);
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        const response = await axios.post("/api/member/profile-image", formData, {
+          withCredentials: true,
+        });
+
+        const imageUrl = response.data.imageUrl;
+        console.log("👀 이미지 업로드 후 받은 URL:", imageUrl);
+        setAvatarPreview(imageUrl);
+        updateUser((prev) => ({ ...prev, avatar: imageUrl })); // 전역 상태 업데이트
+      } catch (err) {
+        console.error("이미지 업로드 실패:", err);
+      }
     }
   };
 
@@ -106,7 +118,9 @@ const EditProfile = ({ nickname: initialNickname, avatar, onNicknameChange, onAv
           <HStack spacing={6} align="center" flex="1">
             <VStack spacing={0} position="relative">
               <Box position="relative" w="12rem" h="12rem">
-                <Avatar boxSize="12rem" src={avatarPreview || undefined} />
+                {/* <Avatar boxSize="12rem" src={avatarPreview || undefined} /> */}
+                <Avatar boxSize="12rem" src={state.avatar ? `http://localhost:8084${state.avatar}` : undefined} />
+
                 <Button
                   size="sm"
                   position="absolute"
@@ -178,13 +192,16 @@ const EditProfile = ({ nickname: initialNickname, avatar, onNicknameChange, onAv
           mr={75}
           w="85px"
           onClick={handleSubmit}
-          bg="transparent"
-          border="1px solid black"
+          bg="white"
+          border="2px solid black"
           color="black"
           _hover={{
-            borderWidth: "2px",
+            // borderWidth: "2px",
+            // borderColor: "green.400",
+            // bg: "white",
             borderColor: "green.400",
-            bg: "white",
+            bg: "green.400",
+            color: "white",
           }}
         >
           저장
