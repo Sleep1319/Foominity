@@ -28,6 +28,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.util.List;
+
 @Table(name = "member")
 @NoArgsConstructor
 @Getter
@@ -64,22 +66,22 @@ public class Member extends BaseEntity {
     private Point point;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
-    private Like like;
+    private List<Like> like;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
-    private ReviewComment reviewComment;
+    private List<ReviewComment> reviewComment;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
-    private Board board;
+    private List<Board> board;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
-    private BoardComment boardComment;
+    private List<BoardComment> boardComment;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
-    private Report report;
+    private List<Report> report;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
-    private ReportComment reportComment;
+    private List<ReportComment> reportComment;
 
     // ================================================================
     public Member(String email, String password, String userName, String nickname, Role role) {
