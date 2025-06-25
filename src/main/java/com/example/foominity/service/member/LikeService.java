@@ -32,6 +32,7 @@ public class LikeService {
     private final ReviewCommentRepository reviewCommentRepository;
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final PointService pointService;
 
     @Transactional
     public void like(Long commentId, HttpServletRequest tokenRequest, LikeRequest req) {
@@ -57,6 +58,8 @@ public class LikeService {
         } else {
             likeRepository.save(req.toEntity(reviewComment, member));
         }
+
+        pointService.updateLikeCount(member);
 
     }
 
