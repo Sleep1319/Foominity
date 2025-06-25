@@ -37,10 +37,10 @@ function AppRoutes() {
       </Route>
 
       {/* 자유게시판 */}
-      <Route path="/boards" element={<BoardLists />} />
-      <Route path="/boards/create" element={<BoardCreateRun />} />
-      <Route path="/boards/:id" element={<BoardDetails />} />
-      <Route path="/boards/update/:id" element={<BoardUpdateRun />} />
+      <Route path="/board" element={<BoardLists />} />
+      <Route path="/board/create" element={<BoardCreateRun />} />
+      <Route path="/board/:id" element={<BoardDetails />} />
+      <Route path="/board/update/:id" element={<BoardUpdateRun />} />
     </Routes>
   );
 }

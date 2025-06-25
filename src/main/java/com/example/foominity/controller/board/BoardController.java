@@ -37,8 +37,8 @@ public class BoardController {
         return ResponseEntity.ok(res);
     }
 
-    @GetMapping("/api/board")
-    public ResponseEntity<List<BoardResponse>> searchBoards(@RequestParam(required = false) String keyword) {
+    @GetMapping("/api/board/search")
+    public ResponseEntity<List<BoardResponse>> searchBoards(@RequestParam String keyword) {
         return ResponseEntity.ok(boardService.findByTitle(keyword));
     }
 

@@ -38,7 +38,7 @@ const BoardList = () => {
   useEffect(() => {
     const fetchBoards = async () => {
       try {
-        const response = await axios.get("/api/board", {
+        const response = await axios.get("/api/board/search", {
           params: {
             keyword: submittedKeyword,
           },
