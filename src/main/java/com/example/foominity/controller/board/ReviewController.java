@@ -35,7 +35,7 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     // 전체 조회
-    @GetMapping("/api/reviews/page")
+    @GetMapping("/api/reviews")
     public ResponseEntity<?> findAll(@RequestParam(defaultValue = "0") int page) {
         Page<ReviewSimpleResponse> res = reviewService.findAll(page);
         return ResponseEntity.ok(res);

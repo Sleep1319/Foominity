@@ -3,6 +3,8 @@ package com.example.foominity.dto.board;
 import java.util.List;
 
 import com.example.foominity.dto.artist.ArtistResponse;
+import com.example.foominity.dto.category.ReviewCategoryResponse;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,6 +18,7 @@ public class ReviewSimpleResponse {
     private String title;
     private float averageStarPoint;
     private List<ArtistResponse> artists;
+    private List<ReviewCategoryResponse> categories;
 
     private String imagePath;
 
