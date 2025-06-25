@@ -12,6 +12,8 @@ import MyPage from "../view/member/MyPage.jsx";
 import ReportDetails from "../view/report/ReportDetails.jsx";
 import NoticeDetails from "../view/notice/NoticeDetails.jsx";
 import SocialRegister from "@/view/Sign/SocialRegister.jsx";
+import Review from "@/view/review/Review.jsx";
+import ReviewDetails from "@/view/review/ReviewDetails.jsx";
 
 import BoardLists from "./../view/board/BoardLists";
 import BoardCreateRun from "../view/board/BoardCreateRun.jsx";
@@ -26,6 +28,8 @@ function AppRoutes() {
       <Route path="/report/report-details" element={<ReportDetails />} />
       <Route path="/notice" element={<Notice />} />
       <Route path="/notice/notice-details" element={<NoticeDetails />} />
+        <Route path="/review" element={<Review />} />
+        <Route path="/review/:id" element={<ReviewDetails />} />
       <Route element={<ProtectedRoute requireAuth={false} />}>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
