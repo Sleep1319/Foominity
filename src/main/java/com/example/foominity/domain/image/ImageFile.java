@@ -23,4 +23,12 @@ public class ImageFile {
         this.originalName = originalName;
         this.savePath = savePath;
     }
+
+    public void setOriginalName(String originalName) {
+        this.originalName = originalName;
+    }
+
+    public void setSavePath(String savePath) {
+        this.savePath = savePath;
+    }
 }

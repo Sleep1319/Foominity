@@ -28,7 +28,9 @@ const Profile = () => {
         {/* <Box p={5} borderWidth={1} borderRadius="lg" flex="1" mr={6}> */}
         <Flex mb={6} align="center" justify="space-between" height={190}>
           <HStack spacing={6} align="center" flex="1">
-            <Avatar boxSize="12rem" />
+            {/* <Avatar boxSize="12rem" /> */}
+            <Avatar boxSize="12rem" src={state.avatar ? `http://localhost:8084${state.avatar}` : undefined} />
+
             <VStack align="start" spacing={4}>
               <HStack>
                 <Text fontWeight="bold" w="80px">
@@ -65,12 +67,14 @@ const Profile = () => {
           <Button
             w="85px"
             bg="white"
-            border="1px solid black"
+            // border="1px solid black"
             onClick={() => navigate("/mypage/editprofile")}
             _hover={{
               borderWidth: "2px",
-              borderColor: "black",
-              bg: "white",
+              // borderColor: "black",
+              // bg: "white",
+              bg: "black",
+              color: "white",
             }}
           >
             편집
@@ -80,11 +84,13 @@ const Profile = () => {
           <Button
             w="85px"
             bg="white"
-            border="1px solid black"
+            color="red"
+            // border="1px solid black"
             _hover={{
-              borderWidth: "2px",
-              borderColor: "red",
-              bg: "white",
+              // borderWidth: "2px",
+              // borderColor: "red",
+              bg: "red",
+              color: "white",
             }}
             onClick={() => setDeleteOpen(true)}
           >

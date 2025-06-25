@@ -2,6 +2,7 @@ package com.example.foominity.controller.sign;
 
 import com.example.foominity.dto.member.UserInfoResponse;
 
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Map;
 
@@ -95,42 +96,65 @@ public class SignController {
 
     @GetMapping("/api/user")
     public ResponseEntity<UserInfoResponse> getUserInfo(HttpServletRequest request) {
-        String token = null;
-        if (request.getCookies() != null) {
-            for (var cookie : request.getCookies()) {
-                if (cookie.getName().equals("token")) {
-                    token = cookie.getValue();
-                    break;
-                }
-            }
-        }
+        String token = jwtTokenProvider.resolveTokenFromCookie(request);
 
         if (token == null || !jwtTokenProvider.validateToken(token)) {
-            return ResponseEntity.status(401).build(); // 인증 실패
+            return ResponseEntity.status(401).build();
         }
 
         Long memberId = jwtTokenProvider.getUserIdFromToken(token);
+        Member member = memberRepository.findById(memberId).orElseThrow(NotFoundMemberException::new);
 
-        // DB에서 사용자 정보 조회
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new NotFoundMemberException());
-
-        UserInfoResponse userInfo = new UserInfoResponse(
-                member.getId(),
-                member.getEmail(),
-                member.getUserName(),
-                member.getNickname(), // 최신 nickname
-                member.getRole().getName() // 최신 role
-
-        );
-
-        // 캐시 무효화 헤더 추가
         return ResponseEntity.ok()
                 .header("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
                 .header("Pragma", "no-cache")
                 .header("Expires", "0")
-                .body(userInfo);
+                .body(new UserInfoResponse(member));
     }
+
+    // @GetMapping("/api/user")
+    // public ResponseEntity<UserInfoResponse> getUserInfo(HttpServletRequest
+    // request) {
+    // String token = null;
+    // if (request.getCookies() != null) {
+    // for (var cookie : request.getCookies()) {
+    // if (cookie.getName().equals("token")) {
+    // token = cookie.getValue();
+    // break;
+    // }
+    // }
+    // }
+
+    // if (token == null || !jwtTokenProvider.validateToken(token)) {
+    // return ResponseEntity.status(401).build();
+    // }
+
+    // Long memberId = jwtTokenProvider.getUserIdFromToken(token);
+    // Member member = memberRepository.findById(memberId)
+    // .orElseThrow(() -> new NotFoundMemberException());
+
+    // // avatar 경로 추출
+    // String avatar = null;
+    // if (member.getProfileImage() != null) {
+    // avatar = "/uploads/" +
+    // Paths.get(member.getProfileImage().getSavePath()).getFileName();
+    // }
+
+    // UserInfoResponse userInfo = new UserInfoResponse(
+    // member.getId(),
+    // member.getEmail(),
+    // member.getUserName(),
+    // member.getNickname(),
+    // member.getRole().getName(),
+    // avatar // ✅ avatar 경로 전달
+    // );
+
+    // return ResponseEntity.ok()
+    // .header("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
+    // .header("Pragma", "no-cache")
+    // .header("Expires", "0")
+    // .body(userInfo);
+    // }
 
     // 로그아웃
     @PostMapping("/api/logout")
