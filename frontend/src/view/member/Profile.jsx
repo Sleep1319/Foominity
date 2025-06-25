@@ -1,12 +1,14 @@
 import { Avatar, Box, HStack, Text, VStack, Flex, Button, Input } from "@chakra-ui/react";
-import React from "react";
+import React, { useState } from "react";
 import DefaultTable from "../../components/reportComponents/DefaultTable.jsx";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../context/UserContext.jsx";
-
+import DeleteModal from "../../view/Member/DeleteModal.jsx";
 const Profile = () => {
   const navigate = useNavigate();
   const { state } = useUser();
+  const [isDeleteOpen, setDeleteOpen] = useState(false);
+
   return (
     <>
       <Text
@@ -58,18 +60,37 @@ const Profile = () => {
             </VStack>
           </HStack>
         </Flex>
-        <Button
-          ml={130}
-          mr={7}
-          onClick={() => navigate("/mypage/editprofile")}
-          _hover={{
-            borderWidth: "2px",
-            borderColor: "black",
-            bg: "white",
-          }}
-        >
-          편집
-        </Button>
+
+        <VStack ml={153} mr={7}>
+          <Button
+            w="85px"
+            bg="white"
+            border="1px solid black"
+            onClick={() => navigate("/mypage/editprofile")}
+            _hover={{
+              borderWidth: "2px",
+              borderColor: "black",
+              bg: "white",
+            }}
+          >
+            편집
+          </Button>
+
+          {/* 회원 탈퇴 버튼 */}
+          <Button
+            w="85px"
+            bg="white"
+            border="1px solid black"
+            _hover={{
+              borderWidth: "2px",
+              borderColor: "red",
+              bg: "white",
+            }}
+            onClick={() => setDeleteOpen(true)}
+          >
+            회원 탈퇴
+          </Button>
+        </VStack>
         {/* </Box> */}
       </Flex>
 
@@ -79,6 +100,7 @@ const Profile = () => {
         </Text>
         <DefaultTable />
       </Box>
+      <DeleteModal isOpen={isDeleteOpen} onClose={() => setDeleteOpen(false)} />
     </>
   );
 };

@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useUser } from "../../context/UserContext";
 import DefaultTable from "../../components/reportComponents/DefaultTable.jsx";
+
 const EditProfile = ({ nickname: initialNickname, avatar, onNicknameChange, onAvatarChange }) => {
   const navigate = useNavigate();
   const [nickname, setNickname] = useState(initialNickname);
@@ -84,6 +85,7 @@ const EditProfile = ({ nickname: initialNickname, avatar, onNicknameChange, onAv
       alert("닉네임을 입력해주세요");
     }
   };
+
   return (
     <>
       <Text
@@ -100,11 +102,30 @@ const EditProfile = ({ nickname: initialNickname, avatar, onNicknameChange, onAv
       </Text>
 
       <Flex maxW="3xl" mx="auto" mt={70} align="center" justify="flex-start">
-        {/* <Box p={5} borderWidth={1} borderRadius="lg" flex="1" mr={6}> */}
         <Flex mb={6} align="center" justify="space-between" height={190}>
           <HStack spacing={6} align="center" flex="1">
-            <VStack>
-              <Avatar boxSize="12rem" />
+            <VStack spacing={0} position="relative">
+              <Box position="relative" w="12rem" h="12rem">
+                <Avatar boxSize="12rem" src={avatarPreview || undefined} />
+                <Button
+                  size="sm"
+                  position="absolute"
+                  bottom="-40px"
+                  left="50%"
+                  transform="translateX(-50%)"
+                  onClick={handlePhotoButtonClick}
+                  bg="transparent"
+                  border="1px solid black"
+                  color="black"
+                  _hover={{
+                    borderWidth: "2px",
+                    borderColor: "black",
+                    bg: "white",
+                  }}
+                >
+                  사진 수정
+                </Button>
+              </Box>
               <Input
                 size="sm"
                 type="file"
@@ -113,20 +134,6 @@ const EditProfile = ({ nickname: initialNickname, avatar, onNicknameChange, onAv
                 display="none"
                 onChange={handleFileChange}
               />
-              <Button
-                size="sm"
-                onClick={handlePhotoButtonClick}
-                bg="transparent"
-                border="1px solid black"
-                color="black"
-                _hover={{
-                  borderWidth: "2px",
-                  borderColor: "black",
-                  bg: "white",
-                }}
-              >
-                사진 수정
-              </Button>
             </VStack>
 
             <VStack align="start" spacing={4}>
@@ -135,7 +142,13 @@ const EditProfile = ({ nickname: initialNickname, avatar, onNicknameChange, onAv
                   <Text fontWeight="bold" w="80px">
                     닉네임
                   </Text>
-                  <Input size="sm" value={nickname} onChange={handleNicknameChange} placeholder={state.nickname} />
+                  <Input
+                    ml={4}
+                    size="sm"
+                    value={nickname}
+                    onChange={handleNicknameChange}
+                    placeholder={state.nickname}
+                  />
                 </HStack>
                 <FormErrorMessage>{nicknameError}</FormErrorMessage>
               </FormControl>
@@ -162,14 +175,15 @@ const EditProfile = ({ nickname: initialNickname, avatar, onNicknameChange, onAv
         </Flex>
         <Button
           ml={66}
-          mr={7}
+          mr={75}
+          w="85px"
           onClick={handleSubmit}
           bg="transparent"
           border="1px solid black"
           color="black"
           _hover={{
             borderWidth: "2px",
-            borderColor: "black",
+            borderColor: "green.400",
             bg: "white",
           }}
         >
