@@ -5,7 +5,9 @@ import ReviewTable from "../../components/reviewComponents/ReviewTable.jsx";
 const Review = () => {
   return (
     <Box p={6}>
-      <Text fontSize="3xl" fontWeight="medium" borderBottom="2px solid gray" pb={2}></Text>
+      <Text fontSize="3xl" fontWeight="medium" pb={2} textAlign="center">
+        Review
+      </Text>
       <ReviewTable />
     </Box>
   );
