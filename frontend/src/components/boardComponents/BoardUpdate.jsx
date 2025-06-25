@@ -30,7 +30,7 @@ const BoardUpdate = () => {
   useEffect(() => {
     const fetchBoard = async () => {
       try {
-        const res = await axios.get(`/api/boards/${id}`);
+        const res = await axios.get(`/api/board/${id}`);
         setTitle(res.data.title);
         setContent(res.data.content);
       } catch (err) {

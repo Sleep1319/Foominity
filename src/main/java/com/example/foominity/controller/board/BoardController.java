@@ -31,37 +31,37 @@ public class BoardController {
 
     private final BoardService boardService;
 
-    @GetMapping("/api/boards/page")
+    @GetMapping("/api/board/page")
     public ResponseEntity<?> findAll(@RequestParam(defaultValue = "0") int page) {
         Page<BoardResponse> res = boardService.findAll(page);
         return ResponseEntity.ok(res);
     }
 
-    @GetMapping("/api/boards")
-    public ResponseEntity<List<BoardResponse>> searchBoards(@RequestParam(required = false) String keyword) {
+    @GetMapping("/api/board/search")
+    public ResponseEntity<List<BoardResponse>> searchBoards(@RequestParam String keyword) {
         return ResponseEntity.ok(boardService.findByTitle(keyword));
     }
 
-    @GetMapping("/api/boards/{id}")
+    @GetMapping("/api/board/{id}")
     public ResponseEntity<BoardResponse> findById(@PathVariable Long id) {
         return ResponseEntity.ok(boardService.findByid(id));
     }
 
-    @PostMapping("/api/boards")
+    @PostMapping("/api/board/create")
     public ResponseEntity<String> createBoard(@Valid @RequestBody BoardRequest req,
             HttpServletRequest tokenRequest) {
         boardService.createBoard(req, tokenRequest);
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/api/boards/{id}")
+    @PutMapping("/api/board/update/{id}")
     public ResponseEntity<String> updateBoard(@PathVariable Long id, @Valid @RequestBody BoardUpdateRequest req,
             HttpServletRequest tokenRequest) {
         boardService.updateBoard(id, req, tokenRequest);
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/api/boards/{id}")
+    @DeleteMapping("/api/board/{id}")
     public ResponseEntity<String> deleteBoard(@PathVariable Long id, HttpServletRequest tokenRequest) {
         boardService.deleteBoard(id, tokenRequest);
         return ResponseEntity.ok().build();

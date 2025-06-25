@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
   Box,
@@ -31,11 +32,13 @@ const BoardList = () => {
   const [searchKeyword, setSearchKeyword] = useState("");
   const [submittedKeyword, setSubmittedKeyword] = useState("");
 
-  // 백엔드에서 게시글 가져오기
+  const navigate = useNavigate();
+
+  // 게시글 가져오기
   useEffect(() => {
     const fetchBoards = async () => {
       try {
-        const response = await axios.get("/api/boards", {
+        const response = await axios.get("/api/board/search", {
           params: {
             keyword: submittedKeyword,
           },
@@ -55,6 +58,15 @@ const BoardList = () => {
   const startIndex = (currentPage - 1) * BOARDS_PER_PAGE;
   const currentBoards = boards.slice(startIndex, startIndex + BOARDS_PER_PAGE);
 
+  const PAGE_BLOCK = 10;
+  const currentBlock = Math.floor((currentPage - 1) / PAGE_BLOCK);
+  const blockStart = currentBlock * PAGE_BLOCK + 1;
+  const blockEnd = Math.min(blockStart + PAGE_BLOCK - 1, totalPages);
+
+  const pageNumbers = [];
+  for (let i = blockStart; i <= blockEnd; i++) {
+    pageNumbers.push(i);
+  }
   return (
     <Box p={6} maxW="1200px" mx="auto">
       {/* 헤딩과 검색어 영역 */}
@@ -100,7 +112,16 @@ const BoardList = () => {
             <CardBody>
               <Flex gap={1} align="center">
                 {/* 게시글 제목 */}
-                <Text fontWeight="bold" fontSize="lg" noOfLines={2} flex="1" minWidth="0">
+                <Text
+                  fontWeight="bold"
+                  fontSize="lg"
+                  noOfLines={2}
+                  flex="1"
+                  minWidth="0"
+                  cursor="pointer"
+                  onClick={() => navigate(`/board/${board.id}`)}
+                  _hover={{ color: "blue.500", textDecoration: "underline" }}
+                >
                   {board.title}
                 </Text>
 
@@ -124,16 +145,31 @@ const BoardList = () => {
 
       {/* 페이지네이션 */}
       <HStack spacing={2} justify="center" mt={8}>
-        {Array.from({ length: totalPages }, (_, i) => (
+        {/* 이전 블록 버튼 */}
+        {blockStart > 1 && (
+          <Button size="sm" variant="outline" onClick={() => setCurrentPage(blockStart - 1)}>
+            이전
+          </Button>
+        )}
+
+        {/* 실제 페이지 번호 버튼 */}
+        {pageNumbers.map((num) => (
           <Button
-            key={i}
+            key={num}
             size="sm"
-            variant={currentPage === i + 1 ? "solid" : "outline"}
-            onClick={() => setCurrentPage(i + 1)}
+            variant={currentPage === num ? "solid" : "outline"}
+            onClick={() => setCurrentPage(num)}
           >
-            {i + 1}
+            {num}
           </Button>
         ))}
+
+        {/* 다음 블록 버튼 */}
+        {blockEnd < totalPages && (
+          <Button size="sm" variant="outline" onClick={() => setCurrentPage(blockEnd + 1)}>
+            다음
+          </Button>
+        )}
       </HStack>
 
       {/* 제목 검색 */}

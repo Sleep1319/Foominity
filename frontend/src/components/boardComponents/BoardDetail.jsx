@@ -22,7 +22,7 @@ const BoardDetail = () => {
     const fetchBoard = async () => {
       try {
         // ✅ 백엔드에서 해당 id의 게시글 정보를 GET으로 가져옵니다
-        const res = await axios.get(`/api/boards/${id}`);
+        const res = await axios.get(`/api/board/${id}`);
         setBoard(res.data);
       } catch (err) {
         console.error(err);

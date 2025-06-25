@@ -1,7 +1,7 @@
 import React from "react";
 import BoardUpdate from "./../../components/boardComponents/BoardUpdate";
 
-const BoardCreateRun = () => {
+const BoardUpdateRun = () => {
   return (
     <div>
       <BoardUpdate />
@@ -9,4 +9,4 @@ const BoardCreateRun = () => {
   );
 };
 
-export default BoardCreateRun;
+export default BoardUpdateRun;
