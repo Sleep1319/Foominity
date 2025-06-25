@@ -2,6 +2,8 @@ package com.example.foominity.service.member;
 
 import java.util.Optional;
 
+import com.example.foominity.domain.member.Role;
+import com.example.foominity.repository.member.RoleRepository;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +30,7 @@ public class PointService {
     private final PointRepository pointRepository;
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final RoleRepository roleRepository;
 
     // public PointResponse getPoint(Point point) {
     // int totalPoint = calPoint(point);
@@ -57,17 +60,30 @@ public class PointService {
     }
 
     @Transactional
-    public void updateReviewCommentCount(Long memberId) {
-        Point point = pointRepository.findByMemberId(memberId).orElseThrow(NotFoundPointException::new);
+    public void updateReviewCommentCount(Member member) {
 
+        Point point = member.getPoint();
         point.addReviewCommentCount();
+        int total = point.getReviewCommentCount() + point.getLikeCount();
+        roleRepository.findTopByRequiredPointLessThanEqualOrderByRequiredPointDesc(total)
+                .ifPresent(newRole -> {
+                    if (!member.getRole().equals(newRole)) {
+                        member.updateRole(newRole);
+                    }
+                });
     }
 
     @Transactional
-    public void updateLikeCount(Long memberId) {
-        Point point = pointRepository.findByMemberId(memberId).orElseThrow(NotFoundPointException::new);
-
+    public void updateLikeCount(Member member) {
+        Point point = member.getPoint();
         point.addLikeCount();
+        int total = point.getReviewCommentCount() + point.getLikeCount();
+        roleRepository.findTopByRequiredPointLessThanEqualOrderByRequiredPointDesc(total)
+                .ifPresent(newRole -> {
+                    if (!member.getRole().equals(newRole)) {
+                        member.updateRole(newRole);
+                    }
+                });
     }
 
     private int calPoint(Point point) {

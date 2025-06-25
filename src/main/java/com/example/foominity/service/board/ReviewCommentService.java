@@ -3,6 +3,13 @@ package com.example.foominity.service.board;
 import java.util.List;
 import java.util.Optional;
 
+import com.example.foominity.domain.member.Point;
+import com.example.foominity.domain.member.Role;
+import com.example.foominity.exception.*;
+import com.example.foominity.exception.IllegalStateException;
+import com.example.foominity.repository.member.PointRepository;
+import com.example.foominity.repository.member.RoleRepository;
+import com.example.foominity.service.member.PointService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,13 +24,6 @@ import com.example.foominity.dto.comment.BoardCommentResponse;
 import com.example.foominity.dto.comment.ReviewCommentRequest;
 import com.example.foominity.dto.comment.ReviewCommentResponse;
 import com.example.foominity.dto.comment.ReviewCommentUpdateRequest;
-import com.example.foominity.exception.ForbiddenActionException;
-import com.example.foominity.exception.IllegalStateException;
-import com.example.foominity.exception.NotFoundBoardException;
-import com.example.foominity.exception.NotFoundMemberException;
-import com.example.foominity.exception.NotFoundReviewCommentException;
-import com.example.foominity.exception.NotFoundReviewException;
-import com.example.foominity.exception.UnauthorizedException;
 import com.example.foominity.repository.board.BoardRepository;
 import com.example.foominity.repository.board.ReviewCommentRepository;
 import com.example.foominity.repository.board.ReviewRepository;
@@ -43,6 +43,7 @@ public class ReviewCommentService {
     private final ReviewRepository reviewRepository;
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final PointService pointService;
 
     public List<ReviewCommentResponse> getList(Long reviewId) {
         List<ReviewComment> comments = reviewCommentRepository.findByReviewId(reviewId);
@@ -66,12 +67,14 @@ public class ReviewCommentService {
         Member member = memberRepository.findById(memberId).orElseThrow(NotFoundMemberException::new);
         Review review = reviewRepository.findById(reviewId).orElseThrow(NotFoundReviewException::new);
 
+
         Optional<ReviewComment> existingComment = reviewCommentRepository.findByReviewIdAndMemberId(reviewId, memberId);
         if (existingComment.isPresent()) {
             throw new IllegalStateException();
         }
         reviewCommentRepository.save(req.toEntity(review, member));
 
+        pointService.updateReviewCommentCount(member);
     }
 
     @Transactional

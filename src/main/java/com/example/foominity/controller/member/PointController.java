@@ -30,19 +30,19 @@ public class PointController {
         return ResponseEntity.ok(res);
     }
 
-    @PutMapping("/api/point/review/{memberId}")
-    public ResponseEntity<String> updateReviewCount(@PathVariable Long memberId) {
-        pointService.updateReviewCommentCount(memberId);
+//    @PutMapping("/api/point/review/{memberId}")
+//    public ResponseEntity<String> updateReviewCount(@PathVariable Long memberId) {
+//        pointService.updateReviewCommentCount(memberId);
+//
+//        return ResponseEntity.ok().build();
+//    }
 
-        return ResponseEntity.ok().build();
-    }
-
-    @PutMapping("/api/point/like/{memberId}")
-    public ResponseEntity<String> updateLikeCount(@PathVariable Long memberId) {
-        pointService.updateLikeCount(memberId);
-
-        return ResponseEntity.ok().build();
-    }
+//    @PutMapping("/api/point/like/{memberId}")
+//    public ResponseEntity<String> updateLikeCount(@PathVariable Long memberId) {
+//        pointService.updateLikeCount(memberId);
+//
+//        return ResponseEntity.ok().build();
+//    }
 
     @DeleteMapping("/api/point/reset/{memberId}")
     public ResponseEntity<String> resetPoint(@PathVariable Long memberId) {
