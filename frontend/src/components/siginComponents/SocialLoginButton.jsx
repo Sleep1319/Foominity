@@ -1,9 +1,11 @@
 import { Button, HStack } from "@chakra-ui/react";
 
+
 const SocialLoginButton = ({mode}) => {
     const isLogin = mode === "login";
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const redirect = (provider) => {
-        const baseUrl = `http://localhost:8084/oauth2/authorization/${provider}`;
+        const baseUrl = `${backendUrl}/oauth2/authorization/${provider}`;
         const finalUrl = mode === "register" ? `${baseUrl}?mode=signup` : baseUrl;
         window.location.href = finalUrl;
     };
