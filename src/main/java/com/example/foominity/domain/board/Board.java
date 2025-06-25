@@ -25,6 +25,9 @@ public class Board extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private Member member;
 
+    @Column(nullable = false, columnDefinition = "int default 0")
+    private int views;
+
     public void update(String title, String content) {
         this.title = title;
         this.content = content;
@@ -34,5 +37,10 @@ public class Board extends BaseEntity {
         this.title = title;
         this.content = content;
         this.member = member;
+        this.views = 0;
+    }
+
+    public void addViews(int views) {
+        this.views = views;
     }
 }

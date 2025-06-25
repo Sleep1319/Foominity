@@ -18,14 +18,17 @@ public class BoardResponse {
     private String content;
     private Long memberId;
     private String nickname;
+    private int views;
 
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
 
-    public BoardResponse(Long id, String title, String nickname, LocalDateTime createdDate, LocalDateTime updatedDate) {
+    public BoardResponse(Long id, String title, String nickname, int views, LocalDateTime createdDate,
+            LocalDateTime updatedDate) {
         this.id = id;
         this.title = title;
         this.nickname = nickname;
+        this.views = views;
         this.createdDate = createdDate;
         this.updatedDate = updatedDate;
     }
@@ -37,6 +40,7 @@ public class BoardResponse {
                 board.getContent(),
                 board.getMember().getId(),
                 board.getMember().getNickname(),
+                board.getViews(),
                 board.getCreatedDate(),
                 board.getUpdatedDate());
     }

@@ -51,6 +51,7 @@ public class BoardService {
                         board.getContent(),
                         board.getMember().getId(),
                         board.getMember().getNickname(),
+                        board.getViews(),
                         board.getCreatedDate(),
                         board.getUpdatedDate()))
                 .toList();
@@ -74,6 +75,7 @@ public class BoardService {
                         board.getContent(),
                         board.getMember().getId(),
                         board.getMember().getNickname(),
+                        board.getViews(),
                         board.getCreatedDate(),
                         board.getUpdatedDate()))
                 .collect(Collectors.toList());
@@ -81,12 +83,16 @@ public class BoardService {
 
     public BoardResponse findByid(Long id) {
         Board board = boardRepository.findById(id).orElseThrow(NotFoundBoardException::new);
+        // 조회수 증가
+        board.addViews(board.getViews() + 1);
+        boardRepository.save(board); // 변경 사항 저장
         return new BoardResponse(
                 board.getId(),
                 board.getTitle(),
                 board.getContent(),
                 board.getMember().getId(),
                 board.getMember().getNickname(),
+                board.getViews(),
                 board.getCreatedDate(),
                 board.getUpdatedDate());
     }
@@ -144,6 +150,7 @@ public class BoardService {
                         board.getId(),
                         board.getTitle(),
                         board.getMember().getNickname(),
+                        board.getViews(),
                         board.getCreatedDate(),
                         board.getUpdatedDate()))
                 .toList();
