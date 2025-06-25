@@ -22,7 +22,7 @@ const BoardDetail = () => {
     const fetchBoard = async () => {
       try {
         // ✅ 백엔드에서 해당 id의 게시글 정보를 GET으로 가져옵니다
-        const res = await axios.get(`/api/boards/${id}`);
+        const res = await axios.get(`/api/board/${id}`);
         setBoard(res.data);
       } catch (err) {
         console.error(err);
@@ -94,14 +94,14 @@ const BoardDetail = () => {
           mb={6}
           display="inline-block"
           cursor="pointer"
-          onClick={() => navigate("/boards")}
+          onClick={() => navigate("/board")}
         >
           목록
         </Text>
 
         {/* 수정 버튼 조건부 표시 */}
         {String(loginMemberId) === String(board.memberId) && (
-          <Button colorScheme="teal" size="sm" ml={2} onClick={() => navigate(`/boards/update/${board.id}`)}>
+          <Button colorScheme="teal" size="sm" ml={2} onClick={() => navigate(`/board/update/${board.id}`)}>
             수정
           </Button>
         )}

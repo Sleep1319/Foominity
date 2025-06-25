@@ -34,11 +34,11 @@ const BoardList = () => {
 
   const navigate = useNavigate();
 
-  // 백엔드에서 게시글 가져오기
+  // 게시글 가져오기
   useEffect(() => {
     const fetchBoards = async () => {
       try {
-        const response = await axios.get("/api/boards", {
+        const response = await axios.get("/api/board", {
           params: {
             keyword: submittedKeyword,
           },
@@ -119,7 +119,7 @@ const BoardList = () => {
                   flex="1"
                   minWidth="0"
                   cursor="pointer"
-                  onClick={() => navigate(`/boards/${board.id}`)}
+                  onClick={() => navigate(`/board/${board.id}`)}
                   _hover={{ color: "blue.500", textDecoration: "underline" }}
                 >
                   {board.title}

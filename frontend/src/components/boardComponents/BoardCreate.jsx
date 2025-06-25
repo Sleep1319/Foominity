@@ -33,7 +33,7 @@ const BoardCreate = () => {
     }
     setIsSubmitting(true);
     try {
-      await axios.post("/api/boards/create", {
+      await axios.post("/api/board/create", {
         title,
         content,
         memberId,
@@ -44,7 +44,7 @@ const BoardCreate = () => {
         duration: 1500,
         isClosable: true,
       });
-      navigate("/boards"); // 등록 후 목록으로 이동
+      navigate("/board"); // 등록 후 목록으로 이동
     } catch (err) {
       console.log(err);
       setError("등록에 실패했습니다. 다시 시도해주세요.");
@@ -94,7 +94,7 @@ const BoardCreate = () => {
             <Button colorScheme="blue" type="submit" isLoading={isSubmitting} px={10}>
               등록
             </Button>
-            <Button variant="outline" onClick={() => navigate("/boards")} px={8}>
+            <Button variant="outline" onClick={() => navigate("/board")} px={8}>
               취소
             </Button>
           </Flex>

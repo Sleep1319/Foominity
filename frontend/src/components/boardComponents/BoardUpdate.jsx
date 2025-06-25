@@ -30,7 +30,7 @@ const BoardUpdate = () => {
   useEffect(() => {
     const fetchBoard = async () => {
       try {
-        const res = await axios.get(`/api/boards/${id}`);
+        const res = await axios.get(`/api/board/${id}`);
         setTitle(res.data.title);
         setContent(res.data.content);
       } catch (err) {
@@ -52,7 +52,7 @@ const BoardUpdate = () => {
     }
     setIsSubmitting(true);
     try {
-      await axios.put(`/api/boards/update/${id}`, {
+      await axios.put(`/api/board/update/${id}`, {
         title,
         content,
         // 필요시 memberId 등 추가
@@ -63,7 +63,7 @@ const BoardUpdate = () => {
         duration: 1500,
         isClosable: true,
       });
-      navigate(`/boards/${id}`); // 수정 후 상세페이지로 이동
+      navigate(`/board/${id}`); // 수정 후 상세페이지로 이동
     } catch (err) {
       console.log(err);
       setError("수정에 실패했습니다. 다시 시도해주세요.");
@@ -76,14 +76,14 @@ const BoardUpdate = () => {
     if (!window.confirm("정말 삭제하시겠습니까?")) return;
     setIsSubmitting(true);
     try {
-      await axios.delete(`/api/boards/delete/${id}`);
+      await axios.delete(`/api/board/delete/${id}`);
       toast({
         title: "게시글이 삭제되었습니다.",
         status: "info",
         duration: 1500,
         isClosable: true,
       });
-      navigate("/boards");
+      navigate("/board");
     } catch (err) {
       console.log(err);
       setError("삭제에 실패했습니다. 다시 시도해주세요.");
@@ -132,7 +132,7 @@ const BoardUpdate = () => {
             <Button colorScheme="blue" type="submit" isLoading={isSubmitting} px={10}>
               수정
             </Button>
-            <Button variant="outline" onClick={() => navigate(`/boards/${id}`)} px={8} disabled={isSubmitting}>
+            <Button variant="outline" onClick={() => navigate(`/board/${id}`)} px={8} disabled={isSubmitting}>
               취소
             </Button>
             <Button colorScheme="red" variant="outline" onClick={handleDelete} px={8} disabled={isSubmitting}>
