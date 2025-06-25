@@ -23,11 +23,11 @@ public class ReviewComment {
     private float starPoint;
 
     @JoinColumn(name = "member_id")
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
     // 게시판 아이디
     @JoinColumn(name = "review_id")
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Review review;
 
     public ReviewComment(String content, Review review, Member member, float starPoint) {

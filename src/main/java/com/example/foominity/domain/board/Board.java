@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @NoArgsConstructor
 @Getter
 @Entity
@@ -22,8 +24,11 @@ public class Board extends BaseEntity {
     private String content;
 
     @JoinColumn(name = "member_id")
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
+
+    @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
+    private List<BoardComment> boardComments;
 
     public void update(String title, String content) {
         this.title = title;

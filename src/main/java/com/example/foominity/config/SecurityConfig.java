@@ -5,6 +5,7 @@ import com.example.foominity.config.jwt.JwtAuthenticationEntryPoint;
 import com.example.foominity.config.jwt.JwtAuthenticationFilter;
 import com.example.foominity.config.jwt.JwtTokenProvider;
 import com.example.foominity.config.social.CustomOAuth2SuccessHandler;
+import com.example.foominity.config.social.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,6 +28,7 @@ public class SecurityConfig {
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final CustomOAuth2SuccessHandler customOAuth2SuccessHandler;
+    private final CustomOAuth2UserService customOAuth2UserService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -41,6 +43,9 @@ public class SecurityConfig {
                         .accessDeniedHandler(jwtAccessDeniedHandler)
                 )
                 .oauth2Login(oauth -> oauth
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService)
+                        )
                         .successHandler(customOAuth2SuccessHandler)
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);

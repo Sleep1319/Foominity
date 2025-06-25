@@ -2,17 +2,11 @@ package com.example.foominity.domain.report;
 
 import com.example.foominity.domain.member.Member;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @NoArgsConstructor
 @Getter
@@ -30,9 +24,12 @@ public class Report {
     @Column(name = "target_type", nullable = false)
     private String targetType;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
+
+    @OneToMany(mappedBy = "report", cascade = CascadeType.REMOVE)
+    private List<ReportComment> reportComments;
 
     public Report(Long targetId, String targetType, Member member) {
         this.targetId = targetId;

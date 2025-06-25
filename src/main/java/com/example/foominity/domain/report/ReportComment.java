@@ -22,12 +22,12 @@ public class ReportComment extends BaseEntity {
     private String content;
 
     @JoinColumn(name = "member_id")
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
     // 신고 게시판 아이디
     @JoinColumn(name = "report_id")
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Report report;
 
     public ReportComment(String content, Report report, Member member) {

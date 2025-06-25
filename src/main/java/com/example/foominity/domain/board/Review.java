@@ -29,6 +29,9 @@ public class Review extends BaseEntity {
     @Column(nullable = false)
     private LocalDate released;
 
+    @OneToMany(mappedBy = "review", cascade = CascadeType.REMOVE)
+    private List<ReviewComment> reviewComments;
+
     // 앨범 이미지
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "image_file_id")
