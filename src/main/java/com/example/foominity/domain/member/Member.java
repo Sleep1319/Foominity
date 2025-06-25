@@ -1,8 +1,14 @@
 package com.example.foominity.domain.member;
 
 import com.example.foominity.domain.BaseEntity;
+import com.example.foominity.domain.board.Board;
+import com.example.foominity.domain.board.BoardComment;
+import com.example.foominity.domain.board.ReviewComment;
+import com.example.foominity.domain.report.Report;
+import com.example.foominity.domain.report.ReportComment;
 import com.example.foominity.domain.sign.SocialType;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -13,6 +19,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -47,10 +55,33 @@ public class Member extends BaseEntity {
     @Column(name = "provider_id")
     private String providerId;
 
+    // 연관 관계======================================================
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id")
     private Role role;
 
+    @OneToOne(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Point point;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    private Like like;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    private ReviewComment reviewComment;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    private Board board;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    private BoardComment boardComment;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    private Report report;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    private ReportComment reportComment;
+
+    // ================================================================
     public Member(String email, String password, String userName, String nickname, Role role) {
         this.email = email;
         this.password = password;
