@@ -46,7 +46,9 @@ import com.example.foominity.util.AuthUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -81,6 +83,14 @@ public class ReviewService {
                                                                         a.getArtist().getName()))
                                                         .toList();
 
+                                        List<ReviewCategory> reviewCategory = reviewCategoryRepository
+                                                        .findByReviewId(review.getId());
+                                        List<ReviewCategoryResponse> categoryResponses = reviewCategory.stream()
+                                                        .map(rc -> new ReviewCategoryResponse(
+                                                                        rc.getCategory().getId(),
+                                                                        rc.getCategory().getCategoryName()))
+                                                        .toList();
+
                                         ImageFile imageFile = review.getImageFile();
                                         String imagePath = (imageFile != null) ? imageFile.getSavePath() : null;
 
@@ -89,6 +99,7 @@ public class ReviewService {
                                                         review.getTitle(),
                                                         reviewCommentService.getAverageStarPoint(review.getId()),
                                                         artistResponses,
+                                                        categoryResponses,
                                                         imagePath);
                                 })
                                 .toList();
@@ -248,6 +259,14 @@ public class ReviewService {
                                                                         a.getArtist().getName()))
                                                         .toList();
 
+                                        List<ReviewCategory> reviewCategory = reviewCategoryRepository
+                                                        .findByReviewId(review.getId());
+                                        List<ReviewCategoryResponse> categoryResponses = reviewCategory.stream()
+                                                        .map(rc -> new ReviewCategoryResponse(
+                                                                        rc.getCategory().getId(),
+                                                                        rc.getCategory().getCategoryName()))
+                                                        .toList();
+
                                         ImageFile imageFile = review.getImageFile();
                                         String imagePath = imageFile.getSavePath();
 
@@ -256,6 +275,7 @@ public class ReviewService {
                                                         review.getTitle(),
                                                         reviewCommentService.getAverageStarPoint(review.getId()),
                                                         artistResponses,
+                                                        categoryResponses,
                                                         imagePath);
 
                                 })
