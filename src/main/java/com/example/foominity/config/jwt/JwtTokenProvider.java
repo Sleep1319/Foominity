@@ -136,8 +136,9 @@ public class JwtTokenProvider {
         String username = claims.get("username", String.class);
         String nickname = claims.get("nickname", String.class);
         String role = claims.get("role", String.class);
+        String avatar = claims.get("avatar", String.class);
 
-        return new UserInfoResponse(id, email, username, nickname, role);
+        return new UserInfoResponse(id, email, username, nickname, role, avatar);
     }
 
     // 인증용
