@@ -4,6 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import PopularPosts from "@/components/homeComponents/PopularPosts";
 import ReviewCommentForm from "@/components/commentComponents/ReviewCommentForm";
+import CommentList from "@/components/commentComponents/CommenList.jsx";
 
 const ReviewDetail = () => {
   const { id } = useParams();
@@ -85,7 +86,7 @@ const ReviewDetail = () => {
 
         {/* ✅ 댓글 작성 컴포넌트 */}
         <ReviewCommentForm reviewId={id} commentCount={review.commentCount || 0} onSuccess={fetchReview} />
-
+        <CommentList type="reviews" id={id} />
         <Text
           fontSize="md"
           textAlign="left"

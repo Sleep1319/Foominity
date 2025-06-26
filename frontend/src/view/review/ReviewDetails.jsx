@@ -6,7 +6,6 @@ const ReviewDetails = () => {
   return (
     <div>
       <ReviewDetail />
-      <ReviewCommentForm />
     </div>
   );
 };
