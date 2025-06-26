@@ -12,13 +12,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class NoticeResponse {
 
-    @NotNull
+ 
     private Long id;
 
-    @NotNull
+
     private String title;
 
-    @NotNull
+   
     private String content;
 
     public NoticeResponse(Long id, String title) {

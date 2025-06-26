@@ -1,18 +1,20 @@
 import React from "react";
 import { Box, Text } from "@chakra-ui/react";
-import NoticeTable from "../../components/noticeComponents/NoticeTable.jsx";
+import NoticeList from "../../components/noticeComponents/NoticeList.jsx";
 
-const Notice = () => {
+const NoticeLists = () => {
   return (
     <div>
       <Box p={6}>
         <Text fontSize="3xl" fontWeight="medium" pb={2} textAlign="center">
           Notice
         </Text>
-        <NoticeTable />
+        <NoticeList />
+        
+
       </Box>
     </div>
   );
 };
 
-export default Notice;
+export default NoticeLists;
