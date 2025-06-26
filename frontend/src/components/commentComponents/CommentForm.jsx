@@ -1,17 +1,21 @@
-import { HStack, Icon, Text, Box, useColorModeValue, Textarea, Button, Flex } from "@chakra-ui/react";
-import { FaRegComment } from "react-icons/fa";
+import {HStack, Icon, Text, Box, useColorModeValue, Textarea, Button, Flex, IconButton} from "@chakra-ui/react";
+import {FaRegComment, FaStar} from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 
-const CommentForm = ({ commentCount, isLoggedIn, onSubmit }) => {
+const CommentForm = ({ commentCount, isLoggedIn, onSubmit, showStarRating = false }) => {
   const [content, setContent] = useState("");
+  const [star, setStar] = useState(0);
+  const [hover, setHover] = useState(null);
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!content.trim()) return;
-    onSubmit(content);
+    const payload = showStarRating ? { content, starPoint: star } : { content };
+    onSubmit(payload);
     setContent("");
+    setStar(0);
   };
 
   return (
@@ -33,6 +37,22 @@ const CommentForm = ({ commentCount, isLoggedIn, onSubmit }) => {
 
         {isLoggedIn ? (
           <>
+            {showStarRating && (
+                <HStack mb={2}>
+                  {[1, 2, 3, 4, 5].map((value) => (
+                      <IconButton
+                          key={value}
+                          icon={<FaStar />}
+                          variant="ghost"
+                          aria-label={`${value}점`}
+                          onMouseEnter={() => setHover(value)}
+                          onMouseLeave={() => setHover(null)}
+                          onClick={() => setStar(value)}
+                          color={hover >= value || star >= value ? "yellow.400" : "gray.300"}
+                      />
+                  ))}
+                </HStack>
+            )}
             <Textarea
               placeholder="댓글을 입력하세요..."
               value={content}
@@ -41,6 +61,7 @@ const CommentForm = ({ commentCount, isLoggedIn, onSubmit }) => {
               minH="100px"
               mb={3}
             />
+
             <Flex justify="flex-end">
               <Button colorScheme="teal" onClick={handleSubmit}>
                 등록

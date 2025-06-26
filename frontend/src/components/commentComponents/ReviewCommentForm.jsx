@@ -8,11 +8,10 @@ const ReviewCommentForm = ({ reviewId, commentCount = 0, onSuccess }) => {
   const { state } = useUser()
   const isLoggedIn = !!state;
 
-  const handleSubmit = async (content) => {
+  const handleSubmit = async ({ content, starPoint }) => {
     if (!isLoggedIn) return;
     await axios.post(`/api/reviews/${reviewId}/comments`,
-        { comment: content,
-          starPoint: 0.0 },
+        { comment: content, starPoint },
         {withCredentials: true}
     );
     try {
@@ -23,7 +22,7 @@ const ReviewCommentForm = ({ reviewId, commentCount = 0, onSuccess }) => {
     }
   };
 
-  return <CommentForm isLoggedIn={isLoggedIn} onSubmit={handleSubmit} commentCount={commentCount} />;
+  return <CommentForm isLoggedIn={isLoggedIn} onSubmit={handleSubmit} commentCount={commentCount} showStarRating={true}/>;
 };
 
 export default ReviewCommentForm;
