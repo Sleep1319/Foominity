@@ -2,6 +2,10 @@ package com.example.foominity.service.artist;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +40,32 @@ public class ArtistService {
     private final ArtistCategoryRepository artistCategoryRepository;
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
+
+    // 아티스트 전체 조회
+    public Page<ArtistResponse> getArtistList(int page) {
+        PageRequest pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "id"));
+        Page<Artist> artists = artistRepository.findAll(pageable);
+
+        List<ArtistResponse> artistResponsesList = artists.stream().map(artist -> {
+            // List<ArtistCategory> artistCategories =
+            // artistCategoryRepository.findByArtistId(artist.getId());
+
+            // List<ArtistCategoryResponse> categoryResponses = artistCategories.stream()
+            // .map(ar -> new ArtistCategoryResponse(
+            // ar.getCategory().getId(),
+            // ar.getCategory().getCategoryName()))
+            // .toList();
+
+            return new ArtistResponse(
+                    artist.getId(),
+                    artist.getName());
+
+        })
+                .toList();
+
+        return new PageImpl<>(artistResponsesList, pageable, artists.getTotalElements());
+
+    }
 
     // 아티스트 조회
     public ArtistResponse readArtist(Long id) {
