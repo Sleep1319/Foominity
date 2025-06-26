@@ -17,5 +17,7 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
 
     Optional<List<Board>> findTop4ByOrderByCreatedDateDesc();
 
-    List<Board> findByTitleContainingIgnoreCase(String keyword);
+    List<Board> findByTitleContainingIgnoreCaseOrderByCreatedDateDesc(String keyword);
+
+    List<Board> findAllByOrderByCreatedDateDesc();
 }

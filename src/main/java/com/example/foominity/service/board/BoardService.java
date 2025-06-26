@@ -63,9 +63,9 @@ public class BoardService {
         List<Board> boards;
 
         if (keyword == null || keyword.trim().isEmpty()) {
-            boards = boardRepository.findAll();
+            boards = boardRepository.findAllByOrderByCreatedDateDesc();
         } else {
-            boards = boardRepository.findByTitleContainingIgnoreCase(keyword);
+            boards = boardRepository.findByTitleContainingIgnoreCaseOrderByCreatedDateDesc(keyword);
         }
 
         return boards.stream()
