@@ -1,5 +1,6 @@
 package com.example.foominity.controller.artist;
 
+import com.example.foominity.dto.artist.ArtistRequest;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
 
