@@ -12,6 +12,7 @@ const ReviewDetail = () => {
 
   const [review, setReview] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [commentKey, setCommentKey] = useState(0);
 
   const fetchReview = () => {
     axios
@@ -25,6 +26,12 @@ const ReviewDetail = () => {
         setLoading(false);
       });
   };
+
+  const handleCommentSuccess = () => {
+    fetchReview(); // 댓글 수 업데이트용
+    setCommentKey(prev => prev + 1); // 🔁 key 변경 → CommentList 리렌더 유도
+  };
+
 
   useEffect(() => {
     fetchReview();
@@ -85,8 +92,8 @@ const ReviewDetail = () => {
         </Box>
 
         {/* ✅ 댓글 작성 컴포넌트 */}
-        <ReviewCommentForm reviewId={id} commentCount={review.commentCount || 0} onSuccess={fetchReview} />
-        <CommentList type="reviews" id={id} />
+        <ReviewCommentForm reviewId={id} commentCount={review.commentCount || 0} onSuccess={handleCommentSuccess} />
+        <CommentList key={commentKey} type="reviews" id={id} />
         <Text
           fontSize="md"
           textAlign="left"

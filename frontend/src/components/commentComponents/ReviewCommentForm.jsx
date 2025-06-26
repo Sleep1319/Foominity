@@ -2,24 +2,20 @@
 import React from "react";
 import CommentForm from "./CommentForm.jsx";
 import axios from "axios";
+import { useUser } from "@/context/UserContext.jsx";
 
 const ReviewCommentForm = ({ reviewId, commentCount = 0, onSuccess }) => {
-  const accessToken = localStorage.getItem("accessToken");
-  const isLoggedIn = !!accessToken;
+  const { state } = useUser()
+  const isLoggedIn = !!state;
 
   const handleSubmit = async (content) => {
     if (!isLoggedIn) return;
-
+    await axios.post(`/api/reviews/${reviewId}/comments`,
+        { comment: content,
+          starPoint: 0.0 },
+        {withCredentials: true}
+    );
     try {
-      await axios.post(
-        `/api/reviews/${reviewId}/comments`,
-        { content },
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
       onSuccess?.();
     } catch (error) {
       console.error("댓글 등록 실패:", error);

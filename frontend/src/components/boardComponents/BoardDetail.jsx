@@ -4,6 +4,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { FaRegEye, FaRegComment } from "react-icons/fa";
 import { useUser } from "../../context/UserContext";
 import axios from "axios";
+import BoardCommentForm from "@/components/commentComponents/BoardCommentForm.jsx";
+import CommentList from "@/components/commentComponents/CommenList.jsx";
 
 const BoardDetail = () => {
   const { state: user } = useUser();
@@ -18,19 +20,25 @@ const BoardDetail = () => {
 
   const [board, setBoard] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [commentKey, setCommentKey] = useState(0);
+
+  const fetchBoard = async () => {
+    try {
+      // 백엔드에서 해당 id의 게시글 정보를 GET으로 가져옵니다
+      const res = await axios.get(`/api/board/${id}`);
+      setBoard(res.data);
+    } catch (err) {
+      console.error(err);
+      setBoard(null);
+    }
+    setLoading(false);
+  };
+  const handleCommentSuccess = () => {
+    fetchBoard(); // 댓글 수 업데이트용
+    setCommentKey(prev => prev + 1); // 🔁 key 변경 → CommentList 리렌더 유도
+  };
 
   useEffect(() => {
-    const fetchBoard = async () => {
-      try {
-        // 백엔드에서 해당 id의 게시글 정보를 GET으로 가져옵니다
-        const res = await axios.get(`/api/board/${id}`);
-        setBoard(res.data);
-      } catch (err) {
-        console.error(err);
-        setBoard(null);
-      }
-      setLoading(false);
-    };
     fetchBoard();
   }, [id]);
 
@@ -88,17 +96,17 @@ const BoardDetail = () => {
           </Text>
         </Box>
 
-        <Text
-          fontSize="md"
-          textAlign="left"
-          mt={6}
-          mb={6}
-          display="inline-block"
-          cursor="pointer"
-          onClick={() => navigate("/board")}
-        >
-          목록
-        </Text>
+        {/*<Text*/}
+        {/*  fontSize="md"*/}
+        {/*  textAlign="left"*/}
+        {/*  mt={6}*/}
+        {/*  mb={6}*/}
+        {/*  display="inline-block"*/}
+        {/*  cursor="pointer"*/}
+        {/*  onClick={() => navigate("/board")}*/}
+        {/*>*/}
+        {/*  목록*/}
+        {/*</Text>*/}
 
         {/* 수정 버튼 조건부 표시 */}
         {String(loginMemberId) === String(board.memberId) && (
@@ -107,37 +115,51 @@ const BoardDetail = () => {
           </Button>
         )}
 
-        <HStack mt={4} spacing={1} borderBottom="2px solid gray" pb={4}>
-          <Icon as={FaRegComment} boxSize={5} color={grayText} />
-          <Text fontSize="lg" color={grayText}>
-            댓글
-          </Text>
-          <Text fontSize="lg" color={blueText}>
-            {board.commentCount ?? 0}
-          </Text>
-        </HStack>
+        {/*<HStack mt={4} spacing={1} borderBottom="2px solid gray" pb={4}>*/}
+        {/*  <Icon as={FaRegComment} boxSize={5} color={grayText} />*/}
+        {/*  <Text fontSize="lg" color={grayText}>*/}
+        {/*    댓글*/}
+        {/*  </Text>*/}
+        {/*  <Text fontSize="lg" color={blueText}>*/}
+        {/*    {board.commentCount ?? 0}*/}
+        {/*  </Text>*/}
+        {/*</HStack>*/}
 
-        <Box mt={4} borderBottom="2px solid gray" pb={14}>
-          <Text fontWeight="bold" mb={2}>
-            댓글 달기
-          </Text>
-          {isLoggedIn ? (
-            <Textarea placeholder="댓글을 입력하세요..." />
-          ) : (
-            <Box
-              p={8}
-              border="1px solid gray"
-              borderRadius="md"
-              color="gray.600"
-              whiteSpace="pre-wrap"
-              minHeight="100px"
-              cursor="pointer"
-              onClick={() => navigate("/login")}
-            >
-              댓글 쓰기 권한이 없습니다. 로그인 하시겠습니까?
-            </Box>
-          )}
-        </Box>
+        <BoardCommentForm boardId={id} commentCount={board.commentCount || 0} onSuccess={handleCommentSuccess} />
+        <CommentList key={commentKey} type="boards" id={id} />
+        <Text
+            fontSize="md"
+            textAlign="left"
+            mt={6}
+            mb={6}
+            display="inline-block"
+            cursor="pointer"
+            onClick={() => navigate("/board")}
+        >
+          목록
+        </Text>
+
+        {/*<Box mt={4} borderBottom="2px solid gray" pb={14}>*/}
+        {/*  <Text fontWeight="bold" mb={2}>*/}
+        {/*    댓글 달기*/}
+        {/*  </Text>*/}
+        {/*  {isLoggedIn ? (*/}
+        {/*    <Textarea placeholder="댓글을 입력하세요..." />*/}
+        {/*  ) : (*/}
+        {/*    <Box*/}
+        {/*      p={8}*/}
+        {/*      border="1px solid gray"*/}
+        {/*      borderRadius="md"*/}
+        {/*      color="gray.600"*/}
+        {/*      whiteSpace="pre-wrap"*/}
+        {/*      minHeight="100px"*/}
+        {/*      cursor="pointer"*/}
+        {/*      onClick={() => navigate("/login")}*/}
+        {/*    >*/}
+        {/*      댓글 쓰기 권한이 없습니다. 로그인 하시겠습니까?*/}
+        {/*    </Box>*/}
+        {/*  )}*/}
+        {/*</Box>*/}
       </Box>
     </Box>
   );
