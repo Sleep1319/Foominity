@@ -1,62 +1,44 @@
-import { Box, Text, Heading, HStack, Icon, Textarea } from "@chakra-ui/react";
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import DefaultTable from "../../components/reportComponents/DefaultTable.jsx";
-import PopularPosts from "@/components/homeComponents/PopularPosts.jsx";
+import { Box, Text, Heading, Spinner } from "@chakra-ui/react";
+import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 const NoticeDetail = () => {
-  const navigate = useNavigate();
-  // const isLoggedIn = false;
+  const { id } = useParams();
+  const [notice, setNotice] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+
+    const fetchNotice = async () => {
+      try {
+        const res = await axios.get(`/api/notices/${id}`);
+        setNotice(res.data);
+      } catch (err) {
+        console.error("공지사항 불러오기 실패", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNotice();
+  }, [id]);
+
+  if (loading) return <Spinner size="lg" />;
+  if (!notice) return <Text>해당 공지사항을 찾을 수 없습니다.</Text>;
 
   return (
-    <Box display="flex" justifyContent="center" px={6} py={10}>
-      <Box flex="1" maxW="900px" pr={{ base: 0, lg: 10 }}>
-        <Text fontSize="2xl" fontWeight="medium" pb={2} textAlign="left">
-          Notice
-        </Text>
-        <Heading as="h1" size="2xl" textAlign="left" pb={2}>
-          제목
-        </Heading>
-        <Box
-          display="flex"
-          textAlign="left"
-          fontSize="lg"
-          fontWeight="light"
-          mt={2}
-          borderBottom="2px solid gray"
-          pb={4}
-        >
-          <Text pr={4}>writer</Text>
-          <Text px={4}>date</Text>
-          <Text px={4}>commentCount</Text>
-        </Box>
-
-        <Box mt={18}>
-          <Text fontSize="md" whiteSpace="pre-wrap" textAlign="left" borderBottom="2px solid gray" pb={4}>
-            TextTextTextTextTextTextTextTextTextTextTextTextTextTextTextTextTextTextTextTextTextTextTextText
-            {"\n"}
-            TextTextTextTextTextText
-          </Text>
-        </Box>
-
-        <Text
-          fontSize="md"
-          textAlign="left"
-          mt={6}
-          mb={6}
-          display="inline-block"
-          cursor="pointer"
-          onClick={() => navigate("/report")}
-        >
-          목록
-        </Text>
-
-        <DefaultTable />
-      </Box>
-
-      <Box display={{ base: "none", lg: "block" }} position="sticky" top="100px" width="250px" alignSelf="flex-start">
-        <PopularPosts />
-      </Box>
+    <Box maxW="800px" mx="auto" px={4} py={8}>
+      <Heading as="h1" mb={4}>
+        {notice.title}
+      </Heading>
+      <Text fontSize="sm" color="gray.600" mb={2}>
+        작성일: {notice.createdAt?.split("T")[0] ?? "알 수 없음"}
+      </Text>
+      <Text fontSize="md" whiteSpace="pre-wrap">
+        {notice.content}
+      </Text>
     </Box>
   );
 };

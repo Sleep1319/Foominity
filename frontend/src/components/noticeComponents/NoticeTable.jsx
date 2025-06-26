@@ -1,165 +1,92 @@
-import React from "react";
-import { Box, Image, Text, VStack, HStack, Link as ChakraLink, SimpleGrid, Divider } from "@chakra-ui/react";
-import { Link as RouterLink } from "react-router-dom";
-
-const newsData = [
-  {
-    id: 1,
-    title: "Blood Orange Shares Video for New Song “The Field”",
-    writer: "Madison Bloom",
-    date: "2025-06-26",
-    image: "/images/news1.jpg",
-    to: "/notice/1",
-    imageWidth: "1100px",
-    imageHeight: "500px",
-  },
-  {
-    id: 2,
-    title: "Oklou Releases New Remix EP Featuring Nick León, Malibu, and More",
-    writer: "Jazz Monroe",
-    date: "2025-06-25",
-    image: "/images/news2.jpg",
-    to: "/notice/2",
-    imageWidth: "360px",
-    imageHeight: "200px",
-  },
-  {
-    id: 3,
-    title: "Watch Justin Vernon Play a Divorce Attorney in Bon Iver’s New Video",
-    writer: "Pitchfork Staff",
-    date: "2025-06-24",
-    image: "/images/news3.jpg",
-    to: "/notice/3",
-    imageWidth: "360px",
-    imageHeight: "200px",
-  },
-];
-
-const moreNews = [
-  {
-    id: 4,
-    title: "Arctic Monkeys Announce Surprise Tour in 2025",
-    date: "2025-06-23",
-    image: "/images/news4.jpg",
-    to: "/notice/4",
-  },
-  {
-    id: 5,
-    title: "Phoebe Bridgers and The 1975 Collaboration Confirmed",
-    date: "2025-06-22",
-    image: "/images/news5.jpg",
-    to: "/notice/5",
-  },
-  {
-    id: 6,
-    title: "The Strokes Drop New Album Without Notice",
-    date: "2025-06-21",
-    image: "/images/news6.jpg",
-    to: "/notice/6",
-  },
-];
+import React, { useEffect, useState } from "react";
+import {
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  TableContainer,
+  Link as ChakraLink,
+  Spinner,
+  Text,
+  Box,
+  Button,
+} from "@chakra-ui/react";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const NoticeTable = () => {
-  // 1. 모든 뉴스 합치고 2. 날짜순 정렬 (최신순)
-  const allNews = [...newsData, ...moreNews].sort((a, b) => new Date(b.date) - new Date(a.date));
+  const [notices, setNotices] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [userInfo, setUserInfo] = useState(null); // 사용자 정보
+  const navigate = useNavigate();
 
-  const mainNews = allNews[0];
-  const sideNews = allNews.slice(1, 3);
-  const restNews = allNews.slice(3);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await axios.get("/api/notice/page?page=0");
+        setNotices(res.data.content);
+      } catch (err) {
+        console.error("공지사항 불러오기 실패", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const fetchUser = async () => {
+      try {
+        const res = await axios.get("/api/user", { withCredentials: true });
+        setUserInfo(res.data);
+        console.log("ROLE:", userInfo?.roleName);
+      } catch (err) {
+        console.error("유저 정보 불러오기 실패", err);
+        setUserInfo(null); // 실패 시 null로 설정
+      }
+    };
+
+    fetchData();
+    fetchUser();
+  }, []);
+
+  if (loading || userInfo === null) return <Spinner size="lg" />;
+  if (!notices.length) return <Text textAlign="center">공지사항이 없습니다.</Text>;
 
   return (
-    <VStack spacing={12} maxW="8xl" mx="auto" py={8} px={4} align="stretch">
-      {/* 상단 레이아웃 */}
-      <HStack spacing={6} align="start" flexWrap="wrap">
-        {/* Main 큰 뉴스 */}
-        <VStack align="start" spacing={3} flex="2">
-          <Image
-            src={mainNews.image}
-            alt={mainNews.title}
-            width={mainNews.imageWidth || "1100px"}
-            height={mainNews.imageHeight || "500px"}
-            objectFit="cover"
-            borderRadius="md"
-          />
-          <Text fontSize="xs" color="gray.500" fontWeight="medium">
-            NEWS
-          </Text>
-          <ChakraLink
-            as={RouterLink}
-            to={mainNews.to}
-            fontWeight="bold"
-            fontSize="2xl"
-            _hover={{ textDecoration: "underline", color: "black" }}
-          >
-            {mainNews.title}
-          </ChakraLink>
-          <Text fontSize="sm" color="gray.600">
-            By {mainNews.writer} – {mainNews.date}
-          </Text>
-        </VStack>
+    <Box>
+      {userInfo?.roleName?.toLowerCase() === "admin" && (
+        <Box textAlign="right" mb={4}>
+          <Button colorScheme="blue" onClick={() => navigate("/notice/create")}>
+            공지 작성
+          </Button>
+        </Box>
+      )}
 
-        {/* Divider */}
-        <Box minHeight={mainNews.imageHeight || "700px"} borderLeft="2px solid black" mx={2} />
-
-        {/* Right: 2개 작은 뉴스 */}
-        <VStack align="start" spacing={12} flex="1">
-          {sideNews.map((news) => (
-            <VStack key={news.id} spacing={2} align="start">
-              <Image
-                src={news.image}
-                alt={news.title}
-                width={news.imageWidth || "360px"}
-                height={news.imageHeight || "200px"}
-                objectFit="cover"
-                borderRadius="md"
-              />
-              <Text fontSize="xs" color="gray.500" fontWeight="medium">
-                NEWS
-              </Text>
-              <ChakraLink
-                as={RouterLink}
-                to={news.to}
-                fontWeight="semibold"
-                fontSize="md"
-                _hover={{ textDecoration: "underline", color: "black" }}
-              >
-                {news.title}
-              </ChakraLink>
-              <Text fontSize="sm" color="gray.600">
-                {news.date}
-              </Text>
-            </VStack>
-          ))}
-        </VStack>
-      </HStack>
-
-      {/* Divider */}
-      <Divider borderColor="gray.300" />
-
-      {/* 하단: 나머지 뉴스 카드 */}
-      <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={10}>
-        {restNews.map((news) => (
-          <VStack key={news.id} spacing={3} align="start">
-            <Image src={news.image} alt={news.title} width="100%" height="250px" objectFit="cover" borderRadius="md" />
-            <Text fontSize="xs" color="gray.500" fontWeight="medium">
-              NEWS
-            </Text>
-            <ChakraLink
-              as={RouterLink}
-              to={news.to}
-              fontWeight="semibold"
-              fontSize="lg"
-              _hover={{ textDecoration: "underline", color: "black" }}
-            >
-              {news.title}
-            </ChakraLink>
-            <Text fontSize="sm" color="gray.500">
-              {news.date}
-            </Text>
-          </VStack>
-        ))}
-      </SimpleGrid>
-    </VStack>
+      <TableContainer>
+        <Table variant="simple" size="md">
+          <Thead>
+            <Tr>
+              <Th textAlign="center">번호</Th>
+              <Th textAlign="center">제목</Th>
+              <Th textAlign="center">작성일</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {notices.map((notice, index) => (
+              <Tr key={notice.id}>
+                <Td textAlign="center">{notices.length - index}</Td>
+                <Td textAlign="center">
+                  <ChakraLink as={RouterLink} to={`/notice/${notice.id}`}>
+                    {notice.title}
+                  </ChakraLink>
+                </Td>
+                <Td textAlign="center">{notice.createdAt?.split("T")[0]}</Td>
+              </Tr>
+            ))}
+          </Tbody>
+        </Table>
+      </TableContainer>
+    </Box>
   );
 };
 
