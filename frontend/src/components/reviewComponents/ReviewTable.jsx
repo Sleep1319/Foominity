@@ -23,8 +23,12 @@ const ReviewTable = () => {
   const { state, isLoading } = useUser();
   const [reviews, setReviews] = useState([]);
   const navigate = useNavigate();
-
   useEffect(() => {
+    console.log("유저 상태 전체 확인:", state);
+    if (state) {
+      console.log("유저 권한 확인:", state.roleName);
+    }
+
     axios
       .get("/api/reviews?page=0")
       .then((res) => {
@@ -36,7 +40,7 @@ const ReviewTable = () => {
       });
   }, []);
 
-  if (isLoading) {
+  if (isLoading || !state) {
     return (
       <Center h="300px">
         <Spinner size="xl" />
@@ -60,6 +64,7 @@ const ReviewTable = () => {
           </Button>
         </Box>
       )}
+
 
       <TableContainer>
         <Table variant="simple" size="md">

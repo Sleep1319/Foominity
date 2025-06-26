@@ -15,26 +15,26 @@ const CreateReview = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios
-      .get("/api/categories?page=0")
-      .then((res) => {
-        console.log("카테고리 데이터" + res.data.content);
-        setCategories(res.data.content);
-      })
-      .catch((err) => {
+    const fetchData = async () => {
+      try {
+        const categoryRes = await axios.get("/api/categories?page=0");
+        console.log("카테고리 데이터:", categoryRes.data);
+        setCategories(Array.isArray(categoryRes.data) ? categoryRes.data : []);
+      } catch (err) {
         console.error("카테고리 불러오기 실패:", err);
-        console.error("에러 응답 본문:", err.response?.data);
-      });
+        setCategories([]);
+      }
 
-    axios
-      .get("/api/artists?page=0")
-      .then((res) => {
-        setArtists(res.data.content);
-      })
-      .catch((err) => {
+      try {
+        const artistRes = await axios.get("/api/artists?page=0");
+        console.log("아티스트 content:", artistRes.data.content);
+        setArtists(Array.isArray(artistRes.data.content) ? artistRes.data.content : []);
+      } catch (err) {
         console.error("아티스트 불러오기 실패:", err);
-        console.error("에러 응답 본문:", err.response?.data);
-      });
+        setArtists([]);
+      }
+    };
+    fetchData();
   }, []);
 
   // 이미지 업로드 API 호출 함수
