@@ -29,7 +29,10 @@ const Profile = () => {
         <Flex mb={6} align="center" justify="space-between" height={190}>
           <HStack spacing={6} align="center" flex="1">
             {/* <Avatar boxSize="12rem" /> */}
-            <Avatar boxSize="12rem" src={state.avatar ? `http://localhost:8084${state.avatar}` : undefined} />
+            <Avatar
+              boxSize="12rem"
+              src={state.avatar ? `http://localhost:8084${state.avatar}` : "/src/assets/images/defaultProfile.jpg"}
+            />
 
             <VStack align="start" spacing={4}>
               <HStack>
@@ -68,6 +71,7 @@ const Profile = () => {
             w="85px"
             bg="white"
             // border="1px solid black"
+            mb={4}
             onClick={() => navigate("/mypage/editprofile")}
             _hover={{
               borderWidth: "2px",
