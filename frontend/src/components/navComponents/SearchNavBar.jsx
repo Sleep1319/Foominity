@@ -46,8 +46,8 @@ const SearchNavbar = ({ isVisible, onMouseEnter, onMouseLeave }) => {
             <Button as={RouterLink} to="/review" variant="ghost" color="white" _hover={{ bg: "transparent" }}>
               Review
             </Button>
-            <Button as={RouterLink} to="/freeboard" variant="ghost" color="white" _hover={{ bg: "transparent" }}>
-              FreeBoard
+            <Button as={RouterLink} to="/board" variant="ghost" color="white" _hover={{ bg: "transparent" }}>
+              Board
             </Button>
             <Button as={RouterLink} to="/notice" variant="ghost" color="white" _hover={{ bg: "transparent" }}>
               Notice

@@ -27,6 +27,9 @@ public class Board extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
+    @Column(nullable = false, columnDefinition = "int default 0")
+    private int views;
+
     @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
     private List<BoardComment> boardComments;
 
@@ -39,5 +42,10 @@ public class Board extends BaseEntity {
         this.title = title;
         this.content = content;
         this.member = member;
+        this.views = 0;
+    }
+
+    public void increaseViews() {
+        this.views++;
     }
 }

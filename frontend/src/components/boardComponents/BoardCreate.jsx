@@ -14,11 +14,12 @@ import {
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useUser } from "../../context/UserContext";
 
 const BoardCreate = () => {
+  const { state: user } = useUser();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [memberId, setMemberId] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const toast = useToast();
@@ -36,7 +37,7 @@ const BoardCreate = () => {
       await axios.post("/api/board/create", {
         title,
         content,
-        memberId,
+        memberId: user.memberId, // memberid는 가져오기
       });
       toast({
         title: "게시글이 등록되었습니다.",
@@ -50,6 +51,10 @@ const BoardCreate = () => {
       setError("등록에 실패했습니다. 다시 시도해주세요.");
     }
     setIsSubmitting(false);
+    console.log("title:", title);
+    console.log("content:", content);
+    console.log("user:", user);
+    console.log("memberId:", user?.id);
   };
 
   return (
@@ -79,15 +84,6 @@ const BoardCreate = () => {
               maxLength={2000}
             />
             {error && <FormErrorMessage>{error}</FormErrorMessage>}
-          </FormControl>
-
-          <FormControl>
-            <FormLabel>작성자 ID</FormLabel>
-            <Input
-              value={memberId}
-              onChange={(e) => setMemberId(e.target.value)}
-              placeholder="작성자 memberId를 입력하세요"
-            />
           </FormControl>
 
           <Flex gap={3}>

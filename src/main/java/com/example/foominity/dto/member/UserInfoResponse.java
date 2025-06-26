@@ -28,4 +28,5 @@ public class UserInfoResponse {
                 ? "/uploads/" + Paths.get(member.getProfileImage().getSavePath()).getFileName().toString()
                 : null;
     }
+
 }

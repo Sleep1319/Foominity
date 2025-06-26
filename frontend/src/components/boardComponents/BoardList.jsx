@@ -22,6 +22,7 @@ import {
 } from "@chakra-ui/react";
 import { FaRegEye } from "react-icons/fa";
 import { SearchIcon } from "@chakra-ui/icons";
+import { useUser } from "../../context/UserContext";
 
 // 페이지 갯수
 const BOARDS_PER_PAGE = 7;
@@ -67,6 +68,33 @@ const BoardList = () => {
   for (let i = blockStart; i <= blockEnd; i++) {
     pageNumbers.push(i);
   }
+
+  function formatDate(dateString) {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    const now = new Date();
+
+    // 오늘 여부 체크
+    const isToday =
+      date.getFullYear() === now.getFullYear() &&
+      date.getMonth() === now.getMonth() &&
+      date.getDate() === now.getDate();
+
+    if (isToday) {
+      // 시간, 분만 반환 (ex: 16:31)
+      const hours = String(date.getHours()).padStart(2, "0");
+      const minutes = String(date.getMinutes()).padStart(2, "0");
+      return `${hours}:${minutes}`;
+    } else {
+      // 날짜만 반환 (ex: 2025.6.24)
+      return `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`;
+    }
+  }
+
+  const { state: user, isLoading } = useUser();
+
+  console.log(isLoading); // 경고 없애기용 (임시)
+
   return (
     <Box p={6} maxW="1200px" mx="auto">
       {/* 헤딩과 검색어 영역 */}
@@ -129,7 +157,7 @@ const BoardList = () => {
                 <Flex align="center" gap={10} ml="auto" flexShrink={0} w={"60"}>
                   <Flex fontSize="sm" color="gray.500" gap={12} align="center">
                     <Text>{board.nickname}</Text>
-                    <Text>{board.createdDate}</Text>
+                    <Text>{formatDate(board.createdDate)}</Text>
                   </Flex>
 
                   <Flex align="center" gap={1} fontSize="sm" color="gray.500">
@@ -174,8 +202,8 @@ const BoardList = () => {
 
       {/* 제목 검색 */}
       <Box mt={8}>
-        <Flex gap={10}>
-          <Text mb={2} fontWeight="bold">
+        <Flex gap={4} align="center">
+          <Text mb={2} fontWeight="bold" whiteSpace="nowrap">
             제목으로 검색
           </Text>
           <form
@@ -183,6 +211,7 @@ const BoardList = () => {
               e.preventDefault();
               setSubmittedKeyword(searchKeyword); // 검색 실행
             }}
+            style={{ flex: 1 }} // form도 옆으로 늘어나게
           >
             <InputGroup maxW="400px">
               <Input
@@ -197,6 +226,11 @@ const BoardList = () => {
               </InputRightElement>
             </InputGroup>
           </form>
+          {user && (
+            <Button colorScheme="blue" size="sm" onClick={() => navigate("/board/create")} ml={2} px={6}>
+              글쓰기
+            </Button>
+          )}
         </Flex>
       </Box>
     </Box>
