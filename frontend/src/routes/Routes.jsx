@@ -28,7 +28,7 @@ function AppRoutes() {
       <Route path="/report" element={<Report />} />
       <Route path="/report/report-details" element={<ReportDetails />} />
       <Route path="/notice" element={<Notice />} />
-      <Route path="/notice/notice-details" element={<NoticeDetails />} />
+      <Route path="/notice/:id" element={<NoticeDetails />} />
       <Route path="/review" element={<Review />} />
       <Route path="/review/:id" element={<ReviewDetails />} />
       <Route element={<ProtectedRoute requireAuth={false} />}>

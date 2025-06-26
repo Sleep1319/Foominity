@@ -34,7 +34,7 @@ public class NoticeController {
         return ResponseEntity.ok(res);
     }
 
-    @GetMapping("/api/notice/{id}")
+    @GetMapping("/api/notices/{id}")
     public ResponseEntity<NoticeResponse> findById(@PathVariable Long id) {
         return ResponseEntity.ok(noticeService.findByID(id));
     }
