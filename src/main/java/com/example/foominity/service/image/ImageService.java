@@ -26,7 +26,6 @@ public class ImageService {
     private final String uploadDir = System.getProperty("user.dir") + "/uploads/"; // 절대 경로
 
     @Transactional
-    // src/main/java/com/example/foominity/service/image/ImageService.java
     public ImageFile imageUpload(MultipartFile file) {
         try {
             String originalName = file.getOriginalFilename();
@@ -40,10 +39,10 @@ public class ImageService {
             Path savePath = saveDir.resolve(newFileName);
             file.transferTo(savePath.toFile());
 
-            // ✅ 상대 경로만 저장
+            // 상대 경로만 저장
             ImageFile image = new ImageFile();
             image.setOriginalName(originalName);
-            image.setSavePath("uploads/" + newFileName); // <<<<<< 이게 핵심
+            image.setSavePath("uploads/" + newFileName); // 상대경로로 저장
 
             return imageRepository.save(image);
 
@@ -52,31 +51,13 @@ public class ImageService {
         }
     }
 
-    // public ImageFile imageUpload(MultipartFile file) {
-    // try {
-    // String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-    // Path savePath = Paths.get(uploadDir + fileName);
-
-    // log.info(">> 저장할 파일 경로: {}", savePath.toString());
-    // log.info(">> 업로드된 파일 이름: {}", file.getOriginalFilename());
-
-    // Files.createDirectories(savePath.getParent());
-    // file.transferTo(savePath.toFile());
-
-    // ImageFile image = new ImageFile(file.getOriginalFilename(),
-    // savePath.toString());
-    // return imageRepository.save(image);
-
-    // } catch (IOException e) {
-    // throw new NotFoundImageException();
-    // }
-    // }
-
     @Transactional
     public void deleteImageFile(ImageFile imageFile) {
         try {
             // 1. 물리적 파일 삭제
-            Path path = Paths.get(imageFile.getSavePath());
+            // Path path = Paths.get(imageFile.getSavePath());
+            // Files.deleteIfExists(path);
+            Path path = Paths.get(System.getProperty("user.dir")).resolve(imageFile.getSavePath());
             Files.deleteIfExists(path);
 
             imageRepository.delete(imageFile);

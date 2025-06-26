@@ -35,7 +35,6 @@ const AuthModal = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
   const { setState } = useUser();
 
-  // 모달이 닫히면 form 초기화
   useEffect(() => {
     if (!isOpen) {
       setForm({
@@ -83,18 +82,85 @@ const AuthModal = ({ isOpen, onClose }) => {
     } catch (err) {
       toast({
         title: "로그인 실패",
-        description:
-          err.response?.data?.message || "이메일/비밀번호를 확인해주세요.",
+        description: err.response?.data?.message || "이메일/비밀번호를 확인해주세요.",
         status: "error",
         duration: 3000,
         isClosable: true,
       });
     }
   };
-
   const handleRegister = async (e) => {
     e.preventDefault();
-    if (form.password !== form.passwordConfirm) {
+
+    const { email, password, username, nickname, passwordConfirm } = form;
+
+    // 1. 이메일 중복 확인
+    try {
+      console.log("이메일 값", form.email);
+
+      const res = await axios.get("/api/check-email", { params: { email } });
+      if (res.data.exists) {
+        toast({
+          title: "회원가입 실패",
+          description: "이미 사용 중인 이메일입니다.",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+        return;
+      }
+    } catch (err) {
+      toast({
+        title: "오류 발생",
+        description: err.response?.data?.error || "이메일 확인 중 문제가 발생했습니다.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    // 2. 이름 형식 검사
+    const usernameRegex = /^[A-Za-z가-힣]{2,}$/;
+    if (!usernameRegex.test(username)) {
+      toast({
+        title: "이름 형식 오류",
+        description: "이름은 한글 또는 영문으로 2자 이상 입력해야 합니다.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    // 3. 닉네임 형식 검사
+    const nicknameRegex = /^[A-Za-z가-힣]{2,}$/;
+    if (!nicknameRegex.test(nickname)) {
+      toast({
+        title: "닉네임 형식 오류",
+        description: "닉네임은 2글자 이상, 한글 또는 영문만 입력 가능합니다.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    // 4. 비밀번호 형식 검사
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
+    if (!passwordRegex.test(password)) {
+      toast({
+        title: "비밀번호 형식 오류",
+        description: "비밀번호는 최소 8자, 영문·숫자·특수문자를 포함해야 합니다.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    // 5. 비밀번호 확인
+    if (password !== passwordConfirm) {
       toast({
         title: "비밀번호 확인 오류",
         description: "비밀번호와 비밀번호 확인이 일치하지 않습니다.",
@@ -105,8 +171,8 @@ const AuthModal = ({ isOpen, onClose }) => {
       return;
     }
 
+    // 6. 서버에 회원가입 요청
     try {
-      const { email, password, username, nickname } = form;
       await axios.post(
         "/api/sign-up",
         { email, password, username, nickname },
@@ -123,7 +189,6 @@ const AuthModal = ({ isOpen, onClose }) => {
         isClosable: true,
       });
 
-      // 비밀번호만 초기화하고 로그인 탭으로 전환
       setForm((prev) => ({
         ...prev,
         password: "",
@@ -142,29 +207,15 @@ const AuthModal = ({ isOpen, onClose }) => {
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      isCentered
-      size="md"
-      blockScrollOnMount={false}
-    >
+    <Modal isOpen={isOpen} onClose={onClose} isCentered size="md" blockScrollOnMount={false}>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader textAlign="center">
           <ButtonGroup isAttached variant="outline" w="100%" mt={10}>
-            <Button
-              flex={1}
-              colorScheme={mode === "login" ? "black" : "gray"}
-              onClick={() => setMode("login")}
-            >
+            <Button flex={1} colorScheme={mode === "login" ? "black" : "gray"} onClick={() => setMode("login")}>
               로그인
             </Button>
-            <Button
-              flex={1}
-              colorScheme={mode === "register" ? "black" : "gray"}
-              onClick={() => setMode("register")}
-            >
+            <Button flex={1} colorScheme={mode === "register" ? "black" : "gray"} onClick={() => setMode("register")}>
               회원가입
             </Button>
           </ButtonGroup>
@@ -173,105 +224,99 @@ const AuthModal = ({ isOpen, onClose }) => {
         <ModalBody pb={6}>
           <form onSubmit={mode === "login" ? handleLogin : handleRegister}>
             <VStack spacing={4}>
-              <FormControl isRequired>
-                <FormLabel>이메일</FormLabel>
-                <Input
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  onChange={handleChange}
-                  value={form.email}
-                />
-              </FormControl>
-
-              {mode === "register" && (
+              {mode === "login" && (
                 <>
                   <FormControl isRequired>
-                    <FormLabel>이름</FormLabel>
+                    {/* <FormLabel>아이디 (이메일)</FormLabel> */}
                     <Input
-                      name="username"
-                      type="text"
+                      border="none"
+                      borderBottom="1px solid"
+                      borderColor="gray.300"
+                      borderRadius="0"
+                      name="email"
+                      type="email"
+                      value={form.email}
                       onChange={handleChange}
-                      value={form.username}
+                      aria-label="이메일"
+                      placeholder="example@email.com"
+                      // variant="filled"
                     />
                   </FormControl>
                   <FormControl isRequired>
-                    <FormLabel>닉네임</FormLabel>
+                    {/* <FormLabel>비밀번호</FormLabel> */}
                     <Input
-                      name="nickname"
-                      type="text"
+                      border="none"
+                      borderBottom="1px solid"
+                      borderColor="gray.300"
+                      borderRadius="0"
+                      name="password"
+                      type="password"
+                      value={form.password}
                       onChange={handleChange}
-                      value={form.nickname}
+                      autoComplete="current-password"
+                      aria-label="비밀번호"
+                      placeholder="비밀번호 입력"
+                      // variant="filled"
                     />
                   </FormControl>
                 </>
               )}
 
-              <FormControl isRequired>
-                <FormLabel>비밀번호</FormLabel>
-                <Input
-                  name="password"
-                  type="password"
-                  autoComplete={
-                    mode === "login" ? "current-password" : "new-password"
-                  }
-                  onChange={handleChange}
-                  value={form.password}
-                />
-              </FormControl>
-
               {mode === "register" && (
-                <FormControl isRequired>
-                  <FormLabel>비밀번호 확인</FormLabel>
-                  <Input
-                    name="passwordConfirm"
-                    type="password"
-                    autoComplete="new-password"
-                    onChange={handleChange}
-                    value={form.passwordConfirm}
-                  />
-                </FormControl>
+                <>
+                  <FormControl isRequired>
+                    <FormLabel>아이디 (이메일)</FormLabel>
+                    <Input
+                      name="email"
+                      type="email"
+                      value={form.email}
+                      onChange={handleChange}
+                      placeholder="이메일 입력 (email@example.com)"
+                      variant="outline"
+                    />
+                  </FormControl>
+                  <FormControl isRequired>
+                    <FormLabel>이름</FormLabel>
+                    <Input
+                      name="username"
+                      value={form.username}
+                      onChange={handleChange}
+                      placeholder="이름 입력 (예: 김민성)"
+                    />
+                  </FormControl>
+                  <FormControl isRequired>
+                    <FormLabel>닉네임</FormLabel>
+                    <Input name="nickname" value={form.nickname} onChange={handleChange} placeholder="닉네임 입력" />
+                  </FormControl>
+                  <FormControl isRequired>
+                    <FormLabel>비밀번호</FormLabel>
+                    <Input
+                      name="password"
+                      type="password"
+                      value={form.password}
+                      onChange={handleChange}
+                      placeholder="영문·숫자·특수문자 포함 8자 이상 입력하세요."
+                      autoComplete="new-password"
+                    />
+                  </FormControl>
+                  <FormControl isRequired>
+                    <FormLabel>비밀번호 확인</FormLabel>
+                    <Input
+                      name="passwordConfirm"
+                      type="password"
+                      value={form.passwordConfirm}
+                      onChange={handleChange}
+                      placeholder="비밀번호를 다시 입력하세요."
+                      autoComplete="new-password"
+                    />
+                  </FormControl>
+                </>
               )}
 
-              <Button
-                colorScheme="blue"
-                type="submit"
-                width="full"
-                bg="black"
-                _hover={{
-                  bg: "gray",
-                }}
-              >
+              <Button type="submit" colorScheme="blue" width="100%" bg="black" _hover={{ bg: "gray" }}>
                 {mode === "login" ? "로그인" : "회원가입"}
               </Button>
 
-              {/* <Text fontSize="sm">
-                {mode === "login" ? (
-                  <>
-                    계정이 없으신가요?{" "}
-                    <Text
-                      as="span"
-                      color="skyblue"
-                      cursor="pointer"
-                      onClick={() => setMode("register")}
-                    >
-                      회원가입
-                    </Text>
-                  </>
-                ) : (
-                  <>
-                    이미 계정이 있으신가요?{" "}
-                    <Text
-                      as="span"
-                      color="skyblue"
-                      cursor="pointer"
-                      onClick={() => setMode("login")}
-                    >
-                      로그인
-                    </Text>
-                  </>
-                )}
-              </Text> */}
               <SocialLoginButton mode={mode} />
             </VStack>
           </form>

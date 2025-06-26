@@ -3,6 +3,7 @@ package com.example.foominity.handler;
 import com.example.foominity.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -34,6 +35,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleSignInFailureException() {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                 Map.of("error", "이메일 또는 비밀번호가 다릅니다."));
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<?> handleValidationException(MethodArgumentNotValidException ex) {
+        String message = ex.getBindingResult().getFieldError().getDefaultMessage();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", message));
     }
 
     @ExceptionHandler(NotFoundBoardException.class)

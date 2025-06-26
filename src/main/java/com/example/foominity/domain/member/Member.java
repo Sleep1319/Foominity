@@ -84,7 +84,7 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<ReportComment> reportComment;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "profile_image_id")
     private ImageFile profileImage;
 
@@ -115,6 +115,11 @@ public class Member extends BaseEntity {
 
     public void changePassword(String password) {
         this.password = password;
+    }
+
+    // 프로필 사진 삭제 시 필요
+    public ImageFile getProfileImage() {
+        return profileImage;
     }
 
     // 프로필 사진 설정

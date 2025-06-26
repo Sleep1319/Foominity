@@ -38,11 +38,123 @@ const Register = () => {
   };
 
   // 회원가입 제출 핸들러
+  // const handleRegister = async (e) => {
+  //   e.preventDefault();
+
+  //   // 비밀번호 재입력 확인
+  //   if (form.password !== form.passwordConfirm) {
+  //     toast({
+  //       title: "비밀번호 확인 오류",
+  //       description: "비밀번호와 비밀번호 확인이 일치하지 않습니다.",
+  //       status: "error",
+  //       duration: 3000,
+  //       isClosable: true,
+  //     });
+  //     return;
+  //   }
+
+  //   try {
+  //     const submitData = {
+  //       email: form.email,
+  //       password: form.password,
+  //       username: form.username,
+  //       nickname: form.nickname,
+  //     };
+  //     console.log(submitData);
+  //     await axios.post("http://localhost:8084/api/sign-up", submitData, {
+  //       withCredentials: true,
+  //       headers: { "Content-Type": "application/json" },
+  //     });
+
+  //     toast({
+  //       title: "회원가입 성공",
+  //       status: "success",
+  //       duration: 2000,
+  //       isClosable: true,
+  //     });
+  //     navigate("/login");
+  //   } catch (error) {
+  //     console.log("중복 에러 내용: " + error.response.data.error);
+  //     const message = error.response?.data?.error || "회원가입 실패";
+  //     toast({
+  //       title: "회원가입 실패",
+  //       description: message,
+  //       status: "error",
+  //       duration: 3000,
+  //       isClosable: true,
+  //     });
+  //   }
+  // };
   const handleRegister = async (e) => {
     e.preventDefault();
 
-    // 비밀번호 재입력 확인
-    if (form.password !== form.passwordConfirm) {
+    const { email, password, username, nickname, passwordConfirm } = form;
+
+    // 1. 이메일 중복 확인
+    try {
+      const res = await axios.get("/api/check-email", { params: { email } });
+      if (res.data.exists) {
+        toast({
+          title: "회원가입 실패",
+          description: "이미 사용 중인 이메일입니다.",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+        return;
+      }
+    } catch (err) {
+      toast({
+        title: "이메일 확인 오류",
+        description: err.response?.data?.error || "이메일 중복 확인 중 문제가 발생했습니다.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    // 2. 이름 형식 검사
+    const usernameRegex = /^[A-Za-z가-힣]{2,}$/;
+    if (!usernameRegex.test(username)) {
+      toast({
+        title: "이름 형식 오류",
+        description: "이름은 한글 또는 영문으로 2자 이상 입력해야 합니다.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    // 3. 닉네임 형식 검사
+    const nicknameRegex = /^[A-Za-z가-힣]{2,}$/;
+    if (!nicknameRegex.test(nickname)) {
+      toast({
+        title: "닉네임 형식 오류",
+        description: "닉네임은 한글 또는 영문으로 2자 이상 입력해야 합니다.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    // 4. 비밀번호 형식 검사
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
+    if (!passwordRegex.test(password)) {
+      toast({
+        title: "비밀번호 형식 오류",
+        description: "비밀번호는 8자 이상이며 영문, 숫자, 특수문자를 포함해야 합니다.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    // 5. 비밀번호 확인
+    if (password !== passwordConfirm) {
       toast({
         title: "비밀번호 확인 오류",
         description: "비밀번호와 비밀번호 확인이 일치하지 않습니다.",
@@ -53,18 +165,16 @@ const Register = () => {
       return;
     }
 
+    // 6. 회원가입 요청
     try {
-      const submitData = {
-        email: form.email,
-        password: form.password,
-        username: form.username,
-        nickname: form.nickname,
-      };
-      console.log(submitData);
-      await axios.post("http://localhost:8084/api/sign-up", submitData, {
-        withCredentials: true,
-        headers: { "Content-Type": "application/json" },
-      });
+      await axios.post(
+        "/api/sign-up",
+        { email, password, username, nickname },
+        {
+          withCredentials: true,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
 
       toast({
         title: "회원가입 성공",
@@ -73,12 +183,10 @@ const Register = () => {
         isClosable: true,
       });
       navigate("/login");
-    } catch (error) {
-      console.log("중복 에러 내용: " + error.response.data.error);
-      const message = error.response?.data?.error || "회원가입 실패";
+    } catch (err) {
       toast({
         title: "회원가입 실패",
-        description: message,
+        description: err.response?.data?.error || "오류가 발생했습니다.",
         status: "error",
         duration: 3000,
         isClosable: true,
@@ -100,16 +208,7 @@ const Register = () => {
         height="85px"
       ></Text>
 
-      <Box
-        maxW="lg"
-        mx="auto"
-        mt={20}
-        p={8}
-        mb={90}
-        borderWidth={1}
-        borderRadius="lg"
-        boxShadow="lg"
-      >
+      <Box maxW="lg" mx="auto" mt={20} p={8} mb={90} borderWidth={1} borderRadius="lg" boxShadow="lg">
         <Heading mb={6} textAlign="center">
           회원가입
         </Heading>
@@ -118,13 +217,13 @@ const Register = () => {
             <FormControl isRequired width="auto">
               <HStack>
                 <FormLabel mb={0} w="120px" mr={-2} pl={10} ml={1.5}>
-                  이메일
+                  아이디
                 </FormLabel>
                 <Input
                   w="300px"
                   type="email"
                   name="email"
-                  placeholder="email@example.com"
+                  placeholder="이메일 형식으로 입력"
                   value={form.email}
                   onChange={handleChange}
                 />
@@ -140,7 +239,7 @@ const Register = () => {
                   w="300px"
                   type="text"
                   name="username"
-                  placeholder="이름(실명) 입력"
+                  placeholder="이름 입력 (예: 김민성)"
                   value={form.username}
                   onChange={handleChange}
                 />

@@ -16,17 +16,19 @@ import axios from "axios";
 import { useUser } from "../../context/UserContext";
 import DefaultTable from "../../components/reportComponents/DefaultTable.jsx";
 
+const DEFAULT_AVATAR_PATH = "/src/assets/images/defaultProfile.jpg";
+
 const EditProfile = ({ nickname: initialNickname, avatar, onNicknameChange }) => {
   const navigate = useNavigate();
   const [nickname, setNickname] = useState(initialNickname);
   const [nicknameError, setNicknameError] = useState("");
   const [avatarPreview, setAvatarPreview] = useState(avatar || null);
+  const [newAvatarFile, setNewAvatarFile] = useState(null);
+  const [isImageDeleted, setIsImageDeleted] = useState(false);
+
   const fileInputRef = useRef();
   const { state } = useUser();
   const { updateUser } = useUser();
-
-  console.log("🧠 [EditProfile] props.avatar:", avatar);
-  console.log("👀 [EditProfile] avatarPreview:", avatarPreview);
 
   const handleNicknameChange = async (e) => {
     const newNickname = e.target.value;
@@ -51,25 +53,23 @@ const EditProfile = ({ nickname: initialNickname, avatar, onNicknameChange }) =>
     fileInputRef.current.click();
   };
 
-  const handleFileChange = async (e) => {
+  const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const formData = new FormData();
-      formData.append("file", file);
-
-      try {
-        const response = await axios.post("/api/member/profile-image", formData, {
-          withCredentials: true,
-        });
-
-        const imageUrl = response.data.imageUrl;
-        console.log("👀 이미지 업로드 후 받은 URL:", imageUrl);
-        setAvatarPreview(imageUrl);
-        updateUser((prev) => ({ ...prev, avatar: imageUrl })); // 전역 상태 업데이트
-      } catch (err) {
-        console.error("이미지 업로드 실패:", err);
-      }
+      setNewAvatarFile(file);
+      const previewUrl = URL.createObjectURL(file);
+      setAvatarPreview(previewUrl);
+      setIsImageDeleted(false);
     }
+  };
+
+  const handleDeletePhoto = () => {
+    setAvatarPreview(null);
+    setNewAvatarFile(null);
+    setIsImageDeleted(true);
+
+    updateUser((prev) => ({ ...prev, avatar: null }));
+    console.log("avatarPreview2: ", avatarPreview);
   };
 
   const handleSubmit = async () => {
@@ -77,24 +77,50 @@ const EditProfile = ({ nickname: initialNickname, avatar, onNicknameChange }) =>
       alert("닉네임을 확인해주세요.");
       return;
     }
-    if (nickname === initialNickname && avatarPreview === avatar) {
-      navigate("/mypage");
-      return;
-    }
+
+    let isChanged = false;
 
     try {
+      // 닉네임 변경
       if (nickname !== initialNickname) {
         await axios.post("/api/change-nickname", { nickname }, { withCredentials: true });
-
-        onNicknameChange(nickname); // MyPage 내부 상태 업데이트
+        onNicknameChange(nickname);
+        isChanged = true;
       }
-      updateUser({ nickname, avatar: avatarPreview }); // 전역 상태 업데이트
 
-      alert("닉네임이 수정되었습니다!");
+      // 프로필 이미지 변경 또는 삭제
+      let updatedAvatarUrl = avatar;
+
+      if (isImageDeleted) {
+        await axios.delete("/api/member/profile-image", { withCredentials: true });
+        updatedAvatarUrl = null;
+        isChanged = true;
+      } else if (newAvatarFile) {
+        if (avatar) {
+          // 기존 이미지가 있으면 삭제
+          await axios.delete("/api/member/profile-image", { withCredentials: true });
+          isChanged = true;
+        }
+        const formData = new FormData();
+        formData.append("file", newAvatarFile);
+
+        const response = await axios.post("/api/member/profile-image", formData, {
+          withCredentials: true,
+        });
+
+        updatedAvatarUrl = response.data.imageUrl;
+        isChanged = true;
+      }
+
+      if (isChanged) {
+        updateUser({ nickname, avatar: updatedAvatarUrl });
+        alert("프로필이 수정되었습니다!");
+      }
+
       navigate("/mypage");
     } catch (err) {
-      console.error("닉네임 업데이트 실패:", err);
-      alert("닉네임을 입력해주세요");
+      console.error("프로필 업데이트 실패:", err);
+      alert("수정에 실패했습니다.");
     }
   };
 
@@ -118,27 +144,48 @@ const EditProfile = ({ nickname: initialNickname, avatar, onNicknameChange }) =>
           <HStack spacing={6} align="center" flex="1">
             <VStack spacing={0} position="relative">
               <Box position="relative" w="12rem" h="12rem">
-                {/* <Avatar boxSize="12rem" src={avatarPreview || undefined} /> */}
-                <Avatar boxSize="12rem" src={state.avatar ? `http://localhost:8084${state.avatar}` : undefined} />
+                <Avatar
+                  boxSize="12rem"
+                  src={
+                    avatarPreview !== null
+                      ? avatarPreview.startsWith("blob:")
+                        ? avatarPreview
+                        : `http://localhost:8084${avatarPreview}`
+                      : DEFAULT_AVATAR_PATH
+                  }
+                />
 
-                <Button
-                  size="sm"
-                  position="absolute"
-                  bottom="-40px"
-                  left="50%"
-                  transform="translateX(-50%)"
-                  onClick={handlePhotoButtonClick}
-                  bg="transparent"
-                  border="1px solid black"
-                  color="black"
-                  _hover={{
-                    borderWidth: "2px",
-                    borderColor: "black",
-                    bg: "white",
-                  }}
-                >
-                  사진 수정
-                </Button>
+                <HStack spacing={2} position="absolute" bottom="-50px" left="50%" transform="translateX(-50%)">
+                  <Button
+                    size="sm"
+                    onClick={handlePhotoButtonClick}
+                    bg="transparent"
+                    border="1px solid black"
+                    color="black"
+                    _hover={{
+                      borderWidth: "2px",
+                      borderColor: "black",
+                      bg: "white",
+                    }}
+                  >
+                    사진 수정
+                  </Button>
+
+                  <Button
+                    size="sm"
+                    onClick={handleDeletePhoto}
+                    bg="transparent"
+                    border="1px solid red"
+                    color="red"
+                    _hover={{
+                      borderWidth: "2px",
+                      borderColor: "red",
+                      bg: "white",
+                    }}
+                  >
+                    사진 삭제
+                  </Button>
+                </HStack>
               </Box>
               <Input
                 size="sm"
@@ -196,9 +243,6 @@ const EditProfile = ({ nickname: initialNickname, avatar, onNicknameChange }) =>
           border="2px solid black"
           color="black"
           _hover={{
-            // borderWidth: "2px",
-            // borderColor: "green.400",
-            // bg: "white",
             borderColor: "green.400",
             bg: "green.400",
             color: "white",

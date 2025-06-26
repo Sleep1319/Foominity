@@ -4,7 +4,7 @@ import { useUser } from "@/context/UserContext";
 
 const UserSection = () => {
   const { logout } = useUser();
-  // const { state } = useUser();
+  const { state } = useUser();
 
   return (
     <Box display="flex" alignItems="center" gap={3}>
@@ -12,7 +12,10 @@ const UserSection = () => {
 
       <Menu>
         <MenuButton>
-          <Avatar size="sm" />
+          <Avatar
+            size="md"
+            src={state.avatar ? `http://localhost:8084${state.avatar}` : "/src/assets/images/defaultProfile.jpg"}
+          />
         </MenuButton>
         <MenuList>
           <MenuItem as={RouterLink} to="/" fontWeight="bold" height="25px" fontSize={17} padding={0} pl={3}>
