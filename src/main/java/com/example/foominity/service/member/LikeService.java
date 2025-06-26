@@ -6,16 +6,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.foominity.config.jwt.JwtTokenProvider;
-import com.example.foominity.domain.board.Review;
+import com.example.foominity.domain.board.ReviewComment;
 import com.example.foominity.domain.member.Like;
 import com.example.foominity.domain.member.Member;
 import com.example.foominity.dto.member.LikeRequest;
 import com.example.foominity.exception.ForbiddenActionException;
-import com.example.foominity.exception.NotFoundBoardException;
 import com.example.foominity.exception.NotFoundLikeException;
 import com.example.foominity.exception.NotFoundMemberException;
+import com.example.foominity.exception.NotFoundReviewCommentException;
 import com.example.foominity.exception.UnauthorizedException;
-import com.example.foominity.repository.board.ReviewRepository;
+import com.example.foominity.repository.board.ReviewCommentRepository;
 import com.example.foominity.repository.member.LikeRepository;
 import com.example.foominity.repository.member.MemberRepository;
 
@@ -29,12 +29,13 @@ import lombok.extern.log4j.Log4j2;
 public class LikeService {
 
     private final LikeRepository likeRepository;
-    private final ReviewRepository reviewRepository;
+    private final ReviewCommentRepository reviewCommentRepository;
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final PointService pointService;
 
     @Transactional
-    public void like(Long boardId, HttpServletRequest tokenRequest, LikeRequest req) {
+    public void like(Long commentId, HttpServletRequest tokenRequest, LikeRequest req) {
         String token = jwtTokenProvider.resolveTokenFromCookie(tokenRequest);
         // 유효성검증
         if (!jwtTokenProvider.validateToken(token)) {
@@ -44,15 +45,21 @@ public class LikeService {
         Long memberId = jwtTokenProvider.getUserIdFromToken(token);
         Member member = memberRepository.findById(memberId).orElseThrow(NotFoundMemberException::new);
 
-        Review review = reviewRepository.findById(boardId).orElseThrow(NotFoundBoardException::new);
+        // Review review =
+        // reviewRepository.findById(boardId).orElseThrow(NotFoundBoardException::new);
 
-        Optional<Like> like = likeRepository.findByMemberAndReview(member, review);
+        ReviewComment reviewComment = reviewCommentRepository.findById(commentId)
+                .orElseThrow(NotFoundReviewCommentException::new);
+
+        Optional<Like> like = likeRepository.findByMemberAndReviewComment(member, reviewComment);
 
         if (like.isPresent()) {
             likeRepository.delete(like.get());
         } else {
-            likeRepository.save(req.toEntity(review, member));
+            likeRepository.save(req.toEntity(reviewComment, member));
         }
+
+        pointService.updateLikeCount(member);
 
     }
 

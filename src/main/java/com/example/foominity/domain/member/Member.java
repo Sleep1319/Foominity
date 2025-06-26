@@ -1,8 +1,15 @@
 package com.example.foominity.domain.member;
 
 import com.example.foominity.domain.BaseEntity;
+import com.example.foominity.domain.board.Board;
+import com.example.foominity.domain.board.BoardComment;
+import com.example.foominity.domain.board.ReviewComment;
+import com.example.foominity.domain.image.ImageFile;
+import com.example.foominity.domain.report.Report;
+import com.example.foominity.domain.report.ReportComment;
 import com.example.foominity.domain.sign.SocialType;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -13,12 +20,16 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+
+import java.util.List;
 
 @Table(name = "member")
 @NoArgsConstructor
@@ -47,10 +58,37 @@ public class Member extends BaseEntity {
     @Column(name = "provider_id")
     private String providerId;
 
+    // 연관 관계======================================================
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id")
     private Role role;
 
+    @OneToOne(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Point point;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    private List<Like> like;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    private List<ReviewComment> reviewComment;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    private List<Board> board;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    private List<BoardComment> boardComment;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    private List<Report> report;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    private List<ReportComment> reportComment;
+
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "profile_image_id")
+    private ImageFile profileImage;
+
+    // ================================================================
     public Member(String email, String password, String userName, String nickname, Role role) {
         this.email = email;
         this.password = password;
@@ -77,5 +115,10 @@ public class Member extends BaseEntity {
 
     public void changePassword(String password) {
         this.password = password;
+    }
+
+    // 프로필 사진 설정
+    public void setProfileImage(ImageFile profileImage) {
+        this.profileImage = profileImage;
     }
 }

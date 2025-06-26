@@ -22,11 +22,11 @@ public class BoardComment extends BaseEntity {
     private String content;
 
     @JoinColumn(name = "member_id")
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
     // 게시판 아이디
     @JoinColumn(name = "board_id")
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Board board;
 
     public BoardComment(String content, Board board, Member member) {

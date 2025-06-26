@@ -1,84 +1,31 @@
-import React from "react";
-import { Table, Thead, Tbody, Tfoot, Tr, Th, Td, TableContainer } from "@chakra-ui/react";
-import { Link as ChakraLink } from "@chakra-ui/react";
-import { Link as RouterLink } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { Box, SimpleGrid } from "@chakra-ui/react";
+import ReviewList from "./ReviewList";
 
 const ReviewTable = () => {
+  const [reviews, setReviews] = useState([]);
+
+  useEffect(() => {
+    axios
+      .get("/api/reviews?page=0")
+      .then((res) => {
+        console.log("서버 응답:", res.data); // 전체 응답 데이터 확인용 로그
+        setReviews(res.data.content); // Page 객체의 content 필드가 리뷰 배열이라 가정
+      })
+      .catch((err) => {
+        console.error("리뷰 조회 실패:", err);
+      });
+  }, []);
+
   return (
-    <TableContainer>
-      <Table
-        variant="simple"
-        size="md"
-        sx={{
-          "th, td": {
-            borderBottom: "1px solid",
-            borderColor: "gray.300",
-            textAlign: "center",
-          },
-        }}
-      >
-        <Thead>
-          <Tr>
-            <Th w="5%" textAlign="center" fontSize="md" fontWeight="medium">
-              번호
-            </Th>
-            <Th w="65%" textAlign="center" fontSize="md" fontWeight="medium">
-              제목
-            </Th>
-            <Th w="15%" textAlign="center" fontSize="md" fontWeight="medium">
-              글쓴이
-            </Th>
-            <Th w="15%" textAlign="center" fontSize="md" fontWeight="medium">
-              날짜
-            </Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          <Tr bg="pink.50">
-            <Td>1</Td>
-            <Td>
-              <ChakraLink as={RouterLink} to="/review/review-details">
-                test
-              </ChakraLink>
-            </Td>
-            <Td>writer</Td>
-            <Td>date</Td>
-          </Tr>
-          <Tr bg="pink.50">
-            <Td></Td>
-            <Td></Td>
-            <Td></Td>
-            <Td></Td>
-          </Tr>
-          <Tr>
-            <Td></Td>
-            <Td></Td>
-            <Td></Td>
-            <Td></Td>
-          </Tr>
-          <Tr>
-            <Td></Td>
-            <Td></Td>
-            <Td></Td>
-            <Td></Td>
-          </Tr>
-          <Tr>
-            <Td></Td>
-            <Td></Td>
-            <Td></Td>
-            <Td></Td>
-          </Tr>
-        </Tbody>
-        <Tfoot>
-          <Tr>
-            <Th></Th>
-            <Th></Th>
-            <Th></Th>
-            <Th></Th>
-          </Tr>
-        </Tfoot>
-      </Table>
-    </TableContainer>
+    <Box px={4} py={6}>
+      <SimpleGrid columns={{ base: 1, sm: 2, md: 3 }} spacing={8}>
+        {reviews.map((review) => (
+          <ReviewList key={review.id} review={review} />
+        ))}
+      </SimpleGrid>
+    </Box>
   );
 };
 

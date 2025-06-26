@@ -1,5 +1,6 @@
 package com.example.foominity.repository.sign;
 
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -21,5 +22,8 @@ public interface SignRepository extends JpaRepository<Member, Long> {
 
     // 넥네임으로 찾기
     public Optional<Member> findByNickname(String nickname);
+
+    @EntityGraph(attributePaths = {"role"})
+    Optional<Member> findWithRoleByEmail(String email);
 
 }

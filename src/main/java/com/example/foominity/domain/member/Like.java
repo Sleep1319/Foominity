@@ -1,6 +1,8 @@
 package com.example.foominity.domain.member;
 
 import com.example.foominity.domain.board.Review;
+import com.example.foominity.domain.board.ReviewComment;
+
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,11 +22,11 @@ public class Like {
     private Member member;
 
     @ManyToOne
-    @JoinColumn(name = "review_id")
-    private Review review;
+    @JoinColumn(name = "comment_id")
+    private ReviewComment reviewComment;
 
-    public Like(Review review, Member member) {
-        this.review = review;
+    public Like(ReviewComment reviewComment, Member member) {
+        this.reviewComment = reviewComment;
         this.member = member;
     }
 }

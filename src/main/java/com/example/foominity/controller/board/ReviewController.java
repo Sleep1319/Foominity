@@ -6,6 +6,7 @@ import com.example.foominity.dto.board.BoardRequest;
 import com.example.foominity.dto.board.BoardUpdateRequest;
 import com.example.foominity.dto.board.ReviewRequest;
 import com.example.foominity.dto.board.ReviewResponse;
+import com.example.foominity.dto.board.ReviewSimpleResponse;
 import com.example.foominity.dto.board.ReviewUpdateRequest;
 import com.example.foominity.service.board.ReviewService;
 
@@ -34,9 +35,9 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     // 전체 조회
-    @GetMapping("/api/reviews/page")
+    @GetMapping("/api/reviews")
     public ResponseEntity<?> findAll(@RequestParam(defaultValue = "0") int page) {
-        Page<ReviewResponse> res = reviewService.findAll(page);
+        Page<ReviewSimpleResponse> res = reviewService.findAll(page);
         return ResponseEntity.ok(res);
     }
 
@@ -46,7 +47,6 @@ public class ReviewController {
         return ResponseEntity.ok(reviewService.readReview(id));
     }
 
-    // 잠깐 주석
     // @GetMapping("/api/reviews/top")
     // public ResponseEntity<List<ReviewResponse>> getTop3LikeReviews() {
     // return ResponseEntity.ok(reviewService.getTop3LikeReviews(3));

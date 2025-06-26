@@ -3,6 +3,8 @@ package com.example.foominity.dto.board;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.example.foominity.dto.category.ReviewCategoryResponse;
 
 import jakarta.validation.constraints.NotBlank;
@@ -24,4 +26,5 @@ public class ReviewUpdateRequest {
     private List<Long> artistIds;
     private List<Long> categoryIds;
 
+    private MultipartFile image;
 }

@@ -1,7 +1,20 @@
 import React, { useState } from "react";
-import { Box, Button, Input, FormControl, FormLabel, Heading, VStack, Text, Link, useToast } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Input,
+  FormControl,
+  FormLabel,
+  Heading,
+  VStack,
+  Text,
+  Link,
+  useToast,
+  HStack,
+} from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import SocialLoginButton from "@/components/siginComponents/SocialLoginButton.jsx";
 
 const Register = () => {
   const [form, setForm] = useState({
@@ -74,80 +87,138 @@ const Register = () => {
   };
 
   return (
-    <Box maxW="md" mx="auto" mt={20} p={8} borderWidth={1} borderRadius="lg" boxShadow="lg">
-      <Heading mb={6} textAlign="center">
-        회원가입
-      </Heading>
-      <form onSubmit={handleRegister}>
-        <VStack spacing={4}>
-          <FormControl isRequired>
-            <FormLabel>이메일</FormLabel>
-            <Input
-              type="email"
-              name="email"
-              placeholder="email@example.com"
-              value={form.email}
-              onChange={handleChange}
-            />
-          </FormControl>
+    <>
+      <Text
+        lineHeight="2.5"
+        textAlign="center"
+        fontSize="3xl"
+        fontWeight="medium"
+        borderBottom="2px solid gray"
+        pb={2}
+        mt={4}
+        ml={5}
+        height="85px"
+      ></Text>
 
-          <FormControl isRequired>
-            <FormLabel>이름</FormLabel>
-            <Input
-              type="text"
-              name="username"
-              placeholder="이름(실명) 입력"
-              value={form.username}
-              onChange={handleChange}
-            />
-          </FormControl>
+      <Box
+        maxW="lg"
+        mx="auto"
+        mt={20}
+        p={8}
+        mb={90}
+        borderWidth={1}
+        borderRadius="lg"
+        boxShadow="lg"
+      >
+        <Heading mb={6} textAlign="center">
+          회원가입
+        </Heading>
+        <form onSubmit={handleRegister}>
+          <VStack spacing={4}>
+            <FormControl isRequired width="auto">
+              <HStack>
+                <FormLabel mb={0} w="120px" mr={-2} pl={10} ml={1.5}>
+                  이메일
+                </FormLabel>
+                <Input
+                  w="300px"
+                  type="email"
+                  name="email"
+                  placeholder="email@example.com"
+                  value={form.email}
+                  onChange={handleChange}
+                />
+              </HStack>
+            </FormControl>
 
-          <FormControl isRequired>
-            <FormLabel>닉네임</FormLabel>
-            <Input
-              type="text"
-              name="nickname"
-              placeholder="닉네임 입력"
-              value={form.nickname}
-              onChange={handleChange}
-            />
-          </FormControl>
+            <FormControl isRequired width="auto">
+              <HStack>
+                <FormLabel mb={0} w="120px" mr={-1} pl={59}>
+                  이름
+                </FormLabel>
+                <Input
+                  w="300px"
+                  type="text"
+                  name="username"
+                  placeholder="이름(실명) 입력"
+                  value={form.username}
+                  onChange={handleChange}
+                />
+              </HStack>
+            </FormControl>
 
-          <FormControl isRequired>
-            <FormLabel>비밀번호</FormLabel>
-            <Input
-              type="password"
-              name="password"
-              placeholder="비밀번호 입력"
-              value={form.password}
-              onChange={handleChange}
-            />
-          </FormControl>
+            <FormControl isRequired width="auto">
+              <HStack>
+                <FormLabel mb={0} w="120px" mr={-2} pl={10} ml={1.5}>
+                  닉네임
+                </FormLabel>
+                <Input
+                  w="300px"
+                  type="text"
+                  name="nickname"
+                  placeholder="닉네임 입력"
+                  value={form.nickname}
+                  onChange={handleChange}
+                />
+              </HStack>
+            </FormControl>
 
-          <FormControl isRequired>
-            <FormLabel>비밀번호 확인</FormLabel>
-            <Input
-              type="password"
-              name="passwordConfirm"
-              placeholder="비밀번호 다시 입력"
-              value={form.passwordConfirm}
-              onChange={handleChange}
-            />
-          </FormControl>
+            <FormControl isRequired width="auto">
+              <HStack>
+                <FormLabel mb={0} w="120px" mr={-1} pl={8}>
+                  비밀번호
+                </FormLabel>
+                <Input
+                  w="300px"
+                  type="password"
+                  name="password"
+                  placeholder="비밀번호 입력"
+                  value={form.password}
+                  onChange={handleChange}
+                />
+              </HStack>
+            </FormControl>
 
-          <Button colorScheme="blue" type="submit" width="full">
-            회원가입
-          </Button>
+            <FormControl isRequired width="auto">
+              <HStack>
+                <FormLabel mb={0} w="105px">
+                  비밀번호 확인
+                </FormLabel>
+                <Input
+                  w="300px"
+                  type="password"
+                  name="passwordConfirm"
+                  placeholder="비밀번호 다시 입력"
+                  value={form.passwordConfirm}
+                  onChange={handleChange}
+                />
+              </HStack>
+            </FormControl>
 
-          <Text fontSize="sm">
-            이미 계정이 있으신가요?{" "}
-            <Link color="skyblue" onClick={() => navigate("/login")}>
-              로그인
-            </Link>
-          </Text>
-        </VStack>
-      </form>
-    </Box>
+            <Button
+              bg="black"
+              type="submit"
+              width="full"
+              color="white"
+              _hover={{
+                bg: "white",
+                color: "black",
+              }}
+            >
+              회원가입
+            </Button>
+
+            <Text fontSize="sm">
+              이미 계정이 있으신가요?{" "}
+              <Link color="skyblue" onClick={() => navigate("/login")}>
+                로그인
+              </Link>
+            </Text>
+            <SocialLoginButton mode="signup" />
+          </VStack>
+        </form>
+      </Box>
+    </>
   );
 };
 

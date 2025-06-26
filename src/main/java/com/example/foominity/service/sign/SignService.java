@@ -144,6 +144,8 @@ public class SignService {
         );
         member.setSocialProvider(req.getSocialType(), req.getProviderId());
         signRepository.save(member);
+        Point point = new Point(member);
+        pointRepository.save(point);
     }
 
     private void validateSignUp(String email, String nickname) {

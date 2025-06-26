@@ -62,7 +62,6 @@ const SocialRegister = () => {
 
             toast({
                 title: "회원가입 완료",
-                description: "다시 로그인해주세요.",
                 status: "success",
                 duration: 3000,
                 isClosable: true,

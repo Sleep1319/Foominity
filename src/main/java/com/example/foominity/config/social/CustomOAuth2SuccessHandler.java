@@ -1,4 +1,4 @@
-package com.example.foominity.config;
+package com.example.foominity.config.social;
 
 import com.example.foominity.config.jwt.JwtTokenProvider;
 import com.example.foominity.domain.member.Member;
@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.Optional;
 
 @Component
@@ -37,14 +38,28 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
         OAuth2AuthenticationToken oauthToken = (OAuth2AuthenticationToken) authentication;
         OAuth2User oauthUser = oauthToken.getPrincipal();
 
-        // 사용자 정보 추출
-        String email = oauthUser.getAttribute("email");
-        String name = oauthUser.getAttribute("name");
         String socialType  = oauthToken.getAuthorizedClientRegistrationId(); // 예: "google"
-        String providerId = oauthUser.getName(); // 구글 고유 ID
+        String providerId = oauthUser.getName(); // 구글/고유 ID
+
+        String email = null;
+        String name = null;
+
+        if ("kakao".equals(socialType)) {
+            Map<String, Object> kakaoAccount = oauthUser.getAttribute("kakao_account");
+            if (kakaoAccount != null) {
+                email = (String) kakaoAccount.get("email");
+                Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
+                if (profile != null) {
+                    name = (String) profile.get("nickname");
+                }
+            }
+        } else {
+            email = oauthUser.getAttribute("email");
+            name = oauthUser.getAttribute("name");
+        }
 
         // 회원 존재 여부 확인
-        Optional<Member> existing = signRepository.findByEmail(email);
+        Optional<Member> existing = signRepository.findWithRoleByEmail(email);
 
         if (existing.isPresent()) {
             Member member = existing.get();
