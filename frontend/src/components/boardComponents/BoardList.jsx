@@ -93,6 +93,8 @@ const BoardList = () => {
 
   const { state: user, isLoading } = useUser();
 
+  console.log(isLoading); // 경고 없애기용 (임시)
+
   return (
     <Box p={6} maxW="1200px" mx="auto">
       {/* 헤딩과 검색어 영역 */}
