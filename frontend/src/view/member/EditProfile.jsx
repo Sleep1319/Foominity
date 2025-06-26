@@ -35,6 +35,14 @@ const EditProfile = ({ nickname: initialNickname, avatar, onNicknameChange }) =>
     setNickname(newNickname);
     setNicknameError("");
 
+    // 닉네임 유효성 검사 (한글, 영어, 숫자만 허용 / 특수문자 )
+    const nicknameRegex = /^[가-힣a-zA-Z0-9]+$/;
+    if (!nicknameRegex.test(newNickname)) {
+      setNicknameError("닉네임은 한글, 영어, 숫자만 사용할 수 있습니다.");
+      return;
+    }
+
+    // 기존 닉네임과 다를 때만 중복 검사
     if (newNickname && newNickname !== initialNickname) {
       try {
         const res = await axios.get("/api/check-nickname", {
