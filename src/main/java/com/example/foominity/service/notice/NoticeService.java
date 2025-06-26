@@ -2,9 +2,13 @@ package com.example.foominity.service.notice;
 
 import java.util.List;
 
+import com.example.foominity.config.jwt.JwtTokenProvider;
 import com.example.foominity.domain.board.Review;
+import com.example.foominity.domain.member.Member;
 import com.example.foominity.dto.board.ReviewResponse;
 import com.example.foominity.exception.NotFoundReviewException;
+import com.example.foominity.exception.UnauthorizedException;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -16,9 +20,13 @@ import com.example.foominity.domain.notice.Notice;
 import com.example.foominity.dto.notice.NoticeRequest;
 import com.example.foominity.dto.notice.NoticeResponse;
 import com.example.foominity.dto.notice.NoticeUpdateRequest;
+import com.example.foominity.exception.ForbiddenActionException;
+import com.example.foominity.exception.NotFoundMemberException;
 import com.example.foominity.exception.NotFoundNoticeException;
+import com.example.foominity.repository.member.MemberRepository;
 import com.example.foominity.repository.notice.NoticeRepository;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -27,6 +35,8 @@ import lombok.RequiredArgsConstructor;
 public class NoticeService {
 
     private final NoticeRepository noticeRepository;
+    private final MemberRepository memberRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
     public Page<NoticeResponse> findAll(int page) {
         PageRequest pageable = PageRequest.of(page, 4, Sort.by(Sort.Direction.DESC, "id"));
@@ -50,17 +60,55 @@ public class NoticeService {
     }
 
     @Transactional
-    public void createNotice(NoticeRequest req) {
+    public void createNotice(NoticeRequest req, HttpServletRequest Request) {
+        String token = jwtTokenProvider.resolveTokenFromCookie(Request);
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw new UnauthorizedException();
+        }
+
+        Long memberId = jwtTokenProvider.getUserIdFromToken(token);
+        Member member = memberRepository.findById(memberId).orElseThrow(NotFoundMemberException::new);
+
+        if (!"ADMIN".equals(member.getRole().getName())) {
+            throw new ForbiddenActionException();
+        }
+
         noticeRepository.save(req.toEntity(req));
     }
 
     @Transactional
-    public void deleteNotice(Long id) {
-        noticeRepository.delete(noticeRepository.findById(id).orElseThrow(NotFoundNoticeException::new));
+    public void deleteNotice(Long id, HttpServletRequest Request) {
+        String token = jwtTokenProvider.resolveTokenFromCookie(Request);
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw new UnauthorizedException();
+        }
+
+        Long memberId = jwtTokenProvider.getUserIdFromToken(token);
+        Member member = memberRepository.findById(memberId).orElseThrow(NotFoundMemberException::new);
+
+        if (!"ADMIN".equals(member.getRole().getName())) {
+            throw new ForbiddenActionException();
+        }
+
+        Notice notice = noticeRepository.findById(id).orElseThrow(NotFoundNoticeException::new);
+        noticeRepository.delete(notice);
+
     }
 
     @Transactional
-    public void changeMainNotice(Long newMainNoticeId) {
+    public void changeMainNotice(Long newMainNoticeId, HttpServletRequest Request) {
+        String token = jwtTokenProvider.resolveTokenFromCookie(Request);
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw new UnauthorizedException();
+        }
+
+        Long memberId = jwtTokenProvider.getUserIdFromToken(token);
+        Member member = memberRepository.findById(memberId).orElseThrow(NotFoundMemberException::new);
+
+        if (!"ADMIN".equals(member.getRole().getName())) {
+            throw new ForbiddenActionException();
+        }
+
         noticeRepository.findByMainNoticeTrue().ifPresent(mainNotice -> {
             mainNotice.cancelNotice();
             noticeRepository.save(mainNotice);

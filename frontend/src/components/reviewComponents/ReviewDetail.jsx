@@ -1,32 +1,18 @@
 import React, { useEffect, useState } from "react";
-import {
-  Box,
-  Text,
-  HStack,
-  Icon,
-  useColorModeValue,
-  Textarea,
-  Image,
-  VStack,
-  Divider,
-  Spinner,
-} from "@chakra-ui/react";
+import { Box, Text, HStack, Image, VStack, Spinner } from "@chakra-ui/react";
 import { useParams, useNavigate } from "react-router-dom";
-import { FaRegComment } from "react-icons/fa";
 import axios from "axios";
 import PopularPosts from "@/components/homeComponents/PopularPosts";
+import ReviewCommentForm from "@/components/commentComponents/ReviewCommentForm";
 
-const ReviewDetails = () => {
+const ReviewDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
   const [review, setReview] = useState(null);
   const [loading, setLoading] = useState(true);
-  const isLoggedIn = false;
 
-  const textColor = useColorModeValue("gray.700", "white");
-
-  useEffect(() => {
+  const fetchReview = () => {
     axios
       .get(`/api/reviews/${id}`)
       .then((res) => {
@@ -37,6 +23,10 @@ const ReviewDetails = () => {
         console.error("리뷰 상세 조회 실패:", err);
         setLoading(false);
       });
+  };
+
+  useEffect(() => {
+    fetchReview();
   }, [id]);
 
   if (loading) {
@@ -57,10 +47,11 @@ const ReviewDetails = () => {
         <Text fontSize="3xl" fontWeight="medium" pb={2} textAlign="center">
           Review
         </Text>
+
+        {/* 앨범 정보 */}
         <Box display="flex" justifyContent="center" px={6} py={10}>
           <Box display="flex" alignItems="flex-end" gap={6}>
             <Image src={review.imagePath} alt={review.title} boxSize="420px" objectFit="cover" borderRadius="md" />
-
             <Box display="flex" flexDirection="row" alignItems="flex-end" gap={8} h="420px">
               <Box display="flex" flexDirection="column" justifyContent="flex-end">
                 <Text fontSize="3xl" fontWeight="bold" mb={2}>
@@ -76,7 +67,6 @@ const ReviewDetails = () => {
                   <strong>Genres:</strong> {review.categories.map((c) => c.categoryName).join(", ")}
                 </Text>
               </Box>
-
               <Box display="flex" flexDirection="column" justifyContent="flex-end">
                 <Text fontSize="xl" fontWeight="semibold" mb={2}>
                   Tracklist
@@ -93,36 +83,8 @@ const ReviewDetails = () => {
           </Box>
         </Box>
 
-        <HStack spacing={1} borderBottom="2px solid gray" pb={4} mb={4}>
-          <Text fontSize="lg" color={textColor}>
-            평점
-          </Text>
-          <Text fontSize="lg" color="blue.400">
-            {review.averageStarPoint.toFixed(1)}
-          </Text>
-        </HStack>
-
-        <Box mt={4} borderBottom="2px solid gray" pb={14}>
-          <Text fontWeight="bold" mb={2}>
-            댓글 달기
-          </Text>
-          {isLoggedIn ? (
-            <Textarea placeholder="댓글을 입력하세요..." />
-          ) : (
-            <Box
-              p={8}
-              border="1px solid gray"
-              borderRadius="md"
-              color="gray.600"
-              whiteSpace="pre-wrap"
-              minHeight="100px"
-              cursor="pointer"
-              onClick={() => navigate("/login")}
-            >
-              댓글 쓰기 권한이 없습니다. 로그인 하시겠습니까?
-            </Box>
-          )}
-        </Box>
+        {/* ✅ 댓글 작성 컴포넌트 */}
+        <ReviewCommentForm reviewId={id} commentCount={review.commentCount || 0} onSuccess={fetchReview} />
 
         <Text
           fontSize="md"
@@ -140,4 +102,4 @@ const ReviewDetails = () => {
   );
 };
 
-export default ReviewDetails;
+export default ReviewDetail;

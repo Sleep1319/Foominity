@@ -14,15 +14,12 @@ import lombok.NoArgsConstructor;
 public class ReportCreateRequest {
 
     @NotNull
-    private Long memberId;
-
-    @NotNull
     private Long targetId;
 
     @NotNull
     private String targetType;
 
-    public Report toEntity(ReportCreateRequest req, Member member) {
-        return new Report(req.getTargetId(), req.getTargetType(), member);
+    public Report toEntity(Member member) {
+        return new Report(this.targetId, this.targetType, member);
     }
 }

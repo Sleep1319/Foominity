@@ -59,9 +59,15 @@ public class ReportService {
     }
 
     @Transactional
-    public void createReport(ReportCreateRequest req) {
-        Member member = memberRepository.findById(req.getMemberId()).orElseThrow(NotFoundMemberException::new);
-        reportRepository.save(req.toEntity(req, member));
+    public void createReport(ReportCreateRequest req, HttpServletRequest tokenRequest) {
+        String token = jwtTokenProvider.resolveTokenFromCookie(tokenRequest);
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw new UnauthorizedException();
+        }
+
+        Long memberId = jwtTokenProvider.getUserIdFromToken(token);
+        Member member = memberRepository.findById(memberId).orElseThrow(NotFoundMemberException::new);
+        reportRepository.save(req.toEntity(member));
     }
 
     @Transactional
