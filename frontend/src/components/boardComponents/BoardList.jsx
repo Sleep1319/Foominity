@@ -117,13 +117,15 @@ const BoardList = () => {
       </Flex>
       {/* 📌 이 부분이 헤더 라인입니다 */}
       <Flex px={4} py={2} fontWeight="semibold" fontSize="sm" color="gray.600" borderBottom="1px solid #e2e8f0">
+        <Text flex="1">번호</Text>
+
         <Text flex="1">제목</Text>
 
-        <Flex gap={6} minW="300px" justify="flex-end">
-          <Text w="80px" textAlign="center">
+        <Flex minW="300px" justify="space-between">
+          <Text w="130px" textAlign="center">
             글쓴이
           </Text>
-          <Text w="80px" textAlign="center">
+          <Text w="70px" textAlign="center" pr={4}>
             날짜
           </Text>
           <Text w="60px" textAlign="center">
@@ -136,31 +138,35 @@ const BoardList = () => {
       {/* 게시글 목록을 그리드 형태로 표시 */}
       <SimpleGrid spacing={4} columns={{ base: 1, md: 1, lg: 1 }}>
         {currentBoards.map((board) => (
-          <Card key={board.id} borderRadius="lg" shadow="md" _hover={{ shadow: "lg" }}>
-            <CardBody>
-              <Flex gap={1} align="center">
+          <Card key={board.id} borderRadius="lg" shadow="md" _hover={{ shadow: "lg" }} mb={2}>
+            <CardBody p={0}>
+              <Flex align="center" minH="64px" px={4}>
+                {/* 번호 */}
+                <Text w="80px" color="gray.400" fontSize="sm" textAlign="center">
+                  {board.id}
+                </Text>
                 {/* 게시글 제목 */}
                 <Text
+                  flex="1"
                   fontWeight="bold"
                   fontSize="lg"
-                  noOfLines={2}
-                  flex="1"
-                  minWidth="0"
                   cursor="pointer"
                   onClick={() => navigate(`/board/${board.id}`)}
                   _hover={{ color: "blue.500", textDecoration: "underline" }}
+                  noOfLines={2}
+                  ml={2}
                 >
                   {board.title}
                 </Text>
-
-                {/* 오른쪽 영역 - 작성자, 날짜, 조회수 */}
-                <Flex align="center" gap={10} ml="auto" flexShrink={0} w={"60"}>
-                  <Flex fontSize="sm" color="gray.500" gap={12} align="center">
-                    <Text>{board.nickname}</Text>
-                    <Text>{formatDate(board.createdDate)}</Text>
-                  </Flex>
-
-                  <Flex align="center" gap={1} fontSize="sm" color="gray.500">
+                {/* 오른쪽 영역: 글쓴이, 날짜, 조회수 */}
+                <Flex gap={6} minW="320px" justify="flex-end" align="center" ml={4}>
+                  <Text w="100px" textAlign="center" color="gray.500" fontSize="sm">
+                    {board.nickname}
+                  </Text>
+                  <Text w="80px" textAlign="center" color="gray.500" fontSize="sm">
+                    {formatDate(board.createdDate)}
+                  </Text>
+                  <Flex w="60px" align="center" justify="center" color="gray.500" fontSize="sm" gap={1}>
                     <Icon as={FaRegEye} />
                     <Text>{board.views / 2}</Text>
                   </Flex>
