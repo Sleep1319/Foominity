@@ -14,7 +14,7 @@ import com.example.foominity.domain.artist.Artist;
 import com.example.foominity.domain.category.ArtistCategory;
 import com.example.foominity.domain.category.Category;
 import com.example.foominity.domain.member.Member;
-import com.example.foominity.dto.artist.AritstRequest;
+import com.example.foominity.dto.artist.ArtistRequest;
 import com.example.foominity.dto.artist.ArtistResponse;
 import com.example.foominity.dto.artist.ArtistUpdateRequest;
 import com.example.foominity.dto.category.ArtistCategoryResponse;
@@ -47,18 +47,20 @@ public class ArtistService {
         Page<Artist> artists = artistRepository.findAll(pageable);
 
         List<ArtistResponse> artistResponsesList = artists.stream().map(artist -> {
-            // List<ArtistCategory> artistCategories =
-            // artistCategoryRepository.findByArtistId(artist.getId());
+            List<ArtistCategory> artistCategories = artistCategoryRepository.findByArtistId(artist.getId());
 
-            // List<ArtistCategoryResponse> categoryResponses = artistCategories.stream()
-            // .map(ar -> new ArtistCategoryResponse(
-            // ar.getCategory().getId(),
-            // ar.getCategory().getCategoryName()))
-            // .toList();
+            List<ArtistCategoryResponse> categoryResponses = artistCategories.stream()
+                    .map(ar -> new ArtistCategoryResponse(
+                            ar.getCategory().getId(),
+                            ar.getCategory().getCategoryName()))
+                    .toList();
 
             return new ArtistResponse(
                     artist.getId(),
-                    artist.getName());
+                    artist.getName(),
+                    artist.getBorn(),
+                    artist.getNationality(),
+                    categoryResponses);
 
         })
                 .toList();
@@ -90,7 +92,7 @@ public class ArtistService {
 
     // 아티스트 생성
     @Transactional
-    public void createArtist(AritstRequest req, HttpServletRequest tokenRequest) {
+    public void createArtist(ArtistRequest req, HttpServletRequest tokenRequest) {
         String token = jwtTokenProvider.resolveTokenFromCookie(tokenRequest);
 
         if (!jwtTokenProvider.validateToken(token)) {
