@@ -6,6 +6,7 @@ import com.example.foominity.dto.notice.NoticeRequest;
 import com.example.foominity.dto.notice.NoticeResponse;
 import com.example.foominity.service.notice.NoticeService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,20 +40,20 @@ public class NoticeController {
     }
 
     @PostMapping("/api/notice/add")
-    public ResponseEntity<String> createNotice(@Valid @RequestBody NoticeRequest req) {
-        noticeService.createNotice(req);
+    public ResponseEntity<String> createNotice(@Valid @RequestBody NoticeRequest req, HttpServletRequest request) {
+        noticeService.createNotice(req, request);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/api/notice/{id}")
-    public ResponseEntity<String> deleteNotice(@PathVariable Long id) {
-        noticeService.deleteNotice(id);
+    public ResponseEntity<String> deleteNotice(@PathVariable Long id, HttpServletRequest request) {
+        noticeService.deleteNotice(id, request);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/api/notice/main/{id}")
-    public ResponseEntity<String> changeMainNotice(@PathVariable Long id) {
-        noticeService.changeMainNotice(id);
+    public ResponseEntity<String> changeMainNotice(@PathVariable Long id, HttpServletRequest request) {
+        noticeService.changeMainNotice(id, request);
         return ResponseEntity.ok().build();
     }
 

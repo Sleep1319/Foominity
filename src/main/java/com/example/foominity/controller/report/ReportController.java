@@ -39,8 +39,9 @@ public class ReportController {
     }
 
     @PostMapping("/api/report/add")
-    public ResponseEntity<String> createReport(@Valid @RequestBody ReportCreateRequest req) {
-        reportService.createReport(req);
+    public ResponseEntity<String> createReport(@Valid @RequestBody ReportCreateRequest req,
+            HttpServletRequest tokenRequest) {
+        reportService.createReport(req, tokenRequest);
         return ResponseEntity.ok().build();
     }
 

@@ -6,7 +6,7 @@ const ReviewDetails = () => {
   return (
     <div>
       <ReviewDetail />
-        <ReviewCommentForm />
+      <ReviewCommentForm />
     </div>
   );
 };
