@@ -1,10 +1,10 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import Home from "../view/home/Home.jsx";
-import Report from "../view/report/Report.jsx";
+
 import Login from "../view/Sign/Login.jsx";
 import Register from "../view/Sign/Register.jsx";
-import Notice from "@/view/notice/Notice.jsx";
+
 import ProtectedRoute from "./ProtectedRoute";
 import Profile from "../view/member/Profile.jsx";
 import EditProfile from "../view/member/EditProfile.jsx";
@@ -20,14 +20,19 @@ import BoardLists from "./../view/board/BoardLists";
 import BoardCreateRun from "../view/board/BoardCreateRun.jsx";
 import BoardDetails from "./../view/board/BoardDetails";
 import BoardUpdateRun from "../view/board/BoardUpdateRun.jsx";
+import NoticeLists from "../view/notice/NoticeLists.jsx";
+import NoticeCreateRun from "../view/notice/NoticeCreateRun.jsx";
+
+import ReportCreateRun from "../view/report/ReportCreateRun.jsx";
+import ReportLists from "../view/report/ReportLists.jsx";
 
 function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
-      <Route path="/report" element={<Report />} />
-      <Route path="/report/report-details" element={<ReportDetails />} />
-      <Route path="/notice" element={<Notice />} />
+      <Route path="/report" element={<ReportLists />} />
+      <Route path="/report/:id" element={<ReportDetails />} />
+      <Route path="/notice" element={<NoticeLists />} />
       <Route path="/notice/:id" element={<NoticeDetails />} />
       <Route path="/review" element={<Review />} />
       <Route path="/review/:id" element={<ReviewDetails />} />
@@ -47,7 +52,15 @@ function AppRoutes() {
       <Route path="/board/create" element={<BoardCreateRun />} />
       <Route path="/board/:id" element={<BoardDetails />} />
       <Route path="/board/update/:id" element={<BoardUpdateRun />} />
+
+      {/* Notice */}
+      <Route path="/notice/create" element={<NoticeCreateRun />} />
+
+      {/* Report */}
+      <Route path="/report/create" element={<ReportCreateRun />} />
     </Routes>
+
+    
   );
 }
 

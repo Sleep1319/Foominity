@@ -20,12 +20,10 @@ const ReportCreate = () => {
   const navigate = useNavigate();
   const { state: user } = useUser();
 
-  const allowedRoles = ["BRONZE", "SILVER", "GOLD"];
-
-  if (!user || !allowedRoles.includes(user.roleName)) {
+  if (!user) {
     return (
       <Box p={6}>
-        <Heading size="md">신고 작성 권한이 없습니다.</Heading>
+        <Heading size="md">로그인 후 이용해주세요.</Heading>
       </Box>
     );
   }
@@ -85,14 +83,14 @@ const ReportCreate = () => {
         </FormControl>
 
         <FormControl mb={6} isRequired>
-          <FormLabel>신고 대상 종류</FormLabel>
+          <FormLabel>신고 게시판</FormLabel>
           <Select
             placeholder="선택하세요"
             value={targetType}
             onChange={(e) => setTargetType(e.target.value)}
           >
-            <option value="REVIEW">리뷰</option>
-            <option value="BOARD">자유 게시판</option>
+            <option value="REVIEW">REVIEW</option>
+            <option value="BOARD">BOARD</option>
           </Select>
         </FormControl>
 

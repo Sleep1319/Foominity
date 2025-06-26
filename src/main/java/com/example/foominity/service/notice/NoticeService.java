@@ -121,6 +121,13 @@ public class NoticeService {
                 .orElseThrow(NotFoundNoticeException::new);
     }
 
+    public List<NoticeResponse> findAllNotices() {
+    List<Notice> notices = noticeRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
+    return notices.stream()
+        .map(notice -> new NoticeResponse(notice.getId(), notice.getTitle(), notice.getContent()))
+        .toList();
+}
+
     public List<NoticeResponse> getLatest() {
         List<Notice> noticeList = noticeRepository.findTop4ByOrderByIdDesc().orElseThrow(NotFoundNoticeException::new);
 

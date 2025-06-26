@@ -76,6 +76,18 @@ public class ReportService {
         reportRepository.delete(report);
     }
 
+    public List<ReportResponse> findAllReports() {
+    List<Report> reports = reportRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
+    return reports.stream()
+        .map(report -> new ReportResponse(
+            report.getId(),
+            report.getMember().getId(),
+            report.getTargetId(),
+            report.getTargetType()
+        ))
+        .toList();
+}
+
     // 권한 검증용
     public Report validateReportOwnership(Long id, HttpServletRequest tokenRequest) {
         String token = jwtTokenProvider.resolveTokenFromCookie(tokenRequest);

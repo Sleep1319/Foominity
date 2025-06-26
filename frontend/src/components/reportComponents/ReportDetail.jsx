@@ -1,96 +1,100 @@
-import { Box, Text, Heading, HStack, Icon, useColorModeValue, Textarea } from "@chakra-ui/react";
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import { FaRegComment } from "react-icons/fa";
-import DefaultTable from "../../components/reportComponents/DefaultTable.jsx";
-import PopularPosts from "@/components/homeComponents/PopularPosts.jsx";
+import React, { useEffect, useState } from "react";
+import {
+  Box,
+  Heading,
+  Text,
+  Button,
+  Spinner,
+  useToast,
+  Flex,
+} from "@chakra-ui/react";
+import { useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useUser } from "../../context/UserContext";
 
 const ReportDetail = () => {
+  const { id } = useParams();
   const navigate = useNavigate();
+  const { state: user } = useUser();
+  const [report, setReport] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const toast = useToast();
 
-  const isLoggedIn = false;
+  useEffect(() => {
+    const fetchReport = async () => {
+      try {
+        const res = await axios.get(`/api/report/${id}`);
+        setReport(res.data);
+      } catch (err) {
+        console.error("리포트 조회 실패:", err);
+        const message =
+          err.response?.data?.message ||
+          err.message ||
+          "리포트 조회 중 오류가 발생했습니다.";
+
+        toast({
+          title: "리포트 조회 실패",
+          description: message,
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchReport();
+  }, [id]);
+
+  const handleDelete = async () => {
+    if (!window.confirm("정말 삭제하시겠습니까?")) return;
+    try {
+      await axios.delete(`/api/report/${id}`, { withCredentials: true });
+      toast({ title: "삭제되었습니다.", status: "success" });
+      setTimeout(() => navigate("/report"), 800);
+    } catch (err) {
+      console.error("리포트 삭제 실패:", err);
+      const message =
+        err.response?.data?.message ||
+        err.message ||
+        "리포트 삭제 중 오류가 발생했습니다.";
+
+      toast({
+        title: "삭제 실패",
+        description: message,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
+
+  if (loading) {
+    return (
+      <Flex justify="center" mt={10}>
+        <Spinner size="xl" />
+      </Flex>
+    );
+  }
+
+  if (!report) return null;
 
   return (
-    <Box display="flex" justifyContent="center" px={6} py={10}>
-      <Box flex="1" maxW="900px" pr={{ base: 0, lg: 10 }}>
-        <Text fontSize="2xl" fontWeight="medium" pb={2} textAlign="left">
-          Report
-        </Text>
-        <Heading as="h1" size="2xl" textAlign="left" pb={2}>
-          제목
-        </Heading>
-        <Box
-          display="flex"
-          textAlign="left"
-          fontSize="lg"
-          fontWeight="light"
-          mt={2}
-          borderBottom="2px solid gray"
-          pb={4}
-        >
-          <Text pr={4}>writer</Text>
-          <Text px={4}>date</Text>
-          <Text px={4}>commentCount</Text>
-        </Box>
+    <Box maxW="800px" mx="auto" py={10} px={4}>
+      <Heading size="lg" mb={6}>신고 상세</Heading>
 
-        <Box mt={18}>
-          <Text fontSize="md" whiteSpace="pre-wrap" textAlign="left" borderBottom="2px solid gray" pb={4}>
-            TextTextTextTextTextTextTextTextTextTextTextTextTextTextTextTextTextTextTextTextTextTextTextText
-            {"\n"}
-            TextTextTextTextTextText
-          </Text>
-        </Box>
+      <Text fontSize="md" mb={2}><strong>신고 ID:</strong> {report.id}</Text>
+      <Text fontSize="md" mb={2}><strong>신고자 ID:</strong> {report.memberId}</Text>
+      <Text fontSize="md" mb={2}><strong>대상 ID:</strong> {report.targetId}</Text>
+      <Text fontSize="md" mb={2}><strong>게시판 종류:</strong> {report.targetType}</Text>
 
-        <Text
-          fontSize="md"
-          textAlign="left"
-          mt={6}
-          mb={6}
-          display="inline-block"
-          cursor="pointer"
-          onClick={() => navigate("/report")}
-        >
-          목록
-        </Text>
-
-        <HStack mt={4} spacing={1} borderBottom="2px solid gray" pb={4}>
-          <Icon as={FaRegComment} boxSize={5} color={useColorModeValue("gray.700", "white")} />
-          <Text fontSize="lg" color={useColorModeValue("gray.700", "white")}>
-            댓글
-          </Text>
-          <Text fontSize="lg" color="blue.400">
-            commentCount
-          </Text>
-        </HStack>
-
-        <Box mt={4} borderBottom="2px solid gray" pb={14}>
-          <Text fontWeight="bold" mb={2}>
-            댓글 달기
-          </Text>
-          {isLoggedIn ? (
-            <Textarea placeholder="댓글을 입력하세요..." />
-          ) : (
-            <Box
-              p={8}
-              border="1px solid gray"
-              borderRadius="md"
-              color="gray.600"
-              whiteSpace="pre-wrap"
-              minHeight="100px"
-              cursor="pointer"
-              onClick={() => navigate("/login")}
-            >
-              댓글 쓰기 권한이 없습니다. 로그인 하시겠습니까?
-            </Box>
-          )}
-        </Box>
-
-        <DefaultTable />
-      </Box>
-
-      <Box display={{ base: "none", lg: "block" }} position="sticky" top="100px" width="250px" alignSelf="flex-start">
-        <PopularPosts />
-      </Box>
+      {user?.id === report.memberId && (
+        <Flex gap={4} mt={8}>
+          <Button colorScheme="red" onClick={handleDelete}>
+            삭제
+          </Button>
+        </Flex>
+      )}
     </Box>
   );
 };

@@ -11,6 +11,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -33,6 +35,12 @@ public class ReportController {
         return ResponseEntity.ok(res);
     }
 
+    @GetMapping("/api/report")
+    public ResponseEntity<List<ReportResponse>> findAllReports() {
+    List<ReportResponse> res = reportService.findAllReports(); // 전체 조회용 서비스 메서드
+    return ResponseEntity.ok(res);
+}
+
     @GetMapping("/api/report/{id}")
     public ResponseEntity<ReportResponse> findById(@PathVariable Long id) {
         return ResponseEntity.ok(reportService.findById(id));
@@ -50,5 +58,7 @@ public class ReportController {
         reportService.deleteReport(id, tokenRequest);
         return ResponseEntity.ok().build();
     }
+
+    
 
 }
