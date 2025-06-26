@@ -40,7 +40,7 @@ const ReviewTable = () => {
       });
   }, []);
 
-  if (isLoading || !state) {
+  if (isLoading) {
     return (
       <Center h="300px">
         <Spinner size="xl" />
