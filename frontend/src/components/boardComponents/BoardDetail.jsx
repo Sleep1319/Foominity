@@ -74,7 +74,7 @@ const BoardDetail = () => {
           <Text px={4}>{board.createDate?.split("T")[0]}</Text>
           <Text px={4}>
             <Icon as={FaRegEye} mr={1} />
-            {board.views}
+            {board.views / 2}
           </Text>
           <Text px={4}>
             <Icon as={FaRegComment} mr={1} />

@@ -162,7 +162,7 @@ const BoardList = () => {
 
                   <Flex align="center" gap={1} fontSize="sm" color="gray.500">
                     <Icon as={FaRegEye} />
-                    <Text>{board.views}</Text>
+                    <Text>{board.views / 2}</Text>
                   </Flex>
                 </Flex>
               </Flex>

@@ -85,6 +85,7 @@ public class BoardService {
     public BoardResponse findByid(Long id) {
         Board board = boardRepository.findById(id).orElseThrow(NotFoundBoardException::new);
         // 조회수 증가 : 지금 2씩 증가하는데 main.jsx에서 StrictMode 를 제거하거나 실전으로 가면 1씩 증가한다고 함.
+        // 지금은 임시로 {view / 2} 로 처리함
         board.increaseViews();
         return new BoardResponse(
                 board.getId(),
