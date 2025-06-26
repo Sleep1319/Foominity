@@ -41,7 +41,7 @@ public class BoardService {
 
     public Page<BoardResponse> findAll(int page) {
         PageRequest pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC,
-                "id"));
+                "createdDate"));
         Page<Board> boards = boardRepository.findAll(pageable);
 
         List<BoardResponse> boardResponseList = boards.stream()
@@ -81,11 +81,11 @@ public class BoardService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = false) // 조회수 증가를 위해 추가
     public BoardResponse findByid(Long id) {
         Board board = boardRepository.findById(id).orElseThrow(NotFoundBoardException::new);
-        // 조회수 증가
-        board.addViews(board.getViews() + 1);
-        boardRepository.save(board); // 변경 사항 저장
+        // 조회수 증가 : 지금 2씩 증가하는데 main.jsx에서 StrictMode 를 제거하거나 실전으로 가면 1씩 증가한다고 함.
+        board.increaseViews();
         return new BoardResponse(
                 board.getId(),
                 board.getTitle(),

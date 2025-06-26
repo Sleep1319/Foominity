@@ -55,7 +55,7 @@ const BoardUpdate = () => {
       await axios.put(`/api/board/update/${id}`, {
         title,
         content,
-        // 필요시 memberId 등 추가
+        // 필요시 memberId 추가
       });
       toast({
         title: "게시글이 수정되었습니다.",
@@ -76,7 +76,7 @@ const BoardUpdate = () => {
     if (!window.confirm("정말 삭제하시겠습니까?")) return;
     setIsSubmitting(true);
     try {
-      await axios.delete(`/api/board/delete/${id}`);
+      await axios.delete(`/api/board/delete/${id}`, { withCredentials: true });
       toast({
         title: "게시글이 삭제되었습니다.",
         status: "info",

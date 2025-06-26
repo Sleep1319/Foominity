@@ -14,8 +14,8 @@ const CategoryTabs = () => (
       >
         Review
       </Button>
-      <Button as={RouterLink} to="/freeboard" bg="white" color="black" _hover={{ bg: "white" }}>
-        FreeBoard
+      <Button as={RouterLink} to="/board" bg="white" color="black" _hover={{ bg: "white" }}>
+        Board
       </Button>
       <Button as={RouterLink} to="/notice" bg="white" color="black" _hover={{ bg: "white" }}>
         Notice

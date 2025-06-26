@@ -2,9 +2,13 @@ import React, { useEffect, useState } from "react";
 import { Box, Text, Heading, HStack, Icon, useColorModeValue, Textarea, Spinner, Button } from "@chakra-ui/react";
 import { useParams, useNavigate } from "react-router-dom";
 import { FaRegEye, FaRegComment } from "react-icons/fa";
+import { useUser } from "../../context/UserContext";
 import axios from "axios";
 
 const BoardDetail = () => {
+  const { state: user } = useUser();
+  const loginMemberId = user?.memberId;
+
   const { id } = useParams(); // URL에서 게시글 id 추출
   const navigate = useNavigate();
   const isLoggedIn = false;
@@ -15,13 +19,10 @@ const BoardDetail = () => {
   const [board, setBoard] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // 비교할 memberId 넣기
-  const loginMemberId = 0;
-
   useEffect(() => {
     const fetchBoard = async () => {
       try {
-        // ✅ 백엔드에서 해당 id의 게시글 정보를 GET으로 가져옵니다
+        // 백엔드에서 해당 id의 게시글 정보를 GET으로 가져옵니다
         const res = await axios.get(`/api/board/${id}`);
         setBoard(res.data);
       } catch (err) {
