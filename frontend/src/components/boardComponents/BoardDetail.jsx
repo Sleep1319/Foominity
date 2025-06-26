@@ -75,7 +75,7 @@ const BoardDetail = () => {
           fontSize="lg"
           fontWeight="light"
           mt={2}
-          borderBottom="2px solid gray"
+          borderBottom="1px solid gray"
           pb={4}
         >
           <Text pr={4}>{board.nickname}</Text>
@@ -91,7 +91,7 @@ const BoardDetail = () => {
         </Box>
 
         <Box mt={18}>
-          <Text fontSize="md" whiteSpace="pre-wrap" textAlign="left" borderBottom="2px solid gray" pb={4}>
+          <Text fontSize="md" whiteSpace="pre-wrap" textAlign="left" borderBottom="1px solid gray" pb={4}>
             {board.content}
           </Text>
         </Box>
