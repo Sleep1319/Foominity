@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -39,9 +38,9 @@ public class NoticeController {
 
     @GetMapping("/api/notices")
     public ResponseEntity<List<NoticeResponse>> findAllNotices() {
-    List<NoticeResponse> res = noticeService.findAllNotices(); // 전체 조회용 서비스 메서드
-    return ResponseEntity.ok(res);
-}
+        List<NoticeResponse> res = noticeService.findAllNotices(); // 전체 조회용 서비스 메서드
+        return ResponseEntity.ok(res);
+    }
 
     @GetMapping("/api/notices/{id}")
     public ResponseEntity<NoticeResponse> findById(@PathVariable Long id) {

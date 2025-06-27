@@ -1,14 +1,5 @@
 import React, { useState } from "react";
-import {
-  Box,
-  Button,
-  FormControl,
-  FormLabel,
-  Input,
-  Textarea,
-  Heading,
-  useToast,
-} from "@chakra-ui/react";
+import { Box, Button, FormControl, FormLabel, Input, Textarea, Heading, useToast } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useUser } from "../../context/UserContext";
@@ -22,9 +13,9 @@ const NoticeCreate = () => {
 
   if (user?.roleName !== "ADMIN") {
     return (
-        <Box p={6}>
-          <Heading size="md">접근 권한이 없습니다.</Heading>
-        </Box>
+      <Box p={6}>
+        <Heading size="md">접근 권한이 없습니다.</Heading>
+      </Box>
     );
   }
 
@@ -63,24 +54,26 @@ const NoticeCreate = () => {
   };
 
   return (
-      <Box maxW="600px" mx="auto" mt={8} p={4}>
-        <Heading size="lg" mb={6}>공지사항 작성</Heading>
-        <form onSubmit={handleSubmit}>
-          <FormControl mb={4} isRequired>
-            <FormLabel>제목</FormLabel>
-            <Input value={title} onChange={(e) => setTitle(e.target.value)} />
-          </FormControl>
+    <Box maxW="600px" mx="auto" mt={8} p={4}>
+      <Heading size="lg" mb={6}>
+        공지사항 작성
+      </Heading>
+      <form onSubmit={handleSubmit}>
+        <FormControl mb={4} isRequired>
+          <FormLabel>제목</FormLabel>
+          <Input value={title} onChange={(e) => setTitle(e.target.value)} />
+        </FormControl>
 
-          <FormControl mb={6} isRequired>
-            <FormLabel>내용</FormLabel>
-            <Textarea rows={10} value={content} onChange={(e) => setContent(e.target.value)} />
-          </FormControl>
+        <FormControl mb={6} isRequired>
+          <FormLabel>내용</FormLabel>
+          <Textarea rows={15} value={content} onChange={(e) => setContent(e.target.value)} />
+        </FormControl>
 
-          <Button type="submit" colorScheme="blue">
-            등록
-          </Button>
-        </form>
-      </Box>
+        <Button type="submit" colorScheme="blue">
+          등록
+        </Button>
+      </form>
+    </Box>
   );
 };
 

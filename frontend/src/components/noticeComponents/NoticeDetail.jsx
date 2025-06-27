@@ -1,13 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Box,
-  Heading,
-  Text,
-  Button,
-  Spinner,
-  useToast,
-  Flex,
-} from "@chakra-ui/react";
+import { Box, Heading, Text, Button, Spinner, useToast, Flex, Divider, HStack } from "@chakra-ui/react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useUser } from "../../context/UserContext";
@@ -27,11 +19,7 @@ const NoticeDetail = () => {
         setNotice(res.data);
       } catch (err) {
         console.error("공지 불러오기 실패:", err);
-        const message =
-          err.response?.data?.message ||
-          err.message ||
-          "공지 조회 중 오류가 발생했습니다.";
-
+        const message = err.response?.data?.message || err.message || "공지 조회 중 오류가 발생했습니다.";
         toast({
           title: "공지 조회 실패",
           description: message,
@@ -43,7 +31,6 @@ const NoticeDetail = () => {
         setLoading(false);
       }
     };
-
     fetchNotice();
   }, [id]);
 
@@ -54,11 +41,7 @@ const NoticeDetail = () => {
       toast({ title: "삭제되었습니다.", status: "success" });
       setTimeout(() => navigate("/notice"), 800);
     } catch (err) {
-      const message =
-        err.response?.data?.message ||
-        err.message ||
-        "삭제 중 오류가 발생했습니다.";
-
+      const message = err.response?.data?.message || err.message || "삭제 중 오류가 발생했습니다.";
       toast({
         title: "삭제 실패",
         description: message,
@@ -74,11 +57,7 @@ const NoticeDetail = () => {
       await axios.post(`/api/notice/main/${id}`, null, { withCredentials: true });
       toast({ title: "메인 공지로 설정됨", status: "success" });
     } catch (err) {
-      const message =
-        err.response?.data?.message ||
-        err.message ||
-        "메인 설정 중 오류가 발생했습니다.";
-
+      const message = err.response?.data?.message || err.message || "메인 설정 중 오류가 발생했습니다.";
       toast({
         title: "메인 설정 실패",
         description: message,
@@ -96,29 +75,46 @@ const NoticeDetail = () => {
       </Flex>
     );
   }
-
   if (!notice) return null;
 
   return (
-    <Box maxW="800px" mx="auto" py={10} px={4}>
-      <Heading size="lg" mb={6}>
-        {notice.title}
-      </Heading>
-      <Text fontSize="md" whiteSpace="pre-line" mb={12}>
-        {notice.content}
+    <>
+      <Text fontSize="4xl" fontWeight="bold" textAlign="center" mt={10} color="black">
+        NOTICE
       </Text>
 
-      {user?.role === "ADMIN" && (
-        <Flex gap={4}>
-          <Button colorScheme="red" onClick={handleDelete}>
-            삭제
-          </Button>
-          <Button colorScheme="blue" onClick={handleSetMain}>
-            메인공지로 설정
-          </Button>
-        </Flex>
-      )}
-    </Box>
+      <Flex justify="center" align="center" minH="70vh" mt={8} mb={59}>
+        <Box w="full" maxW="600px" bg="white" p={10} borderRadius="xl" border="1px solid" borderColor="gray.200">
+          <Heading size="md" mb={6} color="black" borderBottom="1px solid #ddd" pb={2}>
+            <HStack>
+              <Text mb={1} fontWeight="semibold" color="gray.700">
+                제목:
+              </Text>
+              <Text color="gray.900">{notice.title}</Text>
+            </HStack>
+          </Heading>
+
+          <Box mb={4}></Box>
+
+          <Box mb={4}>
+            <Text whiteSpace="pre-line" color="gray.900">
+              {notice.content}
+            </Text>
+          </Box>
+
+          {user?.role === "ADMIN" && (
+            <Flex mt={8} gap={4} justify="flex-end">
+              <Button colorScheme="red" variant="outline" onClick={handleDelete}>
+                삭제
+              </Button>
+              <Button colorScheme="blue" variant="outline" onClick={handleSetMain}>
+                메인공지 설정
+              </Button>
+            </Flex>
+          )}
+        </Box>
+      </Flex>
+    </>
   );
 };
 
