@@ -124,6 +124,13 @@ public class BoardService {
         boardRepository.delete(board);
     }
 
+    public List<BoardResponse> findByMemberId(Long memberId) {
+        return boardRepository.findByMemberId(memberId)
+                .stream()
+                .map(BoardResponse::from)
+                .collect(Collectors.toList());
+    }
+
     public Board validateBoardOwnership(Long id, HttpServletRequest tokenRequest) {
         String token = jwtTokenProvider.resolveTokenFromCookie(tokenRequest);
 
@@ -135,6 +142,11 @@ public class BoardService {
         Member member = memberRepository.findById(memberId).orElseThrow(NotFoundMemberException::new);
 
         Board board = boardRepository.findById(id).orElseThrow(NotFoundBoardException::new);
+
+        // 관리자 통과시키기
+        // if (member.getRole().getId() == 4L) {
+        // return board;
+        // }
 
         if (!board.getMember().getId().equals(member.getId())) {
             throw new ForbiddenActionException();
