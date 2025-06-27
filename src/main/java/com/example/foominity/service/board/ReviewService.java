@@ -3,6 +3,7 @@ package com.example.foominity.service.board;
 import java.util.List;
 import java.util.Optional;
 
+import com.example.foominity.dto.board.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -21,11 +22,6 @@ import com.example.foominity.domain.image.ImageFile;
 import com.example.foominity.domain.member.Member;
 import com.example.foominity.domain.member.Point;
 import com.example.foominity.dto.artist.ArtistResponse;
-import com.example.foominity.dto.board.BoardUpdateRequest;
-import com.example.foominity.dto.board.ReviewRequest;
-import com.example.foominity.dto.board.ReviewResponse;
-import com.example.foominity.dto.board.ReviewSimpleResponse;
-import com.example.foominity.dto.board.ReviewUpdateRequest;
 import com.example.foominity.dto.category.ReviewCategoryResponse;
 import com.example.foominity.exception.ForbiddenActionException;
 import com.example.foominity.exception.NotFoundMemberException;
@@ -245,40 +241,52 @@ public class ReviewService {
                 return member;
         }
 
-        public List<ReviewSimpleResponse> getLatest() {
-                List<Review> reviewList = reviewRepository.findTop4ByOrderByCreatedDateDesc()
-                                .orElseThrow(NotFoundReviewException::new);
 
-                return reviewList.stream()
-                                .map(review -> {
-                                        List<AlbumArtist> albumArtists = albumArtistRepository
-                                                        .findByReviewId(review.getId());
-                                        List<ArtistResponse> artistResponses = albumArtists.stream().map(
-                                                        a -> new ArtistResponse(
-                                                                        a.getArtist().getId(),
-                                                                        a.getArtist().getName()))
-                                                        .toList();
+    public List<ReviewLatestResponse> getLatest() {
+        List<Review> reviewList = reviewRepository.findTop4ByOrderByCreatedDateDesc().orElseThrow(NotFoundReviewException::new);
 
-                                        List<ReviewCategory> reviewCategory = reviewCategoryRepository
-                                                        .findByReviewId(review.getId());
-                                        List<ReviewCategoryResponse> categoryResponses = reviewCategory.stream()
-                                                        .map(rc -> new ReviewCategoryResponse(
-                                                                        rc.getCategory().getId(),
-                                                                        rc.getCategory().getCategoryName()))
-                                                        .toList();
+        return reviewList.stream()
+                .map(review -> new ReviewLatestResponse(
+                        review.getId(),
+                        review.getTitle()
+                )).toList();
+    }
 
-                                        ImageFile imageFile = review.getImageFile();
-                                        String imagePath = imageFile.getSavePath();
 
-                                        return new ReviewSimpleResponse(
-                                                        review.getId(),
-                                                        review.getTitle(),
-                                                        reviewCommentService.getAverageStarPoint(review.getId()),
-                                                        artistResponses,
-                                                        categoryResponses,
-                                                        imagePath);
-
-                                })
-                                .toList();
-        }
+//        public List<ReviewSimpleResponse> getLatest() {
+//                List<Review> reviewList = reviewRepository.findTop4ByOrderByCreatedDateDesc()
+//                        .orElseThrow(NotFoundReviewException::new);
+//
+//                return reviewList.stream()
+//                        .map(review -> {
+//                                List<AlbumArtist> albumArtists = albumArtistRepository
+//                                        .findByReviewId(review.getId());
+//                                List<ArtistResponse> artistResponses = albumArtists.stream().map(
+//                                                a -> new ArtistResponse(
+//                                                        a.getArtist().getId(),
+//                                                        a.getArtist().getName()))
+//                                        .toList();
+//
+//                                List<ReviewCategory> reviewCategory = reviewCategoryRepository
+//                                        .findByReviewId(review.getId());
+//                                List<ReviewCategoryResponse> categoryResponses = reviewCategory.stream()
+//                                        .map(rc -> new ReviewCategoryResponse(
+//                                                rc.getCategory().getId(),
+//                                                rc.getCategory().getCategoryName()))
+//                                        .toList();
+//
+//                                ImageFile imageFile = review.getImageFile();
+//                                String imagePath = imageFile.getSavePath();
+//
+//                                return new ReviewSimpleResponse(
+//                                        review.getId(),
+//                                        review.getTitle(),
+//                                        reviewCommentService.getAverageStarPoint(review.getId()),
+//                                        artistResponses,
+//                                        categoryResponses,
+//                                        imagePath);
+//
+//                        })
+//                        .toList();
+//        }
 }
