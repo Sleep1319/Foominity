@@ -79,6 +79,24 @@ public class GlobalExceptionHandler {
                 Map.of("error", "잘못된 종류의 게시판 요청 입니다."));
     }
 
+    @ExceptionHandler(VerificationCodeExpiredException.class)
+    public ResponseEntity<?> handleVerificationCodeExpiredException() {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                Map.of("error", "인증 코드가 만료되었습니다."));
+    }
+
+    @ExceptionHandler(VerificationCodeMismatchException.class)
+    public ResponseEntity<?> handleVerificationCodeMismatchException() {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                Map.of("error", "인증 코드가 일치하지 않습니다."));
+    }
+
+    @ExceptionHandler(VerificationNotRequestedException.class)
+    public ResponseEntity<?> handleVerificationNotRequestedException() {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                Map.of("error", "이메일 인증 요청이 존재하지 않습니다."));
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleGenericException(Exception ex) {
         ex.printStackTrace();

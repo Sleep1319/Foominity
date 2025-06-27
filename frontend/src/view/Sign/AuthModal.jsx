@@ -30,10 +30,12 @@ const AuthModal = ({ isOpen, onClose }) => {
     nickname: "",
     passwordConfirm: "",
   });
-
   const toast = useToast();
   const navigate = useNavigate();
   const { setState } = useUser();
+  const [code, setCode] = useState("");
+  const [isVerified, setIsVerified] = useState(false);
+  const [codeSent, setCodeSent] = useState(false);
 
   useEffect(() => {
     if (!isOpen) {
@@ -54,6 +56,32 @@ const AuthModal = ({ isOpen, onClose }) => {
       ...prev,
       [name]: value,
     }));
+  };
+
+  const handleSendCode = async () => {
+    if (!form.email.includes("@")) {
+      toast({ title: "이메일 형식 오류", status: "error" });
+      return;
+    }
+    try {
+      await axios.post("/api/email/send-code", null, { params: { email: form.email } });
+      toast({ title: "인증 코드 전송됨", status: "success" });
+      setCodeSent(true);
+      setIsVerified(false);
+    } catch (err) {
+      toast({ title: "코드 전송 실패", description: err.response?.data?.error, status: "error" });
+    }
+  };
+
+  const handleVerifyCode = async () => {
+    try {
+      await axios.post("/api/email/verify", null, { params: { email: form.email, code } });
+      toast({ title: "인증 성공", status: "success" });
+      setIsVerified(true);
+    } catch (err) {
+      toast({ title: "인증 실패", description: err.response?.data?.error, status: "error" });
+      setIsVerified(false);
+    }
   };
 
   const handleLogin = async (e) => {
@@ -265,16 +293,29 @@ const AuthModal = ({ isOpen, onClose }) => {
               {mode === "register" && (
                 <>
                   <FormControl isRequired>
-                    <FormLabel>아이디 (이메일)</FormLabel>
-                    <Input
-                      name="email"
-                      type="email"
-                      value={form.email}
-                      onChange={handleChange}
-                      placeholder="이메일 입력 (email@example.com)"
-                      variant="outline"
-                    />
+                  {/*  <FormLabel>아이디 (이메일)</FormLabel>*/}
+                  {/*  <Input*/}
+                  {/*    name="email"*/}
+                  {/*    type="email"*/}
+                  {/*    value={form.email}*/}
+                  {/*    onChange={handleChange}*/}
+                  {/*    placeholder="이메일 입력 (email@example.com)"*/}
+                  {/*    variant="outline"*/}
+                  {/*  />*/}
+                  {/*</FormControl>*/}
+                    <FormLabel>이메일</FormLabel>
+                    <Input name="email" type="email" value={form.email} onChange={handleChange} isReadOnly={isVerified} />
+                    <Button mt={2} size="sm" onClick={handleSendCode}>인증 코드 전송</Button>
                   </FormControl>
+                  {codeSent && (
+                      <FormControl isRequired>
+                        <FormLabel>인증 코드</FormLabel>
+                        <Input value={code} onChange={(e) => setCode(e.target.value)} placeholder="인증 코드 입력" />
+                        <Button mt={2} size="sm" onClick={handleVerifyCode} colorScheme={isVerified ? "green" : "blue"}>
+                          {isVerified ? "✅ 인증 완료" : "코드 확인"}
+                        </Button>
+                      </FormControl>
+                  )}
                   <FormControl isRequired>
                     <FormLabel>이름</FormLabel>
                     <Input
@@ -313,7 +354,7 @@ const AuthModal = ({ isOpen, onClose }) => {
                 </>
               )}
 
-              <Button type="submit" colorScheme="blue" width="100%" bg="black" _hover={{ bg: "gray" }}>
+              <Button type="submit" colorScheme="blue" width="100%" bg="black" _hover={{ bg: "gray" }} isDisabled={mode === "register" && !isVerified}>
                 {mode === "login" ? "로그인" : "회원가입"}
               </Button>
 
