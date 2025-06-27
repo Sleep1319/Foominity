@@ -1,14 +1,5 @@
 import React, { useState } from "react";
-import {
-  Box,
-  Button,
-  FormControl,
-  FormLabel,
-  Input,
-  Textarea,
-  Heading,
-  useToast,
-} from "@chakra-ui/react";
+import { Box, Button, FormControl, FormLabel, Input, Textarea, Heading, useToast } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useUser } from "../../context/UserContext";
@@ -64,7 +55,9 @@ const NoticeCreate = () => {
 
   return (
     <Box maxW="600px" mx="auto" mt={8} p={4}>
-      <Heading size="lg" mb={6}>공지사항 작성</Heading>
+      <Heading size="lg" mb={6}>
+        공지사항 작성
+      </Heading>
       <form onSubmit={handleSubmit}>
         <FormControl mb={4} isRequired>
           <FormLabel>제목</FormLabel>
