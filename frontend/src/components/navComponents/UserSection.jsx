@@ -7,8 +7,10 @@ const UserSection = () => {
   const { state } = useUser();
 
   return (
-    <Box display="flex" alignItems="center" gap={3}>
-      <Text>{/* {state.nickname} ({state.roleName}) */}</Text>
+    <Box display="flex" alignItems="center" gap={3} position="fixed" top="20px" right="20px" zIndex="1000">
+      {/* <Text>
+        {state.nickname} ({state.roleName})
+      </Text> */}
 
       <Menu>
         <MenuButton>
@@ -18,7 +20,10 @@ const UserSection = () => {
           />
         </MenuButton>
         <MenuList>
-          <MenuItem as={RouterLink} to="/" fontWeight="bold" height="25px" fontSize={17} padding={0} pl={3}>
+          <Text fontWeight="bold" borderBottom="1px solid" borderColor="black" borderRadius="0" ml={1} mb={1}>
+            {state.nickname}
+          </Text>
+          <MenuItem as={RouterLink} to="/" fontWeight="bold" height="25px" fontSize={17} padding={0} pl={3} mt={2}>
             {/* Home 🏚 */}# Home
           </MenuItem>
           <MenuDivider />
