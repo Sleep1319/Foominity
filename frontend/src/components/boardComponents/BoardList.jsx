@@ -99,7 +99,7 @@ const BoardList = () => {
     <Box p={6} maxW="1200px" mx="auto">
       {/* 헤딩과 검색어 영역 */}
       <Flex align="center" justify="space-between" mb={6}>
-        <Heading as="h2" size="xl">
+        <Heading as="h2" size="xl" cursor="pointer" onClick={() => navigate("/board")}>
           자유게시판
         </Heading>
         {/* 
@@ -115,7 +115,6 @@ const BoardList = () => {
           </MenuList>
         </Menu> */}
       </Flex>
-      {/* 📌 이 부분이 헤더 라인입니다 */}
       <Flex px={4} py={2} fontWeight="semibold" fontSize="sm" color="gray.600" borderBottom="1px solid #e2e8f0">
         <Text flex="1">번호</Text>
 
@@ -168,7 +167,7 @@ const BoardList = () => {
                   </Text>
                   <Flex w="60px" align="center" justify="center" color="gray.500" fontSize="sm" gap={1}>
                     <Icon as={FaRegEye} />
-                    <Text>{board.views / 2}</Text>
+                    <Text>{(board.views / 2).toFixed(0)}</Text>
                   </Flex>
                 </Flex>
               </Flex>

@@ -1,5 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { Box, Text, Heading, HStack, Icon, useColorModeValue, Textarea, Spinner, Button } from "@chakra-ui/react";
+import {
+  Box,
+  Text,
+  Heading,
+  HStack,
+  Icon,
+  useColorModeValue,
+  Textarea,
+  Spinner,
+  Button,
+  Flex,
+  Spacer,
+  useToast,
+} from "@chakra-ui/react";
 import { useParams, useNavigate } from "react-router-dom";
 import { FaRegEye, FaRegComment } from "react-icons/fa";
 import { useUser } from "../../context/UserContext";
@@ -22,6 +35,10 @@ const BoardDetail = () => {
   const [loading, setLoading] = useState(true);
   const [commentKey, setCommentKey] = useState(0);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
+  const toast = useToast();
+
   const fetchBoard = async () => {
     try {
       // 백엔드에서 해당 id의 게시글 정보를 GET으로 가져옵니다
@@ -33,9 +50,30 @@ const BoardDetail = () => {
     }
     setLoading(false);
   };
+
+  // 삭제
+  const handleDelete = async () => {
+    if (!window.confirm("정말 삭제하시겠습니까?")) return;
+    setIsSubmitting(true);
+    try {
+      await axios.delete(`/api/board/delete/${id}`, { withCredentials: true });
+      toast({
+        title: "게시글이 삭제되었습니다.",
+        status: "info",
+        duration: 1500,
+        isClosable: true,
+      });
+      navigate("/board");
+    } catch (err) {
+      console.log(err);
+      setError("삭제에 실패했습니다. 다시 시도해주세요.");
+    }
+    setIsSubmitting(false);
+  };
+
   const handleCommentSuccess = () => {
     fetchBoard(); // 댓글 수 업데이트용
-    setCommentKey(prev => prev + 1); // 🔁 key 변경 → CommentList 리렌더 유도
+    setCommentKey((prev) => prev + 1); // 🔁 key 변경 → CommentList 리렌더 유도
   };
 
   useEffect(() => {
@@ -63,35 +101,46 @@ const BoardDetail = () => {
   return (
     <Box display="flex" justifyContent="center" px={6} py={10}>
       <Box flex="1" maxW="900px">
-        <Text fontSize="2xl" fontWeight="medium" pb={2} textAlign="left">
+        <Text
+          fontSize="2xl"
+          fontWeight="medium"
+          pb={2}
+          textAlign="left"
+          borderBottom="1px solid gray"
+          mb={5}
+          cursor="pointer"
+          onClick={() => window.location.reload()}
+        >
           자유게시판
         </Text>
-        <Heading as="h1" size="2xl" textAlign="left" pb={2}>
+        <Heading as="h1" size="xl" textAlign="left" pb={2} mt={10} borderBottom="1px solid gray" mb={10}>
           {board.title}
         </Heading>
-        <Box
-          display="flex"
-          textAlign="left"
-          fontSize="lg"
-          fontWeight="light"
-          mt={2}
-          borderBottom="1px solid gray"
-          pb={4}
-        >
+
+        <Flex textAlign="left" fontSize="lg" fontWeight="light" mt={2} borderBottom="1px solid gray" pb={4}>
           <Text pr={4}>{board.nickname}</Text>
-          <Text px={4}>{board.createDate?.split("T")[0]}</Text>
+          <Spacer /> {/* Spacer로 왼쪽 오른쪽 나누기 */}
+          <Text px={4}>{board.createdDate?.split("T")[0]}</Text>
           <Text px={4}>
             <Icon as={FaRegEye} mr={1} />
-            {board.views / 2}
+            {(board.views / 2).toFixed(0)}
           </Text>
           <Text px={4}>
             <Icon as={FaRegComment} mr={1} />
             {board.commentCount ?? 0}
           </Text>
-        </Box>
+        </Flex>
 
         <Box mt={18}>
-          <Text fontSize="md" whiteSpace="pre-wrap" textAlign="left" borderBottom="1px solid gray" pb={4}>
+          <Text
+            fontSize="md"
+            whiteSpace="pre-wrap"
+            textAlign="left"
+            borderBottom="1px solid gray"
+            pb={4}
+            mt={10}
+            mb={10}
+          >
             {board.content}
           </Text>
         </Box>
@@ -109,11 +158,6 @@ const BoardDetail = () => {
         {/*</Text>*/}
 
         {/* 수정 버튼 조건부 표시 */}
-        {String(loginMemberId) === String(board.memberId) && (
-          <Button colorScheme="teal" size="sm" ml={2} onClick={() => navigate(`/board/update/${board.id}`)}>
-            수정
-          </Button>
-        )}
 
         {/*<HStack mt={4} spacing={1} borderBottom="2px solid gray" pb={4}>*/}
         {/*  <Icon as={FaRegComment} boxSize={5} color={grayText} />*/}
@@ -125,20 +169,32 @@ const BoardDetail = () => {
         {/*  </Text>*/}
         {/*</HStack>*/}
 
-        <BoardCommentForm boardId={id} commentCount={board.commentCount || 0} onSuccess={handleCommentSuccess} />
         <CommentList key={commentKey} type="boards" id={id} />
-        <Text
-            fontSize="md"
-            textAlign="left"
-            mt={6}
-            mb={6}
-            display="inline-block"
-            cursor="pointer"
-            onClick={() => navigate("/board")}
-        >
-          목록
-        </Text>
+        <BoardCommentForm boardId={id} commentCount={board.commentCount || 0} onSuccess={handleCommentSuccess} />
 
+        <Box mt={5}>
+          <HStack>
+            <Flex justify="space-between" mb={2} align="center">
+              <Button bg="black" color="white" size="sm" ml={2} onClick={() => navigate("/board")}>
+                목록
+              </Button>
+            </Flex>
+            <Spacer />
+            <Flex justify="space-between" mb={2} align="center">
+              {String(loginMemberId) === String(board.memberId) && (
+                <Button bg="blue" color="white" size="sm" ml={2} onClick={() => navigate(`/board/update/${board.id}`)}>
+                  수정
+                </Button>
+              )}
+
+              {user?.roleName === "ADMIN" && (
+                <Button bg="red" color="white" size="sm" ml={2} onClick={handleDelete}>
+                  삭제
+                </Button>
+              )}
+            </Flex>
+          </HStack>
+        </Box>
         {/*<Box mt={4} borderBottom="2px solid gray" pb={14}>*/}
         {/*  <Text fontWeight="bold" mb={2}>*/}
         {/*    댓글 달기*/}
