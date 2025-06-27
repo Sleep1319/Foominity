@@ -11,6 +11,7 @@ import {
   Button,
   Flex,
   Spacer,
+  useToast,
 } from "@chakra-ui/react";
 import { useParams, useNavigate } from "react-router-dom";
 import { FaRegEye, FaRegComment } from "react-icons/fa";
@@ -34,6 +35,10 @@ const BoardDetail = () => {
   const [loading, setLoading] = useState(true);
   const [commentKey, setCommentKey] = useState(0);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
+  const toast = useToast();
+
   const fetchBoard = async () => {
     try {
       // 백엔드에서 해당 id의 게시글 정보를 GET으로 가져옵니다
@@ -45,6 +50,27 @@ const BoardDetail = () => {
     }
     setLoading(false);
   };
+
+  // 삭제
+  const handleDelete = async () => {
+    if (!window.confirm("정말 삭제하시겠습니까?")) return;
+    setIsSubmitting(true);
+    try {
+      await axios.delete(`/api/board/delete/${id}`, { withCredentials: true });
+      toast({
+        title: "게시글이 삭제되었습니다.",
+        status: "info",
+        duration: 1500,
+        isClosable: true,
+      });
+      navigate("/board");
+    } catch (err) {
+      console.log(err);
+      setError("삭제에 실패했습니다. 다시 시도해주세요.");
+    }
+    setIsSubmitting(false);
+  };
+
   const handleCommentSuccess = () => {
     fetchBoard(); // 댓글 수 업데이트용
     setCommentKey((prev) => prev + 1); // 🔁 key 변경 → CommentList 리렌더 유도
@@ -75,10 +101,19 @@ const BoardDetail = () => {
   return (
     <Box display="flex" justifyContent="center" px={6} py={10}>
       <Box flex="1" maxW="900px">
-        <Text fontSize="2xl" fontWeight="medium" pb={2} textAlign="left" borderBottom="1px solid gray" mb={5}>
+        <Text
+          fontSize="2xl"
+          fontWeight="medium"
+          pb={2}
+          textAlign="left"
+          borderBottom="1px solid gray"
+          mb={5}
+          cursor="pointer"
+          onClick={() => window.location.reload()}
+        >
           자유게시판
         </Text>
-        <Heading as="h1" size="xl" textAlign="left" pb={2} mt={10}>
+        <Heading as="h1" size="xl" textAlign="left" pb={2} mt={10} borderBottom="1px solid gray" mb={10}>
           {board.title}
         </Heading>
 
@@ -88,7 +123,7 @@ const BoardDetail = () => {
           <Text px={4}>{board.createdDate?.split("T")[0]}</Text>
           <Text px={4}>
             <Icon as={FaRegEye} mr={1} />
-            {board.views / 2}
+            {(board.views / 2).toFixed(0)}
           </Text>
           <Text px={4}>
             <Icon as={FaRegComment} mr={1} />
@@ -153,7 +188,7 @@ const BoardDetail = () => {
               )}
 
               {user?.roleName === "ADMIN" && (
-                <Button bg="red" color="white" size="sm" ml={2}>
+                <Button bg="red" color="white" size="sm" ml={2} onClick={handleDelete}>
                   삭제
                 </Button>
               )}
