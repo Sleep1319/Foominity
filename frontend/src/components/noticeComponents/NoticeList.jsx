@@ -12,7 +12,6 @@ const NoticeList = () => {
 
   const navigate = useNavigate();
   const { state: user } = useUser();
-
   useEffect(() => {
     const fetchNotices = async () => {
       try {
@@ -32,8 +31,17 @@ const NoticeList = () => {
   return (
     <Box p={6} maxW="1000px" mx="auto">
       <Flex justify="space-between" mb={6} align="center">
-        {user?.roleName === "admin" && (
-          <Button colorScheme="blue" size="sm" onClick={() => navigate("/notice/create")}>
+        {user?.roleName === "ADMIN" && (
+          <Button
+            color="white"
+            bg="black"
+            size="sm"
+            _hover={{
+              bg: "black",
+              color: "white",
+            }}
+            onClick={() => navigate("/notice/create")}
+          >
             글 작성
           </Button>
         )}

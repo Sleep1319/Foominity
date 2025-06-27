@@ -33,7 +33,7 @@ const NoticeCreate = () => {
     }
 
     try {
-      await axios.post("/api/notice/add", { title, content }, { withCredentials: true });
+      await axios.post("/api/notices/add", { title, content }, { withCredentials: true });
       toast({
         title: "공지 작성 완료",
         status: "success",
@@ -66,7 +66,7 @@ const NoticeCreate = () => {
 
         <FormControl mb={6} isRequired>
           <FormLabel>내용</FormLabel>
-          <Textarea rows={10} value={content} onChange={(e) => setContent(e.target.value)} />
+          <Textarea rows={15} value={content} onChange={(e) => setContent(e.target.value)} />
         </FormControl>
 
         <Button type="submit" colorScheme="blue">

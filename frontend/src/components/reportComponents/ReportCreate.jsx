@@ -1,19 +1,11 @@
 import React, { useState } from "react";
-import {
-  Box,
-  Button,
-  FormControl,
-  FormLabel,
-  Input,
-  Heading,
-  useToast,
-  Select,
-} from "@chakra-ui/react";
+import { Box, Button, FormControl, FormLabel, Input, Heading, useToast, Select } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useUser } from "../../context/UserContext";
 
 const ReportCreate = () => {
+  // const [targetId, setTargetId] = useState("");
   const [targetId, setTargetId] = useState("");
   const [targetType, setTargetType] = useState("");
   const toast = useToast();
@@ -71,24 +63,18 @@ const ReportCreate = () => {
 
   return (
     <Box maxW="600px" mx="auto" mt={8} p={4}>
-      <Heading size="lg" mb={6}>신고 작성</Heading>
+      <Heading size="lg" mb={6}>
+        신고 작성
+      </Heading>
       <form onSubmit={handleSubmit}>
         <FormControl mb={4} isRequired>
-          <FormLabel>신고 대상 ID</FormLabel>
-          <Input
-            type="number"
-            value={targetId}
-            onChange={(e) => setTargetId(e.target.value)}
-          />
+          <FormLabel>신고 게시물 번호</FormLabel>
+          <Input type="number" value={targetId} onChange={(e) => setTargetId(e.target.value)} />
         </FormControl>
 
         <FormControl mb={6} isRequired>
           <FormLabel>신고 게시판</FormLabel>
-          <Select
-            placeholder="선택하세요"
-            value={targetType}
-            onChange={(e) => setTargetType(e.target.value)}
-          >
+          <Select placeholder="선택하세요" value={targetType} onChange={(e) => setTargetType(e.target.value)}>
             <option value="REVIEW">REVIEW</option>
             <option value="BOARD">BOARD</option>
           </Select>

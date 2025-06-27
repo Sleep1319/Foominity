@@ -1,23 +1,14 @@
 import React, { useEffect, useState } from "react";
-import {
-  Box,
-  Flex,
-  Text,
-  SimpleGrid,
-  Card,
-  CardBody,
-  Button,
-  HStack,
-  Heading,
-} from "@chakra-ui/react";
+import { Box, Flex, Text, SimpleGrid, Card, CardBody, Button, HStack, Heading } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useUser } from "../../context/UserContext";
 
 const ReportList = () => {
   const [reports, setReports] = useState([]);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-
+  const { state: user } = useUser();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -35,7 +26,13 @@ const ReportList = () => {
 
   return (
     <Box p={6} maxW="1000px" mx="auto">
-      
+      <Flex justify="space-between" mb={6} align="center">
+        {user?.roleName !== "ADMIN" && (
+          <Button colorScheme="blue" size="sm" onClick={() => navigate("/report/create")}>
+            글 작성
+          </Button>
+        )}
+      </Flex>
 
       <SimpleGrid spacing={4}>
         {reports.map((report) => (
@@ -47,7 +44,7 @@ const ReportList = () => {
           >
             <CardBody>
               <Text fontSize="md" color="gray.500">
-                대상 ID: {report.targetId}
+                신고 게시물 번호: {report.targetId}
               </Text>
               <Text fontSize="lg" fontWeight="bold">
                 대상 타입: {report.targetType}
@@ -62,21 +59,12 @@ const ReportList = () => {
 
       {/* 페이지네이션 */}
       <HStack spacing={2} justify="center" mt={8}>
-        <Button
-          size="sm"
-          onClick={() => setPage((prev) => Math.max(prev - 1, 0))}
-          isDisabled={page === 0}
-        >
+        <Button size="sm" onClick={() => setPage((prev) => Math.max(prev - 1, 0))} isDisabled={page === 0}>
           이전
         </Button>
 
         {[...Array(totalPages)].map((_, i) => (
-          <Button
-            key={i}
-            size="sm"
-            variant={i === page ? "solid" : "outline"}
-            onClick={() => setPage(i)}
-          >
+          <Button key={i} size="sm" variant={i === page ? "solid" : "outline"} onClick={() => setPage(i)}>
             {i + 1}
           </Button>
         ))}
