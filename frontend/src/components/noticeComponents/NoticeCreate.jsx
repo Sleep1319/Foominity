@@ -42,7 +42,7 @@ const NoticeCreate = () => {
     }
 
     try {
-      await axios.post("/api/notice/add", { title, content }, { withCredentials: true });
+      await axios.post("/api/notices/add", { title, content }, { withCredentials: true });
       toast({
         title: "공지 작성 완료",
         status: "success",
