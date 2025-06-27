@@ -26,7 +26,7 @@ const BoardUpdate = () => {
   const toast = useToast();
   const navigate = useNavigate();
 
-  // 1. 컴포넌트 마운트 시 기존 게시글 데이터 받아오기
+  // 1. 기존 게시글 데이터 받아오기
   useEffect(() => {
     const fetchBoard = async () => {
       try {
@@ -42,7 +42,7 @@ const BoardUpdate = () => {
     fetchBoard();
   }, [id]);
 
-  // 2. 수정 제출
+  // 2. 수정
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -52,11 +52,11 @@ const BoardUpdate = () => {
     }
     setIsSubmitting(true);
     try {
-      await axios.put(`/api/board/update/${id}`, {
-        title,
-        content,
+      await axios.put(
+        `/api/board/update/${id}`,
+        { title, content }
         // 필요시 memberId 추가
-      });
+      );
       toast({
         title: "게시글이 수정되었습니다.",
         status: "success",
