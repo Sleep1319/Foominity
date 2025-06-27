@@ -23,7 +23,7 @@ const UserSection = () => {
           <Text fontWeight="bold" borderBottom="1px solid" borderColor="black" borderRadius="0" ml={1} mb={1}>
             {state.nickname}
           </Text>
-          <MenuItem as={RouterLink} to="/" fontWeight="bold" height="25px" fontSize={17} padding={0} pl={3} mt={2}>
+          <MenuItem as={RouterLink} to="/" height="25px" fontSize={17} padding={0} pl={3} mt={2}>
             {/* Home 🏚 */}# Home
           </MenuItem>
           <MenuDivider />

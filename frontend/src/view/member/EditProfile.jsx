@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useUser } from "../../context/UserContext";
 import DefaultTable from "../../components/reportComponents/DefaultTable.jsx";
+import MyPostsTable from "./MyPostsTable.jsx";
 
 const DEFAULT_AVATAR_PATH = "/src/assets/images/defaultProfile.jpg";
 
@@ -148,7 +149,7 @@ const EditProfile = ({ nickname: initialNickname, avatar, onNicknameChange }) =>
       </Text>
 
       <Flex maxW="3xl" mx="auto" mt={70} align="center" justify="flex-start">
-        <Flex mb={6} align="center" justify="space-between" height={190}>
+        <Flex mb={55} align="center" justify="space-between" height={190}>
           <HStack spacing={6} align="center" flex="1">
             <VStack spacing={0} position="relative">
               <Box position="relative" w="12rem" h="12rem">
@@ -259,12 +260,11 @@ const EditProfile = ({ nickname: initialNickname, avatar, onNicknameChange }) =>
           저장
         </Button>
       </Flex>
-
-      <Box maxW="3xl" mx="auto" px={4} mt={8}>
-        <Text fontSize={20} mb={4}>
-          내가 쓴 게시물
+      <Box maxW="3xl" mx="auto" px={4} mt={8} mb={20}>
+        <Text fontSize={20} mb={4} fontWeight="bold">
+          나의 게시물
         </Text>
-        <DefaultTable />
+        <MyPostsTable />
       </Box>
     </>
   );

@@ -31,6 +31,13 @@ public class BoardController {
 
     private final BoardService boardService;
 
+    @GetMapping("api/board/member/{memberId}")
+    public ResponseEntity<List<BoardResponse>> getByMember(
+            @PathVariable Long memberId) {
+        List<BoardResponse> list = boardService.findByMemberId(memberId);
+        return ResponseEntity.ok(list);
+    }
+
     @GetMapping("/api/board/page")
     public ResponseEntity<?> findAll(@RequestParam(defaultValue = "0") int page) {
         Page<BoardResponse> res = boardService.findAll(page);

@@ -20,4 +20,6 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     List<Board> findByTitleContainingIgnoreCaseOrderByCreatedDateDesc(String keyword);
 
     List<Board> findAllByOrderByCreatedDateDesc();
+
+    List<Board> findByMemberId(Long memberId);
 }

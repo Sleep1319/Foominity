@@ -4,6 +4,11 @@ import DefaultTable from "../../components/reportComponents/DefaultTable.jsx";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../context/UserContext.jsx";
 import DeleteModal from "../../view/Member/DeleteModal.jsx";
+import MyPostsTable from "./MyPostsTable.jsx";
+import axios from "axios";
+axios.defaults.baseURL = "http://localhost:8084"; // 기본 백엔드 주소
+axios.defaults.withCredentials = true;
+
 const Profile = () => {
   const navigate = useNavigate();
   const { state } = useUser();
@@ -89,10 +94,7 @@ const Profile = () => {
             w="85px"
             bg="white"
             color="red"
-            // border="1px solid black"
             _hover={{
-              // borderWidth: "2px",
-              // borderColor: "red",
               bg: "red",
               color: "white",
             }}
@@ -101,14 +103,13 @@ const Profile = () => {
             회원 탈퇴
           </Button>
         </VStack>
-        {/* </Box> */}
       </Flex>
 
-      <Box maxW="3xl" mx="auto" px={4} mt={8}>
-        <Text fontSize={20} mb={4}>
-          내가 쓴 게시물
+      <Box maxW="3xl" mx="auto" px={4} mt={8} mb={20}>
+        <Text fontSize={20} mb={4} fontWeight="bold">
+          나의 게시물
         </Text>
-        <DefaultTable />
+        <MyPostsTable />
       </Box>
       <DeleteModal isOpen={isDeleteOpen} onClose={() => setDeleteOpen(false)} />
     </>
