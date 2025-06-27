@@ -99,7 +99,7 @@ const BoardList = () => {
     <Box p={6} maxW="1200px" mx="auto">
       {/* 헤딩과 검색어 영역 */}
       <Flex align="center" justify="space-between" mb={6}>
-        <Heading as="h2" size="xl">
+        <Heading as="h2" size="xl" cursor="pointer" onClick={() => window.location.reload()}>
           자유게시판
         </Heading>
         {/* 
