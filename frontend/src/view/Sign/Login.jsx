@@ -1,17 +1,5 @@
 import React, { useState } from "react";
-import {
-  Box,
-  Button,
-  Input,
-  FormControl,
-  FormLabel,
-  Heading,
-  VStack,
-  Text,
-  Link,
-  useToast,
-  Divider,
-} from "@chakra-ui/react";
+import { Box, Button, Input, FormControl, FormLabel, Heading, VStack, Text, Link, Divider } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "@/context/UserContext.jsx";
 import axios from "axios";
@@ -19,45 +7,44 @@ import SocialLoginButton from "@/components/siginComponents/SocialLoginButton.js
 
 const Login = () => {
   const [form, setForm] = useState({ email: "", password: "" });
-  const toast = useToast();
   const navigate = useNavigate();
   const { setState } = useUser();
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    try {
-      console.log("보내는 데이터:", form);
-      await axios.post("/api/sign-in", form, {
-        withCredentials: true,
-        headers: { "Content-Type": "application/json" },
-      });
+    setIsLoading(true);
 
-      toast({
-        title: "로그인 성공",
-        status: "success",
-        duration: 2000,
-        isClosable: true,
-      });
+    try {
+      await axios.post(
+        "/api/sign-in",
+        { email: form.email, password: form.password },
+        {
+          withCredentials: true,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
       const userRes = await axios.get("/api/user", { withCredentials: true });
       setState(userRes.data);
-      navigate("/");
-    } catch (error) {
-      const message =
-        error.response?.data?.message || "이메일/비밀번호를 확인해주세요.";
-      toast({
-        title: "로그인 실패",
-        description: message,
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
+
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 200);
+    } catch (err) {
+      setIsLoading(false);
+      setErrorMessage(err.response?.data?.message || "이메일 혹은 비밀번호를 확인해 주세요.");
     }
   };
-
   return (
     <>
       <Text
@@ -71,15 +58,7 @@ const Login = () => {
         ml={5}
         height="85px"
       ></Text>
-      <Box
-        maxW="xl"
-        mx="auto"
-        mt={120}
-        p={5}
-        borderWidth={1}
-        borderRadius="lg"
-        mb={142}
-      >
+      <Box maxW="xl" mx="auto" mt={120} p={5} borderWidth={1} borderRadius="lg" mb={142}>
         <Heading mb={5} textAlign="center">
           로그인
         </Heading>
@@ -97,6 +76,7 @@ const Login = () => {
                 placeholder="아이디 입력 (email@example.com)"
                 aria-label="이메일"
                 onChange={handleChange}
+                value={form.email}
               />
             </FormControl>
             <FormControl isRequired>
@@ -111,10 +91,18 @@ const Login = () => {
                 placeholder="비밀번호 입력"
                 aria-label="비밀번호"
                 onChange={handleChange}
+                value={form.password}
               />
             </FormControl>
+            {errorMessage && (
+              <Text color="red.500" fontSize="sm" alignSelf="start" mt={-2}>
+                {errorMessage}
+              </Text>
+            )}
             <Button
               type="submit"
+              isLoading={isLoading}
+              loadingText="로그인 중..."
               bg="black"
               width="full"
               color="white"

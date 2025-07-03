@@ -1,17 +1,63 @@
-import { Avatar, Box, Text, Menu, MenuButton, MenuList, MenuItem, MenuDivider } from "@chakra-ui/react";
+import { Avatar, Box, Text, Menu, MenuButton, MenuList, MenuItem, MenuDivider, Flex } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
 import { useUser } from "@/context/UserContext";
+import { FiUser, FiHome, FiLock } from "react-icons/fi";
 
 const UserSection = () => {
   const { logout } = useUser();
   const { state } = useUser();
 
+  const MenuItemWithIcon = ({ icon, label, to, onClick }) => (
+    <MenuItem
+      as={to ? RouterLink : undefined}
+      to={to}
+      onClick={onClick}
+      height="25px"
+      padding={0}
+      pl={3}
+      mb={2}
+      bg="white"
+      color="gray.600"
+      fontSize="sm"
+      _hover={{
+        bg: "white",
+        color: "black",
+        fontWeight: "semibold",
+      }}
+    >
+      <Flex align="center">
+        <Box as={icon} fontSize="18px" mr={2} />
+        <Text>{label}</Text>
+      </Flex>
+    </MenuItem>
+  );
+  const LogoutMenu = ({ icon, label, to, onClick }) => (
+    <MenuItem
+      as={to ? RouterLink : undefined}
+      to={to}
+      onClick={onClick}
+      height="25px"
+      padding={0}
+      pl={3}
+      mb={2}
+      bg="white"
+      color="gray.600"
+      fontSize="sm"
+      _hover={{
+        bg: "white",
+        color: "red",
+        fontWeight: "semibold",
+      }}
+    >
+      <Flex align="center">
+        <Box as={icon} fontSize="18px" mr={2} />
+        <Text>{label}</Text>
+      </Flex>
+    </MenuItem>
+  );
+
   return (
     <Box display="flex" alignItems="center" gap={3} position="fixed" top="20px" right="20px" zIndex="1000">
-      {/* <Text>
-        {state.nickname} ({state.roleName})
-      </Text> */}
-
       <Menu>
         <MenuButton>
           <Avatar
@@ -20,20 +66,16 @@ const UserSection = () => {
           />
         </MenuButton>
         <MenuList>
-          <Text fontWeight="bold" borderBottom="1px solid" borderColor="black" borderRadius="0" ml={1} mb={1}>
+          <Text fontWeight="bold" borderBottom="1px solid" borderColor="black" borderRadius="0" ml={3} mb={2}>
             {state.nickname}
           </Text>
-          <MenuItem as={RouterLink} to="/" height="25px" fontSize={17} padding={0} pl={3} mt={2}>
-            {/* Home 🏚 */}# Home
-          </MenuItem>
+
+          <MenuItemWithIcon icon={FiHome} label="Home" to="/" />
+          <MenuItemWithIcon icon={FiUser} label="마이페이지" to="/mypage" />
+
           <MenuDivider />
-          <MenuItem as={RouterLink} to="/mypage" height="25px">
-            마이페이지
-          </MenuItem>
-          <MenuDivider />
-          <MenuItem onClick={logout} height="25px" color="red">
-            로그아웃
-          </MenuItem>
+
+          <LogoutMenu icon={FiLock} label="로그아웃" onClick={logout} color="black" />
         </MenuList>
       </Menu>
     </Box>

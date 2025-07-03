@@ -36,6 +36,11 @@ const EditProfile = ({ nickname: initialNickname, avatar, onNicknameChange }) =>
     setNickname(newNickname);
     setNicknameError("");
 
+    if (!newNickname) {
+      setNicknameError("닉네임을 입력해주세요.");
+      return;
+    }
+
     // 닉네임 유효성 검사 (한글, 영어, 숫자만 허용 / 특수문자 )
     const nicknameRegex = /^[가-힣a-zA-Z0-9]+$/;
     if (!nicknameRegex.test(newNickname)) {

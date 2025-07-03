@@ -25,6 +25,7 @@ import NoticeCreateRun from "../view/notice/NoticeCreateRun.jsx";
 
 import ReportCreateRun from "../view/report/ReportCreateRun.jsx";
 import ReportLists from "../view/report/ReportLists.jsx";
+import DeleteComplete from "../view/member/DeleteComplete.jsx";
 
 function AppRoutes() {
   return (
@@ -36,6 +37,7 @@ function AppRoutes() {
       <Route path="/notice/:id" element={<NoticeDetails />} />
       <Route path="/review" element={<Review />} />
       <Route path="/review/:id" element={<ReviewDetails />} />
+      <Route path="/deletecomplete" element={<DeleteComplete />} />
       <Route element={<ProtectedRoute requireAuth={false} />}>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
@@ -59,8 +61,6 @@ function AppRoutes() {
       {/* Report */}
       <Route path="/report/create" element={<ReportCreateRun />} />
     </Routes>
-
-    
   );
 }
 

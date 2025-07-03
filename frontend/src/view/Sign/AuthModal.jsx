@@ -15,6 +15,7 @@ import {
   Text,
   Divider,
   useToast,
+  Link,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -293,28 +294,36 @@ const AuthModal = ({ isOpen, onClose }) => {
               {mode === "register" && (
                 <>
                   <FormControl isRequired>
-                  {/*  <FormLabel>아이디 (이메일)</FormLabel>*/}
-                  {/*  <Input*/}
-                  {/*    name="email"*/}
-                  {/*    type="email"*/}
-                  {/*    value={form.email}*/}
-                  {/*    onChange={handleChange}*/}
-                  {/*    placeholder="이메일 입력 (email@example.com)"*/}
-                  {/*    variant="outline"*/}
-                  {/*  />*/}
-                  {/*</FormControl>*/}
+                    {/*  <FormLabel>아이디 (이메일)</FormLabel>*/}
+                    {/*  <Input*/}
+                    {/*    name="email"*/}
+                    {/*    type="email"*/}
+                    {/*    value={form.email}*/}
+                    {/*    onChange={handleChange}*/}
+                    {/*    placeholder="이메일 입력 (email@example.com)"*/}
+                    {/*    variant="outline"*/}
+                    {/*  />*/}
+                    {/*</FormControl>*/}
                     <FormLabel>이메일</FormLabel>
-                    <Input name="email" type="email" value={form.email} onChange={handleChange} isReadOnly={isVerified} />
-                    <Button mt={2} size="sm" onClick={handleSendCode}>인증 코드 전송</Button>
+                    <Input
+                      name="email"
+                      type="email"
+                      value={form.email}
+                      onChange={handleChange}
+                      isReadOnly={isVerified}
+                    />
+                    <Button mt={2} size="sm" onClick={handleSendCode}>
+                      인증 코드 전송
+                    </Button>
                   </FormControl>
                   {codeSent && (
-                      <FormControl isRequired>
-                        <FormLabel>인증 코드</FormLabel>
-                        <Input value={code} onChange={(e) => setCode(e.target.value)} placeholder="인증 코드 입력" />
-                        <Button mt={2} size="sm" onClick={handleVerifyCode} colorScheme={isVerified ? "green" : "blue"}>
-                          {isVerified ? "✅ 인증 완료" : "코드 확인"}
-                        </Button>
-                      </FormControl>
+                    <FormControl isRequired>
+                      <FormLabel>인증 코드</FormLabel>
+                      <Input value={code} onChange={(e) => setCode(e.target.value)} placeholder="인증 코드 입력" />
+                      <Button mt={2} size="sm" onClick={handleVerifyCode} colorScheme={isVerified ? "green" : "blue"}>
+                        {isVerified ? "✅ 인증 완료" : "코드 확인"}
+                      </Button>
+                    </FormControl>
                   )}
                   <FormControl isRequired>
                     <FormLabel>이름</FormLabel>
@@ -354,7 +363,14 @@ const AuthModal = ({ isOpen, onClose }) => {
                 </>
               )}
 
-              <Button type="submit" colorScheme="blue" width="100%" bg="black" _hover={{ bg: "gray" }} isDisabled={mode === "register" && !isVerified}>
+              <Button
+                type="submit"
+                colorScheme="blue"
+                width="100%"
+                bg="black"
+                _hover={{ bg: "gray" }}
+                isDisabled={mode === "register" && !isVerified}
+              >
                 {mode === "login" ? "로그인" : "회원가입"}
               </Button>
 

@@ -1,16 +1,11 @@
 package com.example.foominity.controller.sign;
 
-import com.example.foominity.dto.member.UserInfoResponse;
-
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Map;
 
 import com.example.foominity.dto.sign.SocialSignUpRequest;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,19 +14,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.foominity.config.jwt.JwtTokenProvider;
-import com.example.foominity.domain.image.ImageFile;
-import com.example.foominity.domain.member.Member;
-import com.example.foominity.dto.member.MemberRequest;
-import com.example.foominity.dto.member.NicknameChangeRequest;
 import com.example.foominity.dto.sign.SignInRequest;
 import com.example.foominity.dto.sign.SignInResponse;
 import com.example.foominity.dto.sign.SignUpRequest;
-import com.example.foominity.exception.NotFoundMemberException;
 import com.example.foominity.repository.member.MemberRepository;
-import com.example.foominity.service.image.ImageService;
 import com.example.foominity.service.sign.SignService;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -40,62 +28,23 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-// @RequestMapping("/api")
+@RequestMapping("/api")
 public class SignController {
 
     private final SignService signService;
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
-    private final ImageService imageService;
-
-    @DeleteMapping("/api/member/profile-image")
-    public ResponseEntity<?> deleteProfileImage(HttpServletRequest request) {
-        String token = jwtTokenProvider.resolveTokenFromCookie(request);
-
-        if (token == null || !jwtTokenProvider.validateToken(token)) {
-            return ResponseEntity.status(401).body("유효하지 않은 토큰입니다.");
-        }
-
-        Long memberId = jwtTokenProvider.getUserIdFromToken(token);
-        Member member = memberRepository.findById(memberId).orElseThrow(NotFoundMemberException::new);
-
-        // 기존에 등록된 이미지가 있는 경우
-        ImageFile image = member.getProfileImage();
-        if (image != null) {
-            imageService.deleteImageFile(image); // 1. 실제 파일 삭제 + DB 레코드 삭제
-            member.setProfileImage(null); // 2. member와의 연결도 제거
-            memberRepository.save(member); // 3. member 업데이트
-        }
-
-        return ResponseEntity.ok(Map.of("message", "프로필 이미지 삭제 완료"));
-    }
 
     // 회원가입
-    @PostMapping("/api/sign-up")
+    @PostMapping("/sign-up")
     public ResponseEntity<String> signUp(@Valid @RequestBody SignUpRequest req) {
         // ResponseEntity = java 클래스, 객체로 사용하는 것이고 일반 String return보다 다양한 기능 있음
         signService.signUp(req);
         return ResponseEntity.ok().build();
     }
 
-    // 회원탈퇴
-    @DeleteMapping("/api/delete-member")
-    public ResponseEntity<Void> deleteMember(HttpServletRequest request, @RequestBody @Valid MemberRequest req) {
-        signService.deleteMember(request, req);
-        return ResponseEntity.noContent().build(); // noContent = 상태 코드 204를 응답
-        // 클라이언트에게 "요청은 성공했지만 응답 본문은 없음"을 의미하는 HTTP 204 응답을 보내기 위해
-    }
-
-    // 닉네임 변경
-    @PreAuthorize("isAuthenticated()")
-    @PostMapping("/api/change-nickname")
-    public ResponseEntity<Void> changeNickname(HttpServletRequest request,
-            @RequestBody @Valid NicknameChangeRequest req) {
-        signService.changeNickname(request, req);
-        return ResponseEntity.ok().build();
-    }
-
-    @GetMapping("/api/check-email")
+    // 이메일 중복 확인
+    @GetMapping("/check-email")
     public ResponseEntity<?> checkEmail(@RequestParam(required = false) String email) {
         if (email == null || email.isBlank()) {
             return ResponseEntity.badRequest().body(Map.of("error", "이메일이 유효하지 않습니다."));
@@ -105,14 +54,14 @@ public class SignController {
     }
 
     // 닉네임 중복 확인
-    @GetMapping("/api/check-nickname")
+    @GetMapping("/check-nickname")
     public ResponseEntity<Map<String, Boolean>> checkNickname(@RequestParam String nickname) {
         boolean exists = signService.existsNickname(nickname);
         return ResponseEntity.ok(Collections.singletonMap("exists", exists));
     }
 
     // 로그인
-    @PostMapping("/api/sign-in")
+    @PostMapping("/sign-in")
     public ResponseEntity<SignInResponse> signIn(@Valid @RequestBody SignInRequest req, HttpServletResponse response) {
         SignInResponse res = signService.signIn(req);
         ResponseCookie cookie = jwtTokenProvider.createHttpOnlyCookie(res.getAccessToken());
@@ -123,32 +72,15 @@ public class SignController {
         // body에 res 넣어서 보냄
     }
 
-    @PostMapping("/api/social-sign-up")
+    // 소셜 가입
+    @PostMapping("/social-sign-up")
     public ResponseEntity<?> socialSignUp(@RequestBody SocialSignUpRequest req) {
         signService.socialSignUp(req);
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/api/user")
-    public ResponseEntity<UserInfoResponse> getUserInfo(HttpServletRequest request) {
-        String token = jwtTokenProvider.resolveTokenFromCookie(request);
-
-        if (token == null || !jwtTokenProvider.validateToken(token)) {
-            return ResponseEntity.status(401).build();
-        }
-
-        Long memberId = jwtTokenProvider.getUserIdFromToken(token);
-        Member member = memberRepository.findById(memberId).orElseThrow(NotFoundMemberException::new);
-
-        return ResponseEntity.ok()
-                .header("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
-                .header("Pragma", "no-cache")
-                .header("Expires", "0")
-                .body(new UserInfoResponse(member));
-    }
-
     // 로그아웃
-    @PostMapping("/api/logout")
+    @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletResponse response) {
         // 만료된 토큰으로 덮어쓰기 → 쿠키 삭제처럼 동작
         ResponseCookie expiredCookie = jwtTokenProvider.deleteCookie();
