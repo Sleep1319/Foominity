@@ -52,6 +52,11 @@ const Register = () => {
     }
   };
 
+  const isFormValid =
+    Object.values(form).every((v) => v.trim() !== "") && // 모든 입력값이 존재하는지
+    Object.values(errors).every((v) => v === "") && // 모든 에러가 없는지
+    isVerified; // 이메일 인증이 완료되었는지
+
   const checkNicknameDuplicate = async (nickname) => {
     try {
       const res = await axios.get("/api/check-nickname", { params: { nickname } });
@@ -150,7 +155,15 @@ const Register = () => {
             <FormLabel>이메일</FormLabel>
             <HStack>
               <Input name="email" type="email" value={form.email} onChange={handleChange} isReadOnly={isVerified} />
-              <Button onClick={handleSendCode} size="sm" isDisabled={!form.email || !!errors.email || isVerified}>
+              <Button
+                onClick={handleSendCode}
+                size="sm"
+                isDisabled={!form.email || !!errors.email || isVerified}
+                _disabled={{
+                  cursor: "default",
+                  pointerEvents: "auto", // 기본 이벤트 허용하는 코드
+                }}
+              >
                 인증 요청
               </Button>
             </HStack>
@@ -165,12 +178,21 @@ const Register = () => {
             <FormControl isRequired>
               <FormLabel>인증 코드</FormLabel>
               <HStack>
-                <Input value={code} onChange={(e) => setCode(e.target.value)} placeholder="코드 입력" />
+                <Input
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  isReadOnly={isVerified}
+                  placeholder="코드 입력"
+                />
                 <Button
                   onClick={handleVerifyCode}
                   size="sm"
                   colorScheme={isVerified ? "green" : "blue"}
                   isDisabled={!code || isVerified}
+                  _disabled={{
+                    cursor: "default",
+                    pointerEvents: "auto", // 기본 이벤트 허용하는 코드
+                  }}
                 >
                   {isVerified ? "완료" : "확인"}
                 </Button>
@@ -195,7 +217,19 @@ const Register = () => {
             </FormControl>
           ))}
 
-          <Button type="submit" colorScheme="blackAlpha" bg="black" color="white" _hover={{ bg: "gray.700" }}>
+          <Button
+            type="submit"
+            colorScheme="blackAlpha"
+            bg="black"
+            color="white"
+            _hover={{ bg: "gray.700" }}
+            isDisabled={!isFormValid}
+            _disabled={{
+              bg: "gray.600",
+              cursor: "default",
+              pointerEvents: "auto", // 기본 이벤트 허용하는 코드
+            }}
+          >
             회원가입
           </Button>
 

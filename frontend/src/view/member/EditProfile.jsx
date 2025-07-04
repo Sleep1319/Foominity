@@ -209,6 +209,11 @@ const EditProfile = ({ nickname: initialNickname, avatar, onNicknameChange }) =>
                 display="none"
                 onChange={handleFileChange}
               />
+              {/* <Box mt={14}>
+                <Text fontSize="sm" color="gray.500">
+                  파일 용량 제한: 10.00MB
+                </Text>
+              </Box> */}
             </VStack>
 
             <VStack align="start" spacing={4}>

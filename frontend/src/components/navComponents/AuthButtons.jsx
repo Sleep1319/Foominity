@@ -4,6 +4,7 @@ import { Link as RouterLink } from "react-router-dom";
 import { SearchIcon } from "@chakra-ui/icons";
 import SearchNavbar from "./SearchNavBar";
 import AuthModal2 from "../../view/Sign/AuthModal2";
+import AuthModal from "../../view/Sign/AuthModal";
 
 const whiteNeonText = `
   -1px -1px 0 white,

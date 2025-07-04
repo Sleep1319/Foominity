@@ -30,10 +30,8 @@ const Profile = () => {
       </Text>
 
       <Flex maxW="3xl" mx="auto" mt={70} align="center" justify="flex-start">
-        {/* <Box p={5} borderWidth={1} borderRadius="lg" flex="1" mr={6}> */}
         <Flex mb={6} align="center" justify="space-between" height={190}>
           <HStack spacing={6} align="center" flex="1">
-            {/* <Avatar boxSize="12rem" /> */}
             <Avatar
               boxSize="12rem"
               src={state.avatar ? `http://localhost:8084${state.avatar}` : "/src/assets/images/defaultProfile.jpg"}
@@ -47,7 +45,6 @@ const Profile = () => {
                 <Text h="32px" lineHeight="32px">
                   {state.nickname}
                 </Text>
-                {/* <Text>{state.nickname}</Text> */}
               </HStack>
               <HStack>
                 <Text fontWeight="bold" w="80px">
@@ -75,13 +72,10 @@ const Profile = () => {
           <Button
             w="85px"
             bg="white"
-            // border="1px solid black"
             mb={4}
             onClick={() => navigate("/mypage/editprofile")}
             _hover={{
               borderWidth: "2px",
-              // borderColor: "black",
-              // bg: "white",
               bg: "black",
               color: "white",
             }}

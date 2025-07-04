@@ -45,7 +45,7 @@ const UserSection = () => {
       fontSize="sm"
       _hover={{
         bg: "white",
-        color: "red",
+        color: "red.400",
         fontWeight: "semibold",
       }}
     >
