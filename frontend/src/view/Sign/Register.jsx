@@ -145,106 +145,123 @@ const Register = () => {
   };
 
   return (
-    <Box maxW="lg" mx="auto" mt={12} p={8} mb={24} borderRadius="lg">
-      <Heading mb={6} textAlign="center">
-        회원가입
+    <>
+      <Text
+        lineHeight="2.5"
+        textAlign="center"
+        fontSize="3xl"
+        fontWeight="medium"
+        borderBottom="2px solid gray"
+        pb={2}
+        mt={4}
+        ml={5}
+        height="85px"
+      ></Text>
+      <Heading mt={10} mb={7} textAlign="center" fontWeight="semibold">
+        doremiSOL
       </Heading>
-      <form onSubmit={handleRegister}>
-        <VStack spacing={5} align="stretch">
-          <FormControl isRequired>
-            <FormLabel>이메일</FormLabel>
-            <HStack>
-              <Input name="email" type="email" value={form.email} onChange={handleChange} isReadOnly={isVerified} />
-              <Button
-                onClick={handleSendCode}
-                size="sm"
-                isDisabled={!form.email || !!errors.email || isVerified}
-                _disabled={{
-                  cursor: "default",
-                  pointerEvents: "auto", // 기본 이벤트 허용하는 코드
-                }}
-              >
-                인증 요청
-              </Button>
-            </HStack>
-            {errors.email && (
-              <Text color="red.500" fontSize="sm">
-                {errors.email}
-              </Text>
-            )}
-          </FormControl>
-
-          {codeSent && (
+      <Box maxW="lg" mx="auto" mt={0} p={8} mb={24} borderRadius="lg" borderWidth={1}>
+        {/* <Heading mb={6} textAlign="center">
+          회원가입
+        </Heading> */}
+        <form onSubmit={handleRegister}>
+          <VStack spacing={5} align="stretch">
             <FormControl isRequired>
-              <FormLabel>인증 코드</FormLabel>
+              <FormLabel>이메일</FormLabel>
               <HStack>
-                <Input
-                  value={code}
-                  onChange={(e) => setCode(e.target.value)}
-                  isReadOnly={isVerified}
-                  placeholder="코드 입력"
-                />
+                <Input name="email" type="email" value={form.email} onChange={handleChange} isReadOnly={isVerified} />
                 <Button
-                  onClick={handleVerifyCode}
+                  onClick={handleSendCode}
                   size="sm"
-                  colorScheme={isVerified ? "green" : "blue"}
-                  isDisabled={!code || isVerified}
+                  isDisabled={!form.email || !!errors.email || isVerified}
                   _disabled={{
                     cursor: "default",
                     pointerEvents: "auto", // 기본 이벤트 허용하는 코드
                   }}
                 >
-                  {isVerified ? "완료" : "확인"}
+                  인증 요청
                 </Button>
               </HStack>
-            </FormControl>
-          )}
-
-          {[
-            { name: "username", label: "이름", placeholder: "이름 입력" },
-            { name: "nickname", label: "닉네임", placeholder: "닉네임 입력" },
-            { name: "password", label: "비밀번호", placeholder: "비밀번호 입력", type: "password" },
-            { name: "passwordConfirm", label: "비밀번호 확인", placeholder: "비밀번호 재입력", type: "password" },
-          ].map(({ name, label, placeholder, type = "text" }) => (
-            <FormControl isRequired key={name}>
-              <FormLabel>{label}</FormLabel>
-              <Input name={name} placeholder={placeholder} value={form[name]} onChange={handleChange} type={type} />
-              {errors[name] && (
+              {errors.email && (
                 <Text color="red.500" fontSize="sm">
-                  {errors[name]}
+                  {errors.email}
                 </Text>
               )}
             </FormControl>
-          ))}
 
-          <Button
-            type="submit"
-            colorScheme="blackAlpha"
-            bg="black"
-            color="white"
-            _hover={{ bg: "gray.700" }}
-            isDisabled={!isFormValid}
-            _disabled={{
-              bg: "gray.600",
-              cursor: "default",
-              pointerEvents: "auto", // 기본 이벤트 허용하는 코드
-            }}
-          >
-            회원가입
-          </Button>
+            {codeSent && (
+              <FormControl isRequired>
+                <FormLabel>인증 코드</FormLabel>
+                <HStack>
+                  <Input
+                    value={code}
+                    onChange={(e) => setCode(e.target.value)}
+                    isReadOnly={isVerified}
+                    placeholder="코드 입력"
+                  />
+                  <Button
+                    onClick={handleVerifyCode}
+                    size="sm"
+                    colorScheme={isVerified ? "green" : "blue"}
+                    isDisabled={!code || isVerified}
+                    _disabled={{
+                      cursor: "default",
+                      pointerEvents: "auto", // 기본 이벤트 허용하는 코드
+                    }}
+                  >
+                    {isVerified ? "완료" : "확인"}
+                  </Button>
+                </HStack>
+              </FormControl>
+            )}
 
-          <Text fontSize="sm" textAlign="center">
-            이미 계정이 있으신가요?{" "}
-            <Link color="skyblue" onClick={() => navigate("/login")}>
-              로그인
-            </Link>
-          </Text>
+            {[
+              { name: "username", label: "이름", placeholder: "이름 입력" },
+              { name: "nickname", label: "닉네임", placeholder: "닉네임 입력" },
+              { name: "password", label: "비밀번호", placeholder: "비밀번호 입력", type: "password" },
+              { name: "passwordConfirm", label: "비밀번호 확인", placeholder: "비밀번호 재입력", type: "password" },
+            ].map(({ name, label, placeholder, type = "text" }) => (
+              <FormControl isRequired key={name}>
+                <FormLabel>{label}</FormLabel>
+                <Input name={name} placeholder={placeholder} value={form[name]} onChange={handleChange} type={type} />
+                {errors[name] && (
+                  <Text color="red.500" fontSize="sm">
+                    {errors[name]}
+                  </Text>
+                )}
+              </FormControl>
+            ))}
 
-          <Divider />
-          <SocialLoginButton mode="signup" />
-        </VStack>
-      </form>
-    </Box>
+            <Button
+              mt={7}
+              type="submit"
+              colorScheme="blackAlpha"
+              bg="black"
+              color="white"
+              _hover={{ bg: "gray.700" }}
+              isDisabled={!isFormValid}
+              _disabled={{
+                bg: "gray.600",
+                cursor: "default",
+                pointerEvents: "auto", // 기본 이벤트 허용하는 코드
+              }}
+            >
+              회원가입
+            </Button>
+
+            <Text fontSize="sm" textAlign="center">
+              이미 계정이 있으신가요?{" "}
+              <Link color="skyblue" onClick={() => navigate("/login")}>
+                로그인
+              </Link>
+            </Text>
+
+            {/* <Divider /> */}
+            <SocialLoginButton mode="signup" />
+          </VStack>
+        </form>
+      </Box>
+    </>
   );
 };
 

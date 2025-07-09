@@ -26,7 +26,7 @@ const Profile = () => {
         mt={4}
         ml={5}
       >
-        내 프로필
+        마이페이지
       </Text>
 
       <Flex maxW="3xl" mx="auto" mt={70} align="center" justify="flex-start">

@@ -150,7 +150,7 @@ const EditProfile = ({ nickname: initialNickname, avatar, onNicknameChange }) =>
         mt={4}
         ml={5}
       >
-        프로필 수정
+        마이페이지 (수정화면임)
       </Text>
 
       <Flex maxW="3xl" mx="auto" mt={70} align="center" justify="flex-start">

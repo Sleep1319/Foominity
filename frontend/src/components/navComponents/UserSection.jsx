@@ -1,7 +1,7 @@
 import { Avatar, Box, Text, Menu, MenuButton, MenuList, MenuItem, MenuDivider, Flex } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
 import { useUser } from "@/context/UserContext";
-import { FiUser, FiHome, FiLock } from "react-icons/fi";
+import { FiUser, FiHome, FiLock, FiMusic, FiLogOut, FiPower, FiUnlock } from "react-icons/fi";
 
 const UserSection = () => {
   const { logout } = useUser();
@@ -65,17 +65,19 @@ const UserSection = () => {
             src={state.avatar ? `http://localhost:8084${state.avatar}` : "/src/assets/images/defaultProfile.jpg"}
           />
         </MenuButton>
-        <MenuList>
+        <MenuList minW="170px">
           <Text fontWeight="bold" borderBottom="1px solid" borderColor="black" borderRadius="0" ml={3} mb={2}>
             {state.nickname}
           </Text>
 
           <MenuItemWithIcon icon={FiHome} label="Home" to="/" />
           <MenuItemWithIcon icon={FiUser} label="마이페이지" to="/mypage" />
+          {/* <MenuItemWithIcon icon={FiDisc} label="내 음악" to="/mymusic" /> */}
+          <MenuItemWithIcon icon={FiMusic} label="내 음악" to="/mymusic" />
 
           <MenuDivider />
 
-          <LogoutMenu icon={FiLock} label="로그아웃" onClick={logout} color="black" />
+          <LogoutMenu icon={FiLogOut} label="로그아웃" onClick={logout} color="black" />
         </MenuList>
       </Menu>
     </Box>

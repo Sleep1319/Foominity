@@ -26,6 +26,7 @@ import NoticeCreateRun from "../view/notice/NoticeCreateRun.jsx";
 import ReportCreateRun from "../view/report/ReportCreateRun.jsx";
 import ReportLists from "../view/report/ReportLists.jsx";
 import DeleteComplete from "../view/member/DeleteComplete.jsx";
+import MyMusic from "../view/member/MyMusic.jsx";
 
 function AppRoutes() {
   return (
@@ -46,6 +47,7 @@ function AppRoutes() {
       <Route element={<ProtectedRoute requireAuth={true} />}>
         {/* 로그인 필수 페이지 */}
         <Route path="/mypage/*" element={<MyPage />} />
+        <Route path="/mymusic/" element={<MyMusic />} />
         <Route path="/review/create" element={<CreateReview />} />
       </Route>
 

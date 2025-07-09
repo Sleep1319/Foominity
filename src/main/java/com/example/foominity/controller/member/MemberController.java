@@ -1,21 +1,26 @@
 package com.example.foominity.controller.member;
 
+import java.nio.file.Paths;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.foominity.config.jwt.JwtTokenProvider;
 import com.example.foominity.domain.image.ImageFile;
 import com.example.foominity.domain.member.Member;
 import com.example.foominity.dto.member.MemberRequest;
 import com.example.foominity.dto.member.NicknameChangeRequest;
+import com.example.foominity.dto.member.ProfileImageResponse;
 import com.example.foominity.dto.member.UserInfoResponse;
 import com.example.foominity.exception.NotFoundMemberException;
 import com.example.foominity.repository.member.MemberRepository;
@@ -74,26 +79,62 @@ public class MemberController {
         return ResponseEntity.ok().build();
     }
 
-    // 프로필 이미지
-    @DeleteMapping("/member/profile-image")
-    public ResponseEntity<?> deleteProfileImage(HttpServletRequest request) {
-        String token = jwtTokenProvider.resolveTokenFromCookie(request);
+    // 프로필 이미지 등록/수정
+    @Transactional
+    @PostMapping("/member/profile-image")
+    public ResponseEntity<ProfileImageResponse> updateProfileImage(
+            @RequestParam("file") MultipartFile file,
+            HttpServletRequest request) {
 
+        // 토큰 검증 (삭제 메서드와 동일하게)
+        String token = jwtTokenProvider.resolveTokenFromCookie(request);
         if (token == null || !jwtTokenProvider.validateToken(token)) {
-            return ResponseEntity.status(401).body("유효하지 않은 토큰입니다.");
+            return ResponseEntity.status(401).build();
+        }
+
+        // 멤버 조회
+        Long memberId = jwtTokenProvider.getUserIdFromToken(token);
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(NotFoundMemberException::new);
+
+        // 기존 이미지 삭제
+        if (member.getProfileImage() != null) {
+            imageService.deleteImageFile(member.getProfileImage());
+        }
+
+        // 새 이미지 저장 + 연결
+        ImageFile newImage = imageService.imageUpload(file);
+        member.setProfileImage(newImage);
+        memberRepository.save(member);
+
+        String imageUrl = "/uploads/" +
+                Paths.get(newImage.getSavePath()).getFileName().toString();
+
+        // DTO에 imageUrl만 채워서 반환
+        return ResponseEntity.ok(new ProfileImageResponse(imageUrl));
+    }
+
+    // 프로필 이미지 삭제
+    @DeleteMapping("/member/profile-image")
+    public ResponseEntity<Void> deleteProfileImage(HttpServletRequest request) {
+        String token = jwtTokenProvider.resolveTokenFromCookie(request);
+        if (token == null || !jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity.status(401).build();
         }
 
         Long memberId = jwtTokenProvider.getUserIdFromToken(token);
-        Member member = memberRepository.findById(memberId).orElseThrow(NotFoundMemberException::new);
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(NotFoundMemberException::new);
 
-        // 기존에 등록된 이미지가 있는 경우
         ImageFile image = member.getProfileImage();
         if (image != null) {
-            imageService.deleteImageFile(image); // 1. 실제 파일 삭제 + DB 레코드 삭제
-            member.setProfileImage(null); // 2. member와의 연결도 제거
-            memberRepository.save(member); // 3. member 업데이트
+            imageService.deleteImageFile(image);
+            member.setProfileImage(null);
+            memberRepository.save(member);
         }
 
-        return ResponseEntity.ok(Map.of("message", "프로필 이미지 삭제 완료"));
+        // 본문 없이 204만 반환
+        return ResponseEntity.noContent().build();
     }
+
 }
