@@ -104,7 +104,7 @@ const Register = () => {
 
     try {
       await axios.post("/api/email/send-code", null, { params: { email: form.email } });
-      toast({ title: "인증 코드 전송됨", status: "success" });
+      toast({ title: "인증 코드가 전송되었습니다", status: "success" });
       setCodeSent(true);
       setIsVerified(false);
     } catch (err) {
@@ -157,10 +157,10 @@ const Register = () => {
         ml={5}
         height="85px"
       ></Text>
-      <Heading mt={10} mb={7} textAlign="center" fontWeight="semibold">
-        doremiSOL
+      <Heading mt={10} mb={3} textAlign="center" fontSize={40}>
+        회원가입
       </Heading>
-      <Box maxW="lg" mx="auto" mt={0} p={8} mb={24} borderRadius="lg" borderWidth={1}>
+      <Box maxW="lg" mx="auto" p={8} mb={24} borderRadius="lg" borderWidth={0}>
         {/* <Heading mb={6} textAlign="center">
           회원가입
         </Heading> */}
@@ -175,6 +175,7 @@ const Register = () => {
                   size="sm"
                   isDisabled={!form.email || !!errors.email || isVerified}
                   _disabled={{
+                    opacity: 0.4,
                     cursor: "default",
                     pointerEvents: "auto", // 기본 이벤트 허용하는 코드
                   }}
@@ -205,6 +206,7 @@ const Register = () => {
                     colorScheme={isVerified ? "green" : "blue"}
                     isDisabled={!code || isVerified}
                     _disabled={{
+                      opacity: 0.4,
                       cursor: "default",
                       pointerEvents: "auto", // 기본 이벤트 허용하는 코드
                     }}
@@ -241,7 +243,7 @@ const Register = () => {
               _hover={{ bg: "gray.700" }}
               isDisabled={!isFormValid}
               _disabled={{
-                bg: "gray.600",
+                opacity: 0.4,
                 cursor: "default",
                 pointerEvents: "auto", // 기본 이벤트 허용하는 코드
               }}
@@ -249,15 +251,14 @@ const Register = () => {
               회원가입
             </Button>
 
+            {/* <Divider /> */}
+            <SocialLoginButton mode="signup" />
             <Text fontSize="sm" textAlign="center">
               이미 계정이 있으신가요?{" "}
               <Link color="skyblue" onClick={() => navigate("/login")}>
                 로그인
               </Link>
             </Text>
-
-            {/* <Divider /> */}
-            <SocialLoginButton mode="signup" />
           </VStack>
         </form>
       </Box>

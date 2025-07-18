@@ -6,6 +6,7 @@ import java.util.Map;
 import com.example.foominity.dto.sign.SocialSignUpRequest;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.foominity.config.jwt.JwtTokenProvider;
+import com.example.foominity.domain.member.Member;
+import com.example.foominity.dto.sign.PasswordResetRequest;
 import com.example.foominity.dto.sign.SignInRequest;
 import com.example.foominity.dto.sign.SignInResponse;
 import com.example.foominity.dto.sign.SignUpRequest;
@@ -34,6 +37,7 @@ public class SignController {
     private final SignService signService;
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
 
     // 회원가입
     @PostMapping("/sign-up")
@@ -88,6 +92,16 @@ public class SignController {
         // Set-Cookie : 서버가 클라이언트한테 쿠키를 저장하도록 지시함
         // Set-Cookie로 우리가 지정한 만료된 쿠키인 expiredCookie를 지정해서 로그아웃 되게 하는 방식
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody PasswordResetRequest request) {
+        try {
+            signService.resetPassword(request.getEmail(), request.getNewPassword());
+            return ResponseEntity.ok(Map.of("message", "비밀번호가 성공적으로 변경되었습니다."));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 
 }

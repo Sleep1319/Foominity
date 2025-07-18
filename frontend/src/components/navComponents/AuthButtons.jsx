@@ -3,7 +3,6 @@ import { Button, HStack, Avatar, IconButton } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
 import { SearchIcon } from "@chakra-ui/icons";
 import SearchNavbar from "./SearchNavBar";
-import AuthModal2 from "../../view/Sign/AuthModal2";
 import AuthModal from "../../view/Sign/AuthModal";
 
 const whiteNeonText = `
@@ -57,7 +56,7 @@ const AuthButtons = () => {
       </HStack>
 
       {/*  로그인 모달 */}
-      <AuthModal2 isOpen={isLoginOpen} onClose={() => setLoginOpen(false)} />
+      <AuthModal isOpen={isLoginOpen} onClose={() => setLoginOpen(false)} />
     </>
   );
 };

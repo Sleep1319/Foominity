@@ -1,5 +1,18 @@
 import React, { useState } from "react";
-import { Box, Button, Input, FormControl, FormLabel, Heading, VStack, Text, Link, Divider } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Input,
+  FormControl,
+  FormLabel,
+  Heading,
+  VStack,
+  Text,
+  Link,
+  Divider,
+  HStack,
+  Image,
+} from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "@/context/UserContext.jsx";
 import axios from "axios";
@@ -58,10 +71,19 @@ const Login = () => {
         ml={5}
         height="85px"
       ></Text>
-      <Heading mt={120} mb={7} textAlign="center" fontWeight="semibold">
-        doremiSOL
+      <Heading mt={120} mb={2} textAlign="center">
+        로그인
       </Heading>
-      <Box maxW="xl" mx="auto" mt={0} p={5} borderWidth={1} borderRadius="lg" mb={142}>
+      {/* <Image
+        src="/src/assets/images/doremiSOL_lp.png"
+        boxSize="250px"
+        objectFit="cover"
+        display="block" // inline 요소인 이미지를 block 으로 전환
+        mx="auto" // 좌우 margin: auto
+        mt="60px"
+        mb="-60px"
+      /> */}
+      <Box maxW="xl" mx="auto" mt={0} p={5} borderWidth={0} borderRadius="lg" mb={142}>
         {/* <Heading mb={5} textAlign="center">
           로그인
         </Heading> */}
@@ -101,8 +123,28 @@ const Login = () => {
                 {errorMessage}
               </Text>
             )}
+            <HStack ml={380} justify="center">
+              <Link
+                fontSize="sm"
+                color="black"
+                onClick={() => {
+                  navigate("/resetpassword");
+                }}
+              >
+                비밀번호 변경
+              </Link>
+              <Divider orientation="vertical" h="12px" borderColor="gray.300" />
+              <Link
+                fontSize="sm"
+                color="black"
+                onClick={() => {
+                  navigate("/register");
+                }}
+              >
+                회원가입
+              </Link>
+            </HStack>
             <Button
-              mt={7}
               type="submit"
               isLoading={isLoading}
               loadingText="로그인 중..."
@@ -115,13 +157,6 @@ const Login = () => {
             >
               로그인
             </Button>
-
-            <Text fontSize="sm">
-              계정이 없으신가요?{" "}
-              <Link color="skyblue" onClick={() => navigate("/register")}>
-                회원가입
-              </Link>
-            </Text>
             {/* <Divider /> */}
             <SocialLoginButton mode="login" />
           </VStack>

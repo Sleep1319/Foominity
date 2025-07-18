@@ -1,4 +1,4 @@
-import { Box, Button, Heading, HStack, Text, VStack } from "@chakra-ui/react";
+import { Box, Button, Divider, Heading, HStack, Link, Text, VStack } from "@chakra-ui/react";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -20,21 +20,31 @@ const DeleteComplete = () => {
       ></Text>
 
       <VStack mt={180}>
-        <Heading mb={5} textAlign="center">
-          회원 탈퇴가 완료되었습니다.
+        <Heading fontSize={45} mb={5} textAlign="center">
+          회원 탈퇴가 완료되었습니다
         </Heading>
-        <HStack mt={7}>
-          <Button bg="black" color="white" onClick={() => navigate("/")} _hover={{ bg: "black", color: "white" }}>
+        <HStack mt={7} mr="30px">
+          <Link
+            mr={2}
+            bg="none"
+            color="gray.500"
+            fontWeight="semibold"
+            onClick={() => navigate("/")}
+            _hover={{ color: "black" }}
+          >
             홈 화면으로 이동
-          </Button>
-          <Button
-            bg="black"
-            color="white"
+          </Link>
+          <Divider orientation="vertical" h="16px" borderColor="gray.500" />
+          <Link
+            ml={2}
+            bg="none"
+            color="gray.500"
+            fontWeight="semibold"
             onClick={() => navigate("/register")}
-            _hover={{ bg: "black", color: "white" }}
+            _hover={{ color: "black" }}
           >
             회원가입
-          </Button>
+          </Link>
         </HStack>
       </VStack>
     </>

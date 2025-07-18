@@ -14,8 +14,7 @@ import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useUser } from "../../context/UserContext";
-import DefaultTable from "../../components/reportComponents/DefaultTable.jsx";
-import MyPostsTable from "./MyPostsTable.jsx";
+import MyPostsTable from "../../components/memberComponents/MyPostsTable";
 
 const DEFAULT_AVATAR_PATH = "/src/assets/images/defaultProfile.jpg";
 
@@ -148,7 +147,7 @@ const EditProfile = ({ nickname: initialNickname, avatar, onNicknameChange }) =>
         borderBottom="2px solid gray"
         pb={2}
         mt={4}
-        ml={5}
+        ml={16}
       >
         마이페이지 (수정화면임)
       </Text>

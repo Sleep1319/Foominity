@@ -1,16 +1,16 @@
 import { Avatar, Box, HStack, Text, VStack, Flex, Button, Input } from "@chakra-ui/react";
 import React, { useState } from "react";
-import DefaultTable from "../../components/reportComponents/DefaultTable.jsx";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import { useUser } from "../../context/UserContext.jsx";
 import DeleteModal from "../../view/Member/DeleteModal.jsx";
-import MyPostsTable from "./MyPostsTable.jsx";
 import axios from "axios";
+import MyPostsTable from "../../components/memberComponents/MyPostsTable.jsx";
+import SettingsButton from "../../components/memberComponents/SettingsButton.jsx";
 axios.defaults.baseURL = "http://localhost:8084"; // 기본 백엔드 주소
 axios.defaults.withCredentials = true;
 
 const Profile = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const { state } = useUser();
   const [isDeleteOpen, setDeleteOpen] = useState(false);
 
@@ -69,8 +69,10 @@ const Profile = () => {
         </Flex>
 
         <VStack ml={153} mr={7}>
-          <Button
-            w="85px"
+          <SettingsButton />
+
+          {/* <Button
+            w="110px"
             bg="white"
             mb={4}
             onClick={() => navigate("/mypage/editprofile")}
@@ -80,12 +82,23 @@ const Profile = () => {
               color: "white",
             }}
           >
-            편집
+            프로필 편집
           </Button>
-
-          {/* 회원 탈퇴 버튼 */}
           <Button
-            w="85px"
+            w="110px"
+            bg="white"
+            mb={4}
+            onClick={() => navigate("/resetpassword")}
+            _hover={{
+              borderWidth: "2px",
+              bg: "black",
+              color: "white",
+            }}
+          >
+            비밀번호 변경
+          </Button>
+          <Button
+            w="110px"
             bg="white"
             color="red"
             _hover={{
@@ -96,6 +109,7 @@ const Profile = () => {
           >
             회원 탈퇴
           </Button>
+         */}
         </VStack>
       </Flex>
 

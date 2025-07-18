@@ -72,7 +72,6 @@ const UserSection = () => {
 
           <MenuItemWithIcon icon={FiHome} label="Home" to="/" />
           <MenuItemWithIcon icon={FiUser} label="마이페이지" to="/mypage" />
-          {/* <MenuItemWithIcon icon={FiDisc} label="내 음악" to="/mymusic" /> */}
           <MenuItemWithIcon icon={FiMusic} label="내 음악" to="/mymusic" />
 
           <MenuDivider />

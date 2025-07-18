@@ -27,11 +27,14 @@ import ReportCreateRun from "../view/report/ReportCreateRun.jsx";
 import ReportLists from "../view/report/ReportLists.jsx";
 import DeleteComplete from "../view/member/DeleteComplete.jsx";
 import MyMusic from "../view/member/MyMusic.jsx";
+import ResetPassword from "../view/Sign/ResetPassword.jsx";
+import ParticipatedAlbumsList from "../components/memberComponents/ParticipatedAlbumsList.jsx";
 
 function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
+      <Route path="/resetpassword" element={<ResetPassword />} />
       <Route path="/report" element={<ReportLists />} />
       <Route path="/report/:id" element={<ReportDetails />} />
       <Route path="/notice" element={<NoticeLists />} />
@@ -50,6 +53,7 @@ function AppRoutes() {
         <Route path="/mymusic/" element={<MyMusic />} />
         <Route path="/review/create" element={<CreateReview />} />
       </Route>
+      <Route path="/mymusic/participatedalbumslist" element={<ParticipatedAlbumsList />} />
 
       {/* 자유게시판 */}
       <Route path="/board" element={<BoardLists />} />

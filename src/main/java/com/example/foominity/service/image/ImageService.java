@@ -33,7 +33,7 @@ public class ImageService {
             String newFileName = uuid + "_" + originalName;
 
             // 실제 저장 디렉토리
-            Path saveDir = Paths.get("uploads").toAbsolutePath(); // C:/.../uploads
+            Path saveDir = Paths.get(uploadDir).toAbsolutePath(); // C:/.../uploads
             Files.createDirectories(saveDir); // uploads 폴더 없으면 생성
 
             Path savePath = saveDir.resolve(newFileName);

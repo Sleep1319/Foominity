@@ -1,11 +1,8 @@
 import { Avatar, Box, HStack, Text, VStack, Flex, Button, Input } from "@chakra-ui/react";
-import DefaultTable from "../../components/reportComponents/DefaultTable.jsx";
 import { useUser } from "../../context/UserContext.jsx";
-import DeleteModal from "../../view/Member/DeleteModal.jsx";
-import MyPostsTable from "./MyPostsTable.jsx";
 import axios from "axios";
-import TopRankedAlbums from "../../components/homeComponents/TopRankedAlbums.jsx";
 import LikedAlbums from "../../components/memberComponents/LikedAlbums.jsx";
+import ParticipatedAlbums from "../../components/memberComponents/ParticipatedAlbums.jsx";
 axios.defaults.baseURL = "http://localhost:8084"; // 기본 백엔드 주소
 axios.defaults.withCredentials = true;
 
@@ -27,6 +24,7 @@ const MyMusic = () => {
         {state.nickname} 님의 음악
       </Text>
 
+      <ParticipatedAlbums />
       <LikedAlbums />
     </>
   );

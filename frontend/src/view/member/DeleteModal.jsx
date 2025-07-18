@@ -17,7 +17,7 @@ import {
 } from "@chakra-ui/react";
 import axios from "axios";
 
-const AuthModal = ({ isOpen, onClose }) => {
+const DeleteModal = ({ isOpen, onClose }) => {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const handleConfirm = async () => {
@@ -112,4 +112,4 @@ const AuthModal = ({ isOpen, onClose }) => {
   );
 };
 
-export default AuthModal;
+export default DeleteModal;
