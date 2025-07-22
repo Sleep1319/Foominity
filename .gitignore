@@ -44,7 +44,13 @@ out/
 
 ### VS Code ###
 .vscode/
+
+
 application.yml
+docker-compose.yml
+Dockerfile
+frontendDockerfile
+src/main/java/com/example/foominity/config/SecurityConfig.java
 
 uploads/
 src/main/java/com/example/reactbootserver/ReactBootServerApplication.java
