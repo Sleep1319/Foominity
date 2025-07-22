@@ -11,7 +11,7 @@ const ParticipatedAlbumsGrid = () => {
 
   useEffect(() => {
     axios
-      .get("/api/reviews/me/participated-reviews", { withCredentials: true })
+      .get("/api/me/participated-albums", { withCredentials: true })
       .then((res) => setReviews(res.data))
       .catch((err) => console.error("내가 평가한 앨범 불러오기 실패:", err))
       .finally(() => setLoading(false));

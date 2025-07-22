@@ -1,7 +1,7 @@
 package com.example.foominity.controller.member;
 
 import java.nio.file.Paths;
-import java.util.Map;
+import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,11 +19,13 @@ import com.example.foominity.config.jwt.JwtTokenProvider;
 import com.example.foominity.domain.image.ImageFile;
 import com.example.foominity.domain.member.Member;
 import com.example.foominity.dto.member.MemberRequest;
+import com.example.foominity.dto.member.MemberReviewResponse;
 import com.example.foominity.dto.member.NicknameChangeRequest;
 import com.example.foominity.dto.member.ProfileImageResponse;
 import com.example.foominity.dto.member.UserInfoResponse;
 import com.example.foominity.exception.NotFoundMemberException;
 import com.example.foominity.repository.member.MemberRepository;
+import com.example.foominity.service.board.ReviewService;
 import com.example.foominity.service.image.ImageService;
 import com.example.foominity.service.member.MemberService;
 
@@ -42,6 +44,7 @@ public class MemberController {
     private final MemberRepository memberRepository;
     private final ImageService imageService;
     private final MemberService memberService;
+    private final ReviewService reviewService;
 
     // 유저 정보 불러오기
     @GetMapping("/user")
@@ -135,6 +138,25 @@ public class MemberController {
 
         // 본문 없이 204만 반환
         return ResponseEntity.noContent().build();
+    }
+
+    // 평가에 참여한 앨범들 불러오기
+    @GetMapping("/me/participated-albums")
+    public ResponseEntity<List<MemberReviewResponse>> getMyParticipatedReviews(
+            HttpServletRequest req) {
+        String token = jwtTokenProvider.resolveTokenFromCookie(req);
+        Long memberId = jwtTokenProvider.getUserIdFromToken(token);
+        List<MemberReviewResponse> list = reviewService.getParticipatedReviews(memberId);
+        return ResponseEntity.ok(list);
+    }
+
+    // 좋아요 누른 앨범들 불러오기
+    @GetMapping("/me/liked-albums")
+    public ResponseEntity<List<MemberReviewResponse>> getMyLikedReviews(HttpServletRequest req) {
+        String token = jwtTokenProvider.resolveTokenFromCookie(req);
+        Long memberId = jwtTokenProvider.getUserIdFromToken(token);
+        List<MemberReviewResponse> list = reviewService.getLikedReviews(memberId);
+        return ResponseEntity.ok(list);
     }
 
 }
