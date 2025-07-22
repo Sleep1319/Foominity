@@ -7,7 +7,7 @@ const UserSection = () => {
   const { state } = useUser();
 
   return (
-    <Box display="flex" alignItems="center" gap={3} position="fixed" top="20px" right="20px" zIndex="1000">
+    <Box display="flex" alignItems="center" gap={3} right="20px" zIndex="1000">
       {/* <Text>
         {state.nickname} ({state.roleName})
       </Text> */}

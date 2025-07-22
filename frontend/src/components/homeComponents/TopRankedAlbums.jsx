@@ -89,9 +89,9 @@ const TopRankedAlbums = ({ albums = mockAlbums }) => {
 
         <Slider ref={sliderRef} {...settings}>
           {albums.map((album, index) => (
-            <Box key={album.id} mr={index === albums.length - 1 ? 0 : 4}>
-              <VStack spacing={2} align="start" w={`${boxSize}px`}>
-                <Box w={`${boxSize}px`} h={`${boxSize}px`}>
+            <Box key={album.id} px={2} boxSizing="border-box">
+              <VStack spacing={2} align="start" w={`${boxSize}px`} maxW="100%">
+                <Box w="100%" h={`${boxSize}px`}>
                   <Image
                     src={album.coverImage}
                     alt={album.title}

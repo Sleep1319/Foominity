@@ -1,80 +1,46 @@
 import React from "react";
-import { Box, Button, Input, Flex, HStack } from "@chakra-ui/react";
-import { Link as RouterLink } from "react-router-dom";
+import { Box, Input, IconButton, Portal } from "@chakra-ui/react";
+import { CloseIcon } from "@chakra-ui/icons";
 
-const SearchNavbar = ({ isVisible, onMouseEnter, onMouseLeave }) => {
+const SearchNavbar = ({ isVisible, onClose }) => {
+  if (!isVisible) return null;
+
   return (
-    <>
-      {/* 오버레이 */}
-      {isVisible && (
-        <Box
-          position="fixed"
-          top="0"
-          left="0"
-          w="100%"
-          h="100%"
-          bg="blackAlpha.700"
-          zIndex="999"
-          pointerEvents="none"
-        />
-      )}
+    <Portal>
+      {/* 오버레이: 화면 전체 어둡게 + 클릭 시 닫힘 */}
+      <Box position="fixed" top="0" left="0" w="100vw" h="100vh" bg="blackAlpha.700" zIndex="10000" onClick={onClose} />
 
-      {/* 슬라이드 네브바 */}
-      <Box
-        position="fixed"
-        top="0"
-        left="0"
-        w="100%"
-        bg="black"
-        color="white"
-        boxShadow="md"
-        zIndex="1000"
-        px={8}
-        py={6}
-        minH="100px"
-        transform={isVisible ? "translateY(0)" : "translateY(-120%)"}
-        transition="transform 0.3s ease"
-        onMouseEnter={onMouseEnter}
-        onMouseLeave={onMouseLeave}
-      >
-        <Flex align="center" justify="space-between" w="100%">
-          {/* 왼쪽 빈 공간 */}
-          <Box w="300px" />
-
-          {/* 버튼 그룹 */}
-          <HStack spacing={6}>
-            <Button as={RouterLink} to="/review" variant="ghost" color="white" _hover={{ bg: "transparent" }}>
-              Review
-            </Button>
-            <Button as={RouterLink} to="/board" variant="ghost" color="white" _hover={{ bg: "transparent" }}>
-              Board
-            </Button>
-            <Button as={RouterLink} to="/notice" variant="ghost" color="white" _hover={{ bg: "transparent" }}>
-              Notice
-            </Button>
-            <Button as={RouterLink} to="/report" variant="ghost" color="white" _hover={{ bg: "transparent" }}>
-              Report
-            </Button>
-          </HStack>
-
-          {/* 검색창 */}
+      {/* 상단 고정 검색바 */}
+      <Box position="fixed" top="0" left="0" w="100%" bg="black" px={8} py={6} zIndex="10001">
+        <Box position="relative" maxW="500px" mx="auto">
           <Input
             placeholder="Search..."
-            maxW="300px"
+            w="100%"
             bg="white"
             color="black"
-            zIndex="1001"
-            position="relative"
             borderColor="black"
             borderWidth="1px"
             borderRadius="md"
-            boxShadow="sm"
-            _hover={{ borderColor: "black" }}
-            _focus={{ borderColor: "black", boxShadow: "none" }}
+            pr="3rem"
+            _focus={{ boxShadow: "none", borderColor: "black" }}
           />
-        </Flex>
+          <IconButton
+            aria-label="Close Search"
+            icon={<CloseIcon />}
+            variant="ghost"
+            color="black"
+            position="absolute"
+            top="50%"
+            transform="translateY(-50%)"
+            right="8px"
+            size="sm"
+            zIndex="10002"
+            _hover={{ bg: "transparent" }}
+            onClick={onClose}
+          />
+        </Box>
       </Box>
-    </>
+    </Portal>
   );
 };
 

@@ -4,7 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import PopularPosts from "@/components/homeComponents/PopularPosts";
 import ReviewCommentForm from "@/components/commentComponents/ReviewCommentForm";
-import CommentList from "@/components/commentComponents/CommenList.jsx";
+import CommentList from "../commentComponents/CommentList";
 
 const ReviewDetail = () => {
   const { id } = useParams();
@@ -29,9 +29,8 @@ const ReviewDetail = () => {
 
   const handleCommentSuccess = () => {
     fetchReview(); // 댓글 수 업데이트용
-    setCommentKey(prev => prev + 1); // 🔁 key 변경 → CommentList 리렌더 유도
+    setCommentKey((prev) => prev + 1); // 🔁 key 변경 → CommentList 리렌더 유도
   };
-
 
   useEffect(() => {
     fetchReview();

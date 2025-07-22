@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { Box } from "@chakra-ui/react";
 import SliderBox from "@/components/homeComponents/SliderBox.jsx";
-import CategoryTabs from "@/components/homeComponents/CategoryTabs.jsx";
-// import PopularPosts from "@/components/homeComponents/PopularPosts.jsx";
 import CommunityTabs from "@/components/homeComponents/CommunityTabs.jsx";
 import { motion } from "framer-motion";
 import TopRankedAlbums from "../../components/homeComponents/TopRankedAlbums";
+import AppNavbar from "../../layouts/AppNavBar";
 
 const MotionBox = motion(Box);
 
@@ -54,31 +53,17 @@ function Home() {
 
   return (
     <>
+      <AppNavbar />
       <SliderBox />
 
-      <Box ref={categoryRef}>
+      <Box ref={categoryRef} mt={20}>
         <MotionBox
           initial={{ opacity: 0, y: 40 }}
           animate={showTabs ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
           transition={{ duration: 0.5 }}
         >
-          <Box
-            position="sticky"
-            top="0"
-            zIndex={999}
-            bg="white"
-            boxShadow="none" // 🔥 그림자 제거
-          >
-            <Box
-              maxW="1200px"
-              mx="auto"
-              px={4}
-              py={6}
-              display="flex"
-              justifyContent="center" // ✅ 가운데 정렬
-            >
-              <CategoryTabs /> {/* NavMenu 로 교체도 가능 */}
-            </Box>
+          <Box position="sticky" top="0" zIndex={999} bg="white" boxShadow="none">
+            <Box maxW="1200px" mx="auto" px={4} py={6} display="flex" justifyContent="center"></Box>
           </Box>
         </MotionBox>
 

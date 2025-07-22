@@ -1,5 +1,5 @@
-import {HStack, Icon, Text, Box, useColorModeValue, Textarea, Button, Flex, IconButton} from "@chakra-ui/react";
-import {FaRegComment, FaStar} from "react-icons/fa";
+import { HStack, Icon, Text, Box, useColorModeValue, Textarea, Button, Flex, IconButton } from "@chakra-ui/react";
+import { FaRegComment, FaStar } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 
@@ -38,20 +38,20 @@ const CommentForm = ({ commentCount, isLoggedIn, onSubmit, showStarRating = fals
         {isLoggedIn ? (
           <>
             {showStarRating && (
-                <HStack mb={2}>
-                  {[1, 2, 3, 4, 5].map((value) => (
-                      <IconButton
-                          key={value}
-                          icon={<FaStar />}
-                          variant="ghost"
-                          aria-label={`${value}점`}
-                          onMouseEnter={() => setHover(value)}
-                          onMouseLeave={() => setHover(null)}
-                          onClick={() => setStar(value)}
-                          color={hover >= value || star >= value ? "yellow.400" : "gray.300"}
-                      />
-                  ))}
-                </HStack>
+              <HStack mb={2}>
+                {[1, 2, 3, 4, 5].map((value) => (
+                  <IconButton
+                    key={value}
+                    icon={<FaStar />}
+                    variant="ghost"
+                    aria-label={`${value}점`}
+                    onMouseEnter={() => setHover(value)}
+                    onMouseLeave={() => setHover(null)}
+                    onClick={() => setStar(value)}
+                    color={hover >= value || star >= value ? "yellow.400" : "gray.300"}
+                  />
+                ))}
+              </HStack>
             )}
             <Textarea
               placeholder="댓글을 입력하세요..."
@@ -63,7 +63,14 @@ const CommentForm = ({ commentCount, isLoggedIn, onSubmit, showStarRating = fals
             />
 
             <Flex justify="flex-end">
-              <Button colorScheme="teal" onClick={handleSubmit}>
+              <Button
+                color="white"
+                bg="black"
+                size="sm"
+                fontSize="sm"
+                _hover={{ bg: "black", color: "white" }}
+                onClick={handleSubmit}
+              >
                 등록
               </Button>
             </Flex>

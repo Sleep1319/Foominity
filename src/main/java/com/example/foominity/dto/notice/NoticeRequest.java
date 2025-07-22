@@ -1,5 +1,7 @@
 package com.example.foominity.dto.notice;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.example.foominity.domain.member.Member;
 import com.example.foominity.domain.notice.Notice;
 

@@ -54,9 +54,9 @@ const NoticeCreate = () => {
   };
 
   return (
-    <Box maxW="600px" mx="auto" mt={8} p={4}>
+    <Box maxW="1000px" mx="auto" mt={20} px={{ base: 4, md: 10 }}>
       <Heading size="lg" mb={6}>
-        공지사항 작성
+        Magazine 작성
       </Heading>
       <form onSubmit={handleSubmit}>
         <FormControl mb={4} isRequired>
@@ -64,12 +64,21 @@ const NoticeCreate = () => {
           <Input value={title} onChange={(e) => setTitle(e.target.value)} />
         </FormControl>
 
+        <Box mb={4} fontSize="sm" color="gray.500">
+          작성일: {new Date().toLocaleDateString("ko-KR")}
+        </Box>
+
+        <FormControl mb={4}>
+          <FormLabel>대표 이미지</FormLabel>
+          <Input type="file" accept="image/*" />
+        </FormControl>
+
         <FormControl mb={6} isRequired>
           <FormLabel>내용</FormLabel>
           <Textarea rows={15} value={content} onChange={(e) => setContent(e.target.value)} />
         </FormControl>
 
-        <Button type="submit" colorScheme="blue">
+        <Button type="submit" color="white" bg="black" size="sm" fontSize="sm" _hover={{ bg: "black", color: "white" }}>
           등록
         </Button>
       </form>

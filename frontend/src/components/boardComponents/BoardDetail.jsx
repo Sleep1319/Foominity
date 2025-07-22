@@ -1,96 +1,77 @@
+// src/view/board/BoardDetail.jsx
+
 import React, { useEffect, useState } from "react";
 import {
   Box,
   Text,
   Heading,
+  Flex,
+  Spacer,
+  Spinner,
+  Button,
+  useToast,
   HStack,
   Icon,
   useColorModeValue,
-  Textarea,
-  Spinner,
-  Button,
-  Flex,
-  Spacer,
-  useToast,
 } from "@chakra-ui/react";
 import { useParams, useNavigate } from "react-router-dom";
 import { FaRegEye, FaRegComment } from "react-icons/fa";
 import { useUser } from "../../context/UserContext";
 import axios from "axios";
 import BoardCommentForm from "@/components/commentComponents/BoardCommentForm.jsx";
-import CommentList from "@/components/commentComponents/CommenList.jsx";
+import CommentList from "../commentComponents/CommentList";
 
 const BoardDetail = () => {
   const { state: user } = useUser();
   const loginMemberId = user?.memberId;
-
-  const { id } = useParams(); // URL에서 게시글 id 추출
+  const { id } = useParams();
   const navigate = useNavigate();
-  const isLoggedIn = false;
-
-  const grayText = useColorModeValue("gray.700", "white");
-  const blueText = useColorModeValue("blue.400", "blue.200");
+  const toast = useToast();
 
   const [board, setBoard] = useState(null);
   const [loading, setLoading] = useState(true);
   const [commentKey, setCommentKey] = useState(0);
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState("");
-  const toast = useToast();
-
-  const fetchBoard = async () => {
-    try {
-      // 백엔드에서 해당 id의 게시글 정보를 GET으로 가져옵니다
-      const res = await axios.get(`/api/board/${id}`);
-      setBoard(res.data);
-    } catch (err) {
-      console.error(err);
-      setBoard(null);
-    }
-    setLoading(false);
-  };
-
-  // 삭제
-  const handleDelete = async () => {
-    if (!window.confirm("정말 삭제하시겠습니까?")) return;
-    setIsSubmitting(true);
-    try {
-      await axios.delete(`/api/board/delete/${id}`, { withCredentials: true });
-      toast({
-        title: "게시글이 삭제되었습니다.",
-        status: "info",
-        duration: 1500,
-        isClosable: true,
-      });
-      navigate("/board");
-    } catch (err) {
-      console.log(err);
-      setError("삭제에 실패했습니다. 다시 시도해주세요.");
-    }
-    setIsSubmitting(false);
-  };
-
-  const handleCommentSuccess = () => {
-    fetchBoard(); // 댓글 수 업데이트용
-    setCommentKey((prev) => prev + 1); // 🔁 key 변경 → CommentList 리렌더 유도
-  };
+  const grayText = useColorModeValue("gray.700", "white");
+  const blueText = useColorModeValue("blue.400", "blue.200");
 
   useEffect(() => {
-    fetchBoard();
+    (async () => {
+      try {
+        const res = await axios.get(`/api/board/${id}`, { withCredentials: true });
+        setBoard(res.data);
+      } catch (err) {
+        console.error(err);
+        setBoard(null);
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, [id]);
+
+  const handleDelete = async () => {
+    if (!window.confirm("정말 삭제하시겠습니까?")) return;
+    try {
+      await axios.delete(`/api/board/delete/${id}`, { withCredentials: true });
+      toast({ title: "게시글이 삭제되었습니다.", status: "info", duration: 1500 });
+      navigate("/board");
+    } catch {
+      toast({ title: "삭제 실패", status: "error", duration: 1500 });
+    }
+  };
+
+  const handleCommentSuccess = () => setCommentKey((k) => k + 1);
 
   if (loading) {
     return (
-      <Box minH="60vh" display="flex" alignItems="center" justifyContent="center">
+      <Box minH="60vh" display="flex" align="center" justify="center">
         <Spinner size="xl" />
       </Box>
     );
   }
-
   if (!board) {
     return (
-      <Box minH="60vh" display="flex" alignItems="center" justifyContent="center">
+      <Box minH="60vh" display="flex" align="center" justify="center">
         <Text fontSize="xl" color="gray.500">
           게시글을 찾을 수 없습니다.
         </Text>
@@ -101,6 +82,7 @@ const BoardDetail = () => {
   return (
     <Box display="flex" justifyContent="center" px={6} py={10}>
       <Box flex="1" maxW="900px">
+        {/* 게시글 헤더 */}
         <Text
           fontSize="2xl"
           fontWeight="medium"
@@ -117,9 +99,10 @@ const BoardDetail = () => {
           {board.title}
         </Heading>
 
+        {/* 메타 정보 */}
         <Flex textAlign="left" fontSize="lg" fontWeight="light" mt={2} borderBottom="1px solid gray" pb={4}>
           <Text pr={4}>{board.nickname}</Text>
-          <Spacer /> {/* Spacer로 왼쪽 오른쪽 나누기 */}
+          <Spacer />
           <Text px={4}>{board.createdDate?.split("T")[0]}</Text>
           <Text px={4}>
             <Icon as={FaRegEye} mr={1} />
@@ -127,10 +110,11 @@ const BoardDetail = () => {
           </Text>
           <Text px={4}>
             <Icon as={FaRegComment} mr={1} />
-            {board.commentCount ?? 0}
+            {board.commentCount || 0}
           </Text>
         </Flex>
 
+        {/* 내용 */}
         <Box mt={18}>
           <Text
             fontSize="md"
@@ -145,77 +129,35 @@ const BoardDetail = () => {
           </Text>
         </Box>
 
-        {/*<Text*/}
-        {/*  fontSize="md"*/}
-        {/*  textAlign="left"*/}
-        {/*  mt={6}*/}
-        {/*  mb={6}*/}
-        {/*  display="inline-block"*/}
-        {/*  cursor="pointer"*/}
-        {/*  onClick={() => navigate("/board")}*/}
-        {/*>*/}
-        {/*  목록*/}
-        {/*</Text>*/}
-
-        {/* 수정 버튼 조건부 표시 */}
-
-        {/*<HStack mt={4} spacing={1} borderBottom="2px solid gray" pb={4}>*/}
-        {/*  <Icon as={FaRegComment} boxSize={5} color={grayText} />*/}
-        {/*  <Text fontSize="lg" color={grayText}>*/}
-        {/*    댓글*/}
-        {/*  </Text>*/}
-        {/*  <Text fontSize="lg" color={blueText}>*/}
-        {/*    {board.commentCount ?? 0}*/}
-        {/*  </Text>*/}
-        {/*</HStack>*/}
-
+        {/* 댓글 */}
         <CommentList key={commentKey} type="boards" id={id} />
         <BoardCommentForm boardId={id} commentCount={board.commentCount || 0} onSuccess={handleCommentSuccess} />
 
-        <Box mt={5}>
-          <HStack>
-            <Flex justify="space-between" mb={2} align="center">
-              <Button bg="black" color="white" size="sm" ml={2} onClick={() => navigate("/board")}>
-                목록
-              </Button>
-            </Flex>
-            <Spacer />
-            <Flex justify="space-between" mb={2} align="center">
-              {String(loginMemberId) === String(board.memberId) && (
-                <Button bg="blue" color="white" size="sm" ml={2} onClick={() => navigate(`/board/update/${board.id}`)}>
-                  수정
-                </Button>
-              )}
-
-              {user?.roleName === "ADMIN" && (
-                <Button bg="red" color="white" size="sm" ml={2} onClick={handleDelete}>
-                  삭제
-                </Button>
-              )}
-            </Flex>
-          </HStack>
-        </Box>
-        {/*<Box mt={4} borderBottom="2px solid gray" pb={14}>*/}
-        {/*  <Text fontWeight="bold" mb={2}>*/}
-        {/*    댓글 달기*/}
-        {/*  </Text>*/}
-        {/*  {isLoggedIn ? (*/}
-        {/*    <Textarea placeholder="댓글을 입력하세요..." />*/}
-        {/*  ) : (*/}
-        {/*    <Box*/}
-        {/*      p={8}*/}
-        {/*      border="1px solid gray"*/}
-        {/*      borderRadius="md"*/}
-        {/*      color="gray.600"*/}
-        {/*      whiteSpace="pre-wrap"*/}
-        {/*      minHeight="100px"*/}
-        {/*      cursor="pointer"*/}
-        {/*      onClick={() => navigate("/login")}*/}
-        {/*    >*/}
-        {/*      댓글 쓰기 권한이 없습니다. 로그인 하시겠습니까?*/}
-        {/*    </Box>*/}
-        {/*  )}*/}
-        {/*</Box>*/}
+        {/* 버튼들 */}
+        <HStack mt={5}>
+          <Button bg="black" color="white" size="sm" onClick={() => navigate("/board")}>
+            목록
+          </Button>
+          {/* ★ 신고하기: 별도 페이지로 이동 ★ */}
+          <Button
+            colorScheme="red"
+            size="sm"
+            onClick={() => navigate(`/report/create?targetType=BOARD&targetId=${board.id}`)}
+          >
+            신고하기
+          </Button>
+          <Spacer />
+          {String(loginMemberId) === String(board.memberId) && (
+            <Button bg="blue" color="white" size="sm" onClick={() => navigate(`/board/update/${board.id}`)}>
+              수정
+            </Button>
+          )}
+          {user?.roleName === "ADMIN" && (
+            <Button bg="red" color="white" size="sm" onClick={handleDelete}>
+              삭제
+            </Button>
+          )}
+        </HStack>
       </Box>
     </Box>
   );
