@@ -43,10 +43,9 @@ public class NoticeService {
         Page<Notice> notices = noticeRepository.findAll(pageable);
 
         List<NoticeResponse> noticeResponseList = notices.stream()
-                .map(notice -> new NoticeResponse(
-                        notice.getId(),
-                        notice.getTitle(),
-                        notice.getContent()))
+                .map(notice -> new NoticeResponse(notice.getId(), notice.getTitle(), notice.getContent(),
+                        notice.getCreatedDate()))
+
                 .toList();
         return new PageImpl<>(noticeResponseList, pageable, notices.getTotalElements());
     }
@@ -56,7 +55,8 @@ public class NoticeService {
         return new NoticeResponse(
                 notice.getId(),
                 notice.getTitle(),
-                notice.getContent());
+                notice.getContent(),
+                notice.getCreatedDate());
     }
 
     @Transactional
@@ -122,11 +122,15 @@ public class NoticeService {
     }
 
     public List<NoticeResponse> findAllNotices() {
-    List<Notice> notices = noticeRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
-    return notices.stream()
-        .map(notice -> new NoticeResponse(notice.getId(), notice.getTitle(), notice.getContent()))
-        .toList();
-}
+        List<Notice> notices = noticeRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
+        return notices.stream()
+                .map(notice -> new NoticeResponse(
+                        notice.getId(),
+                        notice.getTitle(),
+                        notice.getContent(),
+                        notice.getCreatedDate()))
+                .toList();
+    }
 
     public List<NoticeResponse> getLatest() {
         List<Notice> noticeList = noticeRepository.findTop4ByOrderByIdDesc().orElseThrow(NotFoundNoticeException::new);
@@ -134,8 +138,11 @@ public class NoticeService {
         return noticeList.stream()
                 .map(notice -> new NoticeResponse(
                         notice.getId(),
-                        notice.getTitle()))
+                        notice.getTitle(),
+                        notice.getContent(),
+                        notice.getCreatedDate()))
                 .toList();
+
     }
 
 }
