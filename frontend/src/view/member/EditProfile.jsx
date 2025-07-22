@@ -14,8 +14,7 @@ import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useUser } from "../../context/UserContext";
-import DefaultTable from "../../components/reportComponents/DefaultTable.jsx";
-import MyPostsTable from "./MyPostsTable.jsx";
+import MyPostsTable from "../../components/memberComponents/MyPostsTable";
 
 const DEFAULT_AVATAR_PATH = "/src/assets/images/defaultProfile.jpg";
 
@@ -35,6 +34,11 @@ const EditProfile = ({ nickname: initialNickname, avatar, onNicknameChange }) =>
     const newNickname = e.target.value;
     setNickname(newNickname);
     setNicknameError("");
+
+    if (!newNickname) {
+      setNicknameError("닉네임을 입력해주세요.");
+      return;
+    }
 
     // 닉네임 유효성 검사 (한글, 영어, 숫자만 허용 / 특수문자 )
     const nicknameRegex = /^[가-힣a-zA-Z0-9]+$/;
@@ -143,9 +147,9 @@ const EditProfile = ({ nickname: initialNickname, avatar, onNicknameChange }) =>
         borderBottom="2px solid gray"
         pb={2}
         mt={4}
-        ml={5}
+        ml={16}
       >
-        프로필 수정
+        마이페이지 (수정화면임)
       </Text>
 
       <Flex maxW="3xl" mx="auto" mt={70} align="center" justify="flex-start">
@@ -204,6 +208,11 @@ const EditProfile = ({ nickname: initialNickname, avatar, onNicknameChange }) =>
                 display="none"
                 onChange={handleFileChange}
               />
+              {/* <Box mt={14}>
+                <Text fontSize="sm" color="gray.500">
+                  파일 용량 제한: 10.00MB
+                </Text>
+              </Box> */}
             </VStack>
 
             <VStack align="start" spacing={4}>

@@ -1,7 +1,5 @@
 package com.example.foominity.service.sign;
 
-import java.util.Optional;
-
 import com.example.foominity.domain.member.Point;
 import com.example.foominity.domain.member.Role;
 import com.example.foominity.dto.sign.SocialSignUpRequest;
@@ -14,21 +12,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.foominity.config.jwt.JwtTokenProvider;
 import com.example.foominity.domain.member.Member;
-import com.example.foominity.dto.member.MemberRequest;
-import com.example.foominity.dto.member.NicknameChangeRequest;
 import com.example.foominity.dto.sign.SignInRequest;
 import com.example.foominity.dto.sign.SignInResponse;
 import com.example.foominity.dto.sign.SignUpRequest;
 import com.example.foominity.exception.MemberEmailAlreadyExistsException;
 import com.example.foominity.exception.MemberNicknameAlreadyExistsException;
-import com.example.foominity.exception.NotFoundMemberException;
 import com.example.foominity.exception.SignInFailureException;
-import com.example.foominity.exception.UnauthorizedException;
 import com.example.foominity.repository.member.MemberRepository;
 import com.example.foominity.repository.sign.SignRepository;
 
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -42,46 +34,6 @@ public class SignService {
     private final MemberRepository memberRepository;
     private final PointRepository pointRepository;
     private final RoleRepository roleRepository;
-
-    // 회원 탈퇴
-    @Transactional
-    public void deleteMember(HttpServletRequest tokenRequest, MemberRequest req) {
-        String token = jwtTokenProvider.resolveTokenFromCookie(tokenRequest);
-
-        // 유효성검증
-        if (!jwtTokenProvider.validateToken(token)) {
-            throw new UnauthorizedException();
-        }
-        Long memberId = jwtTokenProvider.getUserIdFromToken(token);
-        Member member = memberRepository.findById(memberId).orElseThrow(NotFoundMemberException::new);
-
-        // 비밀번호 일치 확인
-        if (!passwordEncoder.matches(req.getPassword(), member.getPassword())) {
-            throw new IllegalStateException("비밀번호가 일치하지 않습니다.");
-        } else {
-            memberRepository.delete(member);
-        }
-    }
-
-    // 닉네임 변경
-    @Transactional
-    public void changeNickname(HttpServletRequest tokenRequest, NicknameChangeRequest req) {
-
-        String token = jwtTokenProvider.resolveTokenFromCookie(tokenRequest);
-
-        // 유효성검증
-        if (!jwtTokenProvider.validateToken(token)) {
-            throw new UnauthorizedException();
-        }
-        Long memberId = jwtTokenProvider.getUserIdFromToken(token);
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(NotFoundMemberException::new);
-
-        if (memberRepository.existsByNickname(req.getNickname())) {
-            throw new IllegalStateException("이미 사용 중인 닉네임입니다.");
-        }
-        member.changeNickname(req.getNickname());
-    }
 
     @Transactional(readOnly = true)
     public boolean existsNickname(String nickname) {
@@ -140,8 +92,7 @@ public class SignService {
                 "", // 소셜 로그인은 비밀번호 없음
                 req.getUsername(),
                 req.getNickname(),
-                defaultRole
-        );
+                defaultRole);
         member.setSocialProvider(req.getSocialType(), req.getProviderId());
         signRepository.save(member);
         Point point = new Point(member);
@@ -163,4 +114,17 @@ public class SignService {
         }
     }
 
+    // 비밀번호 변경
+    @Transactional
+    public void resetPassword(String email, String newPassword) {
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        if (passwordEncoder.matches(newPassword, member.getPassword())) {
+            throw new IllegalArgumentException("기존 비밀번호와 동일한 비밀번호는 사용할 수 없습니다.");
+        }
+
+        member.setPassword(passwordEncoder.encode(newPassword));
+        memberRepository.save(member);
+    }
 }

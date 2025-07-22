@@ -126,4 +126,9 @@ public class Member extends BaseEntity {
     public void setProfileImage(ImageFile profileImage) {
         this.profileImage = profileImage;
     }
+
+    public void setPassword(String encodedPassword) {
+        this.password = encodedPassword;
+    }
+
 }

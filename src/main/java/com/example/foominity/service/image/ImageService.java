@@ -11,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -18,13 +20,16 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 @Log4j2
 public class ImageService {
 
     private final ImageRepository imageRepository;
-    private final String uploadDir = System.getProperty("user.dir") + "/uploads/"; // 절대 경로
+    // 서버 업로드 폴더 경로 (절대경로)
+    private final String uploadDir = System.getProperty("user.dir") + "/uploads/";
 
+    /**
+     * 일반 파일 업로드 (직접 업로드)
+     */
     @Transactional
     public ImageFile imageUpload(MultipartFile file) {
         try {
@@ -32,17 +37,18 @@ public class ImageService {
             String uuid = UUID.randomUUID().toString();
             String newFileName = uuid + "_" + originalName;
 
-            // 실제 저장 디렉토리
-            Path saveDir = Paths.get("uploads").toAbsolutePath(); // C:/.../uploads
-            Files.createDirectories(saveDir); // uploads 폴더 없으면 생성
+            // 실제 저장 디렉토리 생성 (없으면)
+            Path saveDir = Paths.get(uploadDir).toAbsolutePath();
+            Files.createDirectories(saveDir);
 
+            // 저장 경로
             Path savePath = saveDir.resolve(newFileName);
             file.transferTo(savePath.toFile());
 
-            // 상대 경로만 저장
+            // DB에는 상대 경로로 저장
             ImageFile image = new ImageFile();
             image.setOriginalName(originalName);
-            image.setSavePath("uploads/" + newFileName); // 상대경로로 저장
+            image.setSavePath("uploads/" + newFileName);
 
             return imageRepository.save(image);
 
@@ -51,20 +57,50 @@ public class ImageService {
         }
     }
 
+    /**
+     * 외부 URL에서 이미지를 다운로드하여 저장
+     */
     @Transactional
-    public void deleteImageFile(ImageFile imageFile) {
-        try {
-            // 1. 물리적 파일 삭제
-            // Path path = Paths.get(imageFile.getSavePath());
-            // Files.deleteIfExists(path);
-            Path path = Paths.get(System.getProperty("user.dir")).resolve(imageFile.getSavePath());
-            Files.deleteIfExists(path);
+    public ImageFile downloadAndSaveFromUrl(String imageUrl) {
+        try (InputStream in = new URL(imageUrl).openStream()) {
+            String uuid = UUID.randomUUID().toString();
+            String fileExt = imageUrl.contains(".") ? imageUrl.substring(imageUrl.lastIndexOf('.')) : ".jpg";
+            String newFileName = uuid + fileExt;
 
-            imageRepository.delete(imageFile);
+            Path saveDir = Paths.get(uploadDir).toAbsolutePath();
+            Files.createDirectories(saveDir);
+
+            Path savePath = saveDir.resolve(newFileName);
+            Files.copy(in, savePath);
+
+            ImageFile image = new ImageFile();
+            image.setOriginalName(imageUrl.substring(imageUrl.lastIndexOf('/') + 1));
+            image.setSavePath("uploads/" + newFileName);
+
+            return imageRepository.save(image);
 
         } catch (IOException e) {
-            throw new NotFoundImageException(); // 커스텀 예외 정의 (선택)
+            throw new RuntimeException("외부 이미지 다운로드 실패", e);
         }
     }
 
+    /**
+     * 업로드/저장된 이미지 삭제
+     */
+    @Transactional
+    public void deleteImageFile(ImageFile imageFile) {
+        try {
+            Path path = Paths.get(System.getProperty("user.dir")).resolve(imageFile.getSavePath());
+            Files.deleteIfExists(path);
+            imageRepository.delete(imageFile);
+        } catch (IOException e) {
+            throw new NotFoundImageException();
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public ImageFile getImageByPath(String savePath) {
+        return imageRepository.findBySavePath(savePath)
+                .orElseThrow(() -> new RuntimeException("이미지 없음: " + savePath));
+    }
 }

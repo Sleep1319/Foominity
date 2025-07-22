@@ -11,6 +11,7 @@ import {
   Link,
   useToast,
   HStack,
+  Divider,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -25,172 +26,121 @@ const Register = () => {
     passwordConfirm: "",
   });
 
+  const [errors, setErrors] = useState({});
   const toast = useToast();
   const navigate = useNavigate();
+  const [code, setCode] = useState("");
+  const [isVerified, setIsVerified] = useState(false);
+  const [codeSent, setCodeSent] = useState(false);
 
-  // 입력값 변경 핸들러
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  const validateField = (name, value) => {
+    switch (name) {
+      case "email":
+        return value.includes("@") ? "" : "올바른 이메일 형식이 아닙니다.";
+      case "username":
+        return /^[A-Za-z가-힣]{2,}$/.test(value) ? "" : "이름은 2자 이상 한글/영문";
+      case "nickname":
+        return /^[A-Za-z가-힣]{2,}$/.test(value) ? "" : "닉네임은 2자 이상 한글/영문";
+      case "password":
+        return /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&]).{8,}$/.test(value)
+          ? ""
+          : "비밀번호는 8자 이상, 문자+숫자+특수문자 포함";
+      case "passwordConfirm":
+        return value === form.password ? "" : "비밀번호가 일치하지 않습니다.";
+      default:
+        return "";
+    }
   };
 
-  // 회원가입 제출 핸들러
-  // const handleRegister = async (e) => {
-  //   e.preventDefault();
+  const isFormValid =
+    Object.values(form).every((v) => v.trim() !== "") && // 모든 입력값이 존재하는지
+    Object.values(errors).every((v) => v === "") && // 모든 에러가 없는지
+    isVerified; // 이메일 인증이 완료되었는지
 
-  //   // 비밀번호 재입력 확인
-  //   if (form.password !== form.passwordConfirm) {
-  //     toast({
-  //       title: "비밀번호 확인 오류",
-  //       description: "비밀번호와 비밀번호 확인이 일치하지 않습니다.",
-  //       status: "error",
-  //       duration: 3000,
-  //       isClosable: true,
-  //     });
-  //     return;
-  //   }
-
-  //   try {
-  //     const submitData = {
-  //       email: form.email,
-  //       password: form.password,
-  //       username: form.username,
-  //       nickname: form.nickname,
-  //     };
-  //     console.log(submitData);
-  //     await axios.post("http://localhost:8084/api/sign-up", submitData, {
-  //       withCredentials: true,
-  //       headers: { "Content-Type": "application/json" },
-  //     });
-
-  //     toast({
-  //       title: "회원가입 성공",
-  //       status: "success",
-  //       duration: 2000,
-  //       isClosable: true,
-  //     });
-  //     navigate("/login");
-  //   } catch (error) {
-  //     console.log("중복 에러 내용: " + error.response.data.error);
-  //     const message = error.response?.data?.error || "회원가입 실패";
-  //     toast({
-  //       title: "회원가입 실패",
-  //       description: message,
-  //       status: "error",
-  //       duration: 3000,
-  //       isClosable: true,
-  //     });
-  //   }
-  // };
-  const handleRegister = async (e) => {
-    e.preventDefault();
-
-    const { email, password, username, nickname, passwordConfirm } = form;
-
-    // 1. 이메일 중복 확인
+  const checkNicknameDuplicate = async (nickname) => {
     try {
-      const res = await axios.get("/api/check-email", { params: { email } });
+      const res = await axios.get("/api/check-nickname", { params: { nickname } });
       if (res.data.exists) {
-        toast({
-          title: "회원가입 실패",
-          description: "이미 사용 중인 이메일입니다.",
-          status: "error",
-          duration: 3000,
-          isClosable: true,
-        });
-        return;
+        setErrors((prev) => ({ ...prev, nickname: "이미 사용 중인 닉네임입니다." }));
       }
     } catch (err) {
       toast({
-        title: "이메일 확인 오류",
-        description: err.response?.data?.error || "이메일 중복 확인 중 문제가 발생했습니다.",
+        title: "닉네임 확인 오류",
+        description: err.response?.data?.error,
         status: "error",
-        duration: 3000,
-        isClosable: true,
       });
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+
+    const error = validateField(name, value);
+    setErrors((prev) => ({ ...prev, [name]: error }));
+
+    if (name === "nickname" && !error) {
+      checkNicknameDuplicate(value);
+    }
+  };
+
+  const handleSendCode = async () => {
+    const emailError = validateField("email", form.email);
+    if (emailError) {
+      setErrors((prev) => ({ ...prev, email: emailError }));
       return;
     }
 
-    // 2. 이름 형식 검사
-    const usernameRegex = /^[A-Za-z가-힣]{2,}$/;
-    if (!usernameRegex.test(username)) {
-      toast({
-        title: "이름 형식 오류",
-        description: "이름은 한글 또는 영문으로 2자 이상 입력해야 합니다.",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-      return;
-    }
-
-    // 3. 닉네임 형식 검사
-    const nicknameRegex = /^[A-Za-z가-힣]{2,}$/;
-    if (!nicknameRegex.test(nickname)) {
-      toast({
-        title: "닉네임 형식 오류",
-        description: "닉네임은 한글 또는 영문으로 2자 이상 입력해야 합니다.",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-      return;
-    }
-
-    // 4. 비밀번호 형식 검사
-    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
-    if (!passwordRegex.test(password)) {
-      toast({
-        title: "비밀번호 형식 오류",
-        description: "비밀번호는 8자 이상이며 영문, 숫자, 특수문자를 포함해야 합니다.",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-      return;
-    }
-
-    // 5. 비밀번호 확인
-    if (password !== passwordConfirm) {
-      toast({
-        title: "비밀번호 확인 오류",
-        description: "비밀번호와 비밀번호 확인이 일치하지 않습니다.",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-      return;
-    }
-
-    // 6. 회원가입 요청
     try {
-      await axios.post(
-        "/api/sign-up",
-        { email, password, username, nickname },
-        {
-          withCredentials: true,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-
-      toast({
-        title: "회원가입 성공",
-        status: "success",
-        duration: 2000,
-        isClosable: true,
-      });
-      navigate("/login");
+      const res = await axios.get("/api/check-email", { params: { email: form.email } });
+      if (res.data.exists) {
+        setErrors((prev) => ({ ...prev, email: "이미 사용 중인 이메일입니다." }));
+        return;
+      }
     } catch (err) {
-      toast({
-        title: "회원가입 실패",
-        description: err.response?.data?.error || "오류가 발생했습니다.",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
+      toast({ title: "이메일 확인 오류", description: err.response?.data?.error, status: "error" });
+      return;
+    }
+
+    try {
+      await axios.post("/api/email/send-code", null, { params: { email: form.email } });
+      toast({ title: "인증 코드가 전송되었습니다", status: "success" });
+      setCodeSent(true);
+      setIsVerified(false);
+    } catch (err) {
+      toast({ title: "코드 전송 실패", description: err.response?.data?.error, status: "error" });
+    }
+  };
+
+  const handleVerifyCode = async () => {
+    try {
+      await axios.post("/api/email/verify", null, { params: { email: form.email, code } });
+      alert("인증 성공하였습니다.");
+      setIsVerified(true);
+    } catch (err) {
+      toast({ title: "인증 실패", description: err.response?.data?.error, status: "error" });
+      setIsVerified(false);
+    }
+  };
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    const newErrors = {};
+    Object.keys(form).forEach((field) => {
+      const error = validateField(field, form[field]);
+      if (error) newErrors[field] = error;
+    });
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    try {
+      await axios.post("/api/sign-up", form);
+      alert("회원가입이 성공적으로 완료되었습니다.");
+      window.location.href = "/login";
+    } catch (err) {
+      toast({ title: "회원가입 실패", description: err.response?.data?.error, status: "error" });
     }
   };
 
@@ -207,113 +157,108 @@ const Register = () => {
         ml={5}
         height="85px"
       ></Text>
-
-      <Box maxW="lg" mx="auto" mt={20} p={8} mb={90} borderWidth={1} borderRadius="lg" boxShadow="lg">
-        <Heading mb={6} textAlign="center">
+      <Heading mt={10} mb={3} textAlign="center" fontSize={40}>
+        회원가입
+      </Heading>
+      <Box maxW="lg" mx="auto" p={8} mb={24} borderRadius="lg" borderWidth={0}>
+        {/* <Heading mb={6} textAlign="center">
           회원가입
-        </Heading>
+        </Heading> */}
         <form onSubmit={handleRegister}>
-          <VStack spacing={4}>
-            <FormControl isRequired width="auto">
+          <VStack spacing={5} align="stretch">
+            <FormControl isRequired>
+              <FormLabel>이메일</FormLabel>
               <HStack>
-                <FormLabel mb={0} w="120px" mr={-2} pl={10} ml={1.5}>
-                  아이디
-                </FormLabel>
-                <Input
-                  w="300px"
-                  type="email"
-                  name="email"
-                  placeholder="이메일 형식으로 입력"
-                  value={form.email}
-                  onChange={handleChange}
-                />
+                <Input name="email" type="email" value={form.email} onChange={handleChange} isReadOnly={isVerified} />
+                <Button
+                  onClick={handleSendCode}
+                  size="sm"
+                  isDisabled={!form.email || !!errors.email || isVerified}
+                  _disabled={{
+                    opacity: 0.4,
+                    cursor: "default",
+                    pointerEvents: "auto", // 기본 이벤트 허용하는 코드
+                  }}
+                >
+                  인증 요청
+                </Button>
               </HStack>
+              {errors.email && (
+                <Text color="red.500" fontSize="sm">
+                  {errors.email}
+                </Text>
+              )}
             </FormControl>
 
-            <FormControl isRequired width="auto">
-              <HStack>
-                <FormLabel mb={0} w="120px" mr={-1} pl={59}>
-                  이름
-                </FormLabel>
-                <Input
-                  w="300px"
-                  type="text"
-                  name="username"
-                  placeholder="이름 입력 (예: 김민성)"
-                  value={form.username}
-                  onChange={handleChange}
-                />
-              </HStack>
-            </FormControl>
+            {codeSent && (
+              <FormControl isRequired>
+                <FormLabel>인증 코드</FormLabel>
+                <HStack>
+                  <Input
+                    value={code}
+                    onChange={(e) => setCode(e.target.value)}
+                    isReadOnly={isVerified}
+                    placeholder="코드 입력"
+                  />
+                  <Button
+                    onClick={handleVerifyCode}
+                    size="sm"
+                    colorScheme={isVerified ? "green" : "blue"}
+                    isDisabled={!code || isVerified}
+                    _disabled={{
+                      opacity: 0.4,
+                      cursor: "default",
+                      pointerEvents: "auto", // 기본 이벤트 허용하는 코드
+                    }}
+                  >
+                    {isVerified ? "완료" : "확인"}
+                  </Button>
+                </HStack>
+              </FormControl>
+            )}
 
-            <FormControl isRequired width="auto">
-              <HStack>
-                <FormLabel mb={0} w="120px" mr={-2} pl={10} ml={1.5}>
-                  닉네임
-                </FormLabel>
-                <Input
-                  w="300px"
-                  type="text"
-                  name="nickname"
-                  placeholder="닉네임 입력"
-                  value={form.nickname}
-                  onChange={handleChange}
-                />
-              </HStack>
-            </FormControl>
-
-            <FormControl isRequired width="auto">
-              <HStack>
-                <FormLabel mb={0} w="120px" mr={-1} pl={8}>
-                  비밀번호
-                </FormLabel>
-                <Input
-                  w="300px"
-                  type="password"
-                  name="password"
-                  placeholder="비밀번호 입력"
-                  value={form.password}
-                  onChange={handleChange}
-                />
-              </HStack>
-            </FormControl>
-
-            <FormControl isRequired width="auto">
-              <HStack>
-                <FormLabel mb={0} w="105px">
-                  비밀번호 확인
-                </FormLabel>
-                <Input
-                  w="300px"
-                  type="password"
-                  name="passwordConfirm"
-                  placeholder="비밀번호 다시 입력"
-                  value={form.passwordConfirm}
-                  onChange={handleChange}
-                />
-              </HStack>
-            </FormControl>
+            {[
+              { name: "username", label: "이름", placeholder: "이름 입력" },
+              { name: "nickname", label: "닉네임", placeholder: "닉네임 입력" },
+              { name: "password", label: "비밀번호", placeholder: "비밀번호 입력", type: "password" },
+              { name: "passwordConfirm", label: "비밀번호 확인", placeholder: "비밀번호 재입력", type: "password" },
+            ].map(({ name, label, placeholder, type = "text" }) => (
+              <FormControl isRequired key={name}>
+                <FormLabel>{label}</FormLabel>
+                <Input name={name} placeholder={placeholder} value={form[name]} onChange={handleChange} type={type} />
+                {errors[name] && (
+                  <Text color="red.500" fontSize="sm">
+                    {errors[name]}
+                  </Text>
+                )}
+              </FormControl>
+            ))}
 
             <Button
-              bg="black"
+              mt={7}
               type="submit"
-              width="full"
+              colorScheme="blackAlpha"
+              bg="black"
               color="white"
-              _hover={{
-                bg: "white",
-                color: "black",
+              _hover={{ bg: "gray.700" }}
+              isDisabled={!isFormValid}
+              _disabled={{
+                opacity: 0.4,
+                cursor: "default",
+                pointerEvents: "auto", // 기본 이벤트 허용하는 코드
               }}
             >
               회원가입
             </Button>
 
-            <Text fontSize="sm">
+            {/* <Divider /> */}
+            <SocialLoginButton mode="signup" />
+            <Text fontSize="sm" textAlign="center">
               이미 계정이 있으신가요?{" "}
               <Link color="skyblue" onClick={() => navigate("/login")}>
                 로그인
               </Link>
             </Text>
-            <SocialLoginButton mode="signup" />
           </VStack>
         </form>
       </Box>

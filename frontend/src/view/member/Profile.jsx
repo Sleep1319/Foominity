@@ -1,16 +1,16 @@
 import { Avatar, Box, HStack, Text, VStack, Flex, Button, Input } from "@chakra-ui/react";
 import React, { useState } from "react";
-import DefaultTable from "../../components/reportComponents/DefaultTable.jsx";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import { useUser } from "../../context/UserContext.jsx";
 import DeleteModal from "../../view/Member/DeleteModal.jsx";
-import MyPostsTable from "./MyPostsTable.jsx";
 import axios from "axios";
+import MyPostsTable from "../../components/memberComponents/MyPostsTable.jsx";
+import SettingsButton from "../../components/memberComponents/SettingsButton.jsx";
 axios.defaults.baseURL = "http://localhost:8084"; // 기본 백엔드 주소
 axios.defaults.withCredentials = true;
 
 const Profile = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const { state } = useUser();
   const [isDeleteOpen, setDeleteOpen] = useState(false);
 
@@ -26,14 +26,12 @@ const Profile = () => {
         mt={4}
         ml={5}
       >
-        내 프로필
+        마이페이지
       </Text>
 
       <Flex maxW="3xl" mx="auto" mt={70} align="center" justify="flex-start">
-        {/* <Box p={5} borderWidth={1} borderRadius="lg" flex="1" mr={6}> */}
         <Flex mb={6} align="center" justify="space-between" height={190}>
           <HStack spacing={6} align="center" flex="1">
-            {/* <Avatar boxSize="12rem" /> */}
             <Avatar
               boxSize="12rem"
               src={state.avatar ? `http://localhost:8084${state.avatar}` : "/src/assets/images/defaultProfile.jpg"}
@@ -47,7 +45,6 @@ const Profile = () => {
                 <Text h="32px" lineHeight="32px">
                   {state.nickname}
                 </Text>
-                {/* <Text>{state.nickname}</Text> */}
               </HStack>
               <HStack>
                 <Text fontWeight="bold" w="80px">
@@ -72,26 +69,36 @@ const Profile = () => {
         </Flex>
 
         <VStack ml={153} mr={7}>
-          <Button
-            w="85px"
+          <SettingsButton />
+
+          {/* <Button
+            w="110px"
             bg="white"
-            // border="1px solid black"
             mb={4}
             onClick={() => navigate("/mypage/editprofile")}
             _hover={{
               borderWidth: "2px",
-              // borderColor: "black",
-              // bg: "white",
               bg: "black",
               color: "white",
             }}
           >
-            편집
+            프로필 편집
           </Button>
-
-          {/* 회원 탈퇴 버튼 */}
           <Button
-            w="85px"
+            w="110px"
+            bg="white"
+            mb={4}
+            onClick={() => navigate("/resetpassword")}
+            _hover={{
+              borderWidth: "2px",
+              bg: "black",
+              color: "white",
+            }}
+          >
+            비밀번호 변경
+          </Button>
+          <Button
+            w="110px"
             bg="white"
             color="red"
             _hover={{
@@ -102,6 +109,7 @@ const Profile = () => {
           >
             회원 탈퇴
           </Button>
+         */}
         </VStack>
       </Flex>
 
