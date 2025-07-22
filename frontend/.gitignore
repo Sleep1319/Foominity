@@ -24,5 +24,3 @@ dist-ssr
 *.sln
 *.sw?
 
-#임시 설정
-vite.config.mjs
