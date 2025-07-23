@@ -1,17 +1,18 @@
-import React, { useEffect, useState } from "react";
 import { Box, Text, VStack, Spinner, Image, Divider } from "@chakra-ui/react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import React, { useEffect, useState } from "react";
 
 const ArtistDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+
   const [artist, setArtist] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchArtist = () => {
+  useEffect(() => {
     axios
-      .get(`/api/artists/${id}`, { withCredentials: true })
+      .get(`/api/artists/${id}`)
       .then((res) => {
         setArtist(res.data);
         setLoading(false);
@@ -20,10 +21,6 @@ const ArtistDetail = () => {
         console.error("아티스트 조회 실패:", err);
         setLoading(false);
       });
-  };
-
-  useEffect(() => {
-    fetchArtist();
   }, [id]);
 
   if (loading) {
@@ -33,21 +30,14 @@ const ArtistDetail = () => {
       </Box>
     );
   }
-
-  if (!artist) {
-    return <Text>아티스트를 찾을 수 없습니다.</Text>;
-  }
+  if (!artist) return <Text>아티스트를 찾을 수 없습니다.</Text>;
 
   return (
     <Box display="flex" justifyContent="center" px={6} py={10}>
-      <Box flex="1" maxW="800px">
-        <Text fontSize="3xl" fontWeight="bold" pb={4} textAlign="center">
-          {artist.name}
-        </Text>
-
-        {/* 아티스트 이미지 (있을 경우만) */}
+      <Box flex="1" maxW="1000px" pt="80px">
+        {/* 이미지 */}
         {artist.imagePath && (
-          <Box display="flex" justifyContent="center" mb={6}>
+          <Box display="flex" mb={6}>
             <Image
               src={`http://localhost:8084/${artist.imagePath}`}
               alt={artist.name}
@@ -57,7 +47,11 @@ const ArtistDetail = () => {
             />
           </Box>
         )}
+        <Text fontSize="3xl" fontWeight="bold" pb={4}>
+          {artist.name}
+        </Text>
 
+        {/* 상세 필드 */}
         <VStack align="start" spacing={3} px={4}>
           <Text fontSize="md">
             <strong>출생일:</strong> {artist.born || "정보 없음"}
@@ -65,18 +59,15 @@ const ArtistDetail = () => {
           <Text fontSize="md">
             <strong>국적:</strong> {artist.nationality || "정보 없음"}
           </Text>
+          <Text fontSize="md">
+            <strong>장르:</strong> {artist.categories?.map((c) => c.categoryName).join(", ") || "정보 없음"}
+          </Text>
         </VStack>
 
         <Divider my={6} />
 
-        <Text
-          fontSize="md"
-          textAlign="left"
-          mt={4}
-          cursor="pointer"
-          display="inline-block"
-          onClick={() => navigate("/artist")}
-        >
+        {/* 뒤로가기 */}
+        <Text fontSize="md" cursor="pointer" onClick={() => navigate(-1)} _hover={{ textDecoration: "underline" }}>
           ← 목록으로
         </Text>
       </Box>

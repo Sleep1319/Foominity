@@ -46,7 +46,7 @@ public class ArtistController {
         return ResponseEntity.ok(artistService.readArtist(id));
     }
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/api/artists", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> createArtist(
             @Valid @ModelAttribute ArtistRequest req,
             HttpServletRequest tokenRequest) {

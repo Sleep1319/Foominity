@@ -152,6 +152,7 @@ const ReviewDetail = () => {
                     ))}
                   </VStack>
                 </Box>
+
               </Box>
             </Box>
           </Box>

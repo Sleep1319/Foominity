@@ -18,6 +18,8 @@ import com.example.foominity.dto.board.ReviewResponse;
 import com.example.foominity.dto.board.ReviewSimpleResponse;
 import com.example.foominity.dto.board.ReviewUpdateRequest;
 import com.example.foominity.service.board.ReviewService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/api/reviews")
@@ -47,6 +49,13 @@ public class ReviewController {
     public ResponseEntity<ReviewResponse> findById(
             @PathVariable Long id) {
         return ResponseEntity.ok(reviewService.readReview(id));
+    }
+
+    // 특정 아티스트의 앨범 리스트
+    @GetMapping("/")
+    public ResponseEntity<List<ReviewSimpleResponse>> getReviewsArtist(@PathVariable Long id) {
+        List<ReviewSimpleResponse> res = reviewService.getReviewsByArtist(id);
+        return ResponseEntity.ok(res);
     }
 
     // 생성 (메타데이터 + 이미지 한 번에 업로드)

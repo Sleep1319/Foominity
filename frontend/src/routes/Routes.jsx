@@ -2,9 +2,12 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import Home from "../view/home/Home.jsx";
 
+import Login from "../view/Sign/Login.jsx";
 import Register from "../view/Sign/Register.jsx";
 
 import ProtectedRoute from "./ProtectedRoute";
+import Profile from "../view/member/Profile.jsx";
+import EditProfile from "../view/member/EditProfile.jsx";
 import MyPage from "../view/member/MyPage.jsx";
 import ReportDetails from "../view/report/ReportDetails.jsx";
 import NoticeDetails from "../view/notice/NoticeDetails.jsx";
@@ -25,9 +28,13 @@ import ReportLists from "../view/report/ReportLists.jsx";
 import DeleteComplete from "../view/member/DeleteComplete.jsx";
 import MyMusic from "../view/member/MyMusic.jsx";
 import ParticipatedAlbumsList from "../components/memberComponents/ParticipatedAlbumsList.jsx";
+
 import FindPassword from "../view/Sign/FindPassword.jsx";
 import LoginPage from "../view/Sign/LoginPage.jsx";
 import ChangePassword from "../view/Sign/ChangePassword.jsx";
+
+import ArtistDetails from "../view/artist/ArtistDetails.jsx";
+
 
 function AppRoutes() {
   return (
@@ -42,6 +49,7 @@ function AppRoutes() {
       <Route path="/review" element={<Review />} />
       <Route path="/review/:id" element={<ReviewDetails />} />
       <Route path="/deletecomplete" element={<DeleteComplete />} />
+      <Route path="/artist/:id" element={<ArtistDetails />} />
       <Route element={<ProtectedRoute requireAuth={false} />}>
         <Route path="/loginpage" element={<LoginPage />} />
         <Route path="/register" element={<Register />} />

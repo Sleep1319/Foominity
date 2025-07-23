@@ -23,4 +23,12 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
        WHERE rc.member.id = :memberId
        """)
   List<Review> findParticipatedReviews(Long memberId);
+
+  @Query("""
+      SELECT aa.review
+      FROM AlbumArtist aa
+      WHERE aa.artist.id = :artistId
+      """)
+  List<Review> findReviewsByArtist(Long artistId);
+
 }
