@@ -160,7 +160,7 @@ const Register = () => {
       <Heading mt={10} mb={3} textAlign="center" fontSize={40}>
         회원가입
       </Heading>
-      <Box maxW="lg" mx="auto" p={8} mb={24} borderRadius="lg" borderWidth={0}>
+      <Box maxW="lg" mx="auto" p={8} mb="37px" borderRadius="lg" borderWidth={0}>
         {/* <Heading mb={6} textAlign="center">
           회원가입
         </Heading> */}
@@ -253,9 +253,9 @@ const Register = () => {
 
             {/* <Divider /> */}
             <SocialLoginButton mode="signup" />
-            <Text fontSize="sm" textAlign="center">
+            <Text fontSize="sm" textAlign="center" mt="5px">
               이미 계정이 있으신가요?{" "}
-              <Link color="skyblue" onClick={() => navigate("/login")}>
+              <Link color="skyblue" onClick={() => navigate("/loginpage")}>
                 로그인
               </Link>
             </Text>
