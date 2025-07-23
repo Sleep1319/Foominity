@@ -16,7 +16,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const ResetPassword = () => {
+const FindPassword = () => {
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [isVerified, setIsVerified] = useState(false);
@@ -95,12 +95,12 @@ const ResetPassword = () => {
     }
 
     try {
-      await axios.post("/api/reset-password", {
+      await axios.post("/api/find-password", {
         email,
         newPassword,
       });
       toast({ title: "비밀번호가 변경되었습니다.", status: "success" });
-      navigate("/login");
+      navigate("/loginpage");
     } catch (err) {
       toast({
         title: "비밀번호 변경 실패",
@@ -124,18 +124,19 @@ const ResetPassword = () => {
         height="85px"
       ></Text>
       <Box maxW="lg" mx="auto" mt={10} p={8} borderRadius="lg" borderWidth={0} mb={24}>
-        <Image
+        {/* <Image
           src="/src/assets/images/doremiSOL_lp.png"
           boxSize="250px"
           objectFit="cover"
           display="block" // inline 요소인 이미지를 block 으로 전환
           mx="auto" // 좌우 margin: auto
           mt="-70px"
-        />
-        {/* <Heading fontSize={40} mb={3} textAlign="center">
-          doremiSOL
-        </Heading> */}
-        <Text textAlign="center" fontSize={18} fontWeight="semibold" mb={5} mt="-55px">
+        /> */}
+        <Heading fontSize={40} mb={3} textAlign="center">
+          비밀번호 찾기
+        </Heading>
+        {/* <Text textAlign="center" fontSize={18} fontWeight="semibold" mb={5} mt="-55px"> */}
+        <Text textAlign="center" fontSize={18} fontWeight="semibold" mb={5} mt="30px">
           비밀번호 변경을 위한 이메일 인증을 진행합니다
         </Text>
         {/* <Text textAlign="center" fontSize={18} fontWeight="semibold" mb={10}>
@@ -225,4 +226,4 @@ const ResetPassword = () => {
   );
 };
 
-export default ResetPassword;
+export default FindPassword;

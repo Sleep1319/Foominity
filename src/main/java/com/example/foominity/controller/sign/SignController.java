@@ -94,7 +94,7 @@ public class SignController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/reset-password")
+    @PostMapping("/find-password")
     public ResponseEntity<?> resetPassword(@RequestBody PasswordResetRequest request) {
         try {
             signService.resetPassword(request.getEmail(), request.getNewPassword());

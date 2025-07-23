@@ -23,7 +23,7 @@ const SettingsButton = ({ items: customItems }) => {
   // 기본 메뉴 아이템 정의
   const defaultItems = [
     { title: "프로필 편집", href: "/mypage/editprofile" },
-    { title: "비밀번호 변경", href: "/resetpassword" },
+    { title: "비밀번호 변경", href: "/changepassword" },
     {
       title: "회원 탈퇴",
       action: () => setDeleteOpen(true),
