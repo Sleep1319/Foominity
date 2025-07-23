@@ -29,6 +29,7 @@ import DeleteComplete from "../view/member/DeleteComplete.jsx";
 import MyMusic from "../view/member/MyMusic.jsx";
 import ResetPassword from "../view/Sign/ResetPassword.jsx";
 import ParticipatedAlbumsList from "../components/memberComponents/ParticipatedAlbumsList.jsx";
+import ArtistDetails from "../view/artist/ArtistDetails.jsx";
 
 function AppRoutes() {
   return (
@@ -42,6 +43,7 @@ function AppRoutes() {
       <Route path="/review" element={<Review />} />
       <Route path="/review/:id" element={<ReviewDetails />} />
       <Route path="/deletecomplete" element={<DeleteComplete />} />
+      <Route path="/artist/:id" element={<ArtistDetails />} />
       <Route element={<ProtectedRoute requireAuth={false} />}>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
