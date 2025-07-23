@@ -1,28 +1,25 @@
+import React, { useEffect, useState, useRef } from "react";
+import axios from "axios";
 import { Box, Image, Text, VStack } from "@chakra-ui/react";
 import { BsChevronLeft, BsChevronRight } from "react-icons/bs";
 import Slider from "react-slick";
-import { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-const mockAlbums = [
-  { id: 1, title: "This is a very long album title", artist: "Famous Artist", coverImage: "/images/albums/album1.jpg" },
-  { id: 2, title: "Another Album Title", artist: "Another Artist", coverImage: "/images/albums/album2.jpg" },
-  { id: 3, title: "Midnight Journey to Mars", artist: "Cosmic Voyager", coverImage: "/images/albums/album3.jpg" },
-  { id: 4, title: "Summer Sunset", artist: "Sunwave", coverImage: "/images/albums/album4.jpg" },
-  { id: 5, title: "Neon Streets", artist: "City Lights", coverImage: "/images/albums/album5.jpg" },
-  { id: 6, title: "Calm Before the Storm", artist: "Ocean Deep", coverImage: "/images/albums/album6.jpg" },
-  { id: 7, title: "Dreamscape", artist: "Lucid", coverImage: "/images/albums/album7.jpg" },
-  { id: 8, title: "Electric Pulse", artist: "Volt", coverImage: "/images/albums/album8.jpg" },
-  { id: 9, title: "Lost in Echoes", artist: "Shadow Sound", coverImage: "/images/albums/album9.jpg" },
-  { id: 10, title: "Aurora Lights", artist: "North Glow", coverImage: "/images/albums/album10.jpg" },
-];
-
-const TopRankedAlbums = ({ albums = mockAlbums }) => {
+const TopRankedAlbums = () => {
+  const [albums, setAlbums] = useState([]);
   const sliderRef = useRef(null);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    axios
+      .get("/api/reviews/top-albums")
+      .then((res) => setAlbums(res.data))
+      .catch((err) => console.error("Top10 불러오기 실패:", err));
+  }, []);
 
   const slidesToShow = 6.5;
   const slidesToScroll = 3.5;
-
   const settings = {
     dots: false,
     infinite: false,
@@ -30,12 +27,11 @@ const TopRankedAlbums = ({ albums = mockAlbums }) => {
     slidesToShow,
     slidesToScroll,
     arrows: false,
-    afterChange: (index) => setCurrentIndex(index),
+    afterChange: (idx) => setCurrentIndex(idx),
   };
 
-  const isFirstSlide = currentIndex === 0;
-  const isLastSlide = currentIndex + slidesToShow >= albums.length;
-
+  const isFirst = currentIndex === 0;
+  const isLast = currentIndex + slidesToShow >= albums.length;
   const boxSize = 210;
 
   return (
@@ -45,7 +41,7 @@ const TopRankedAlbums = ({ albums = mockAlbums }) => {
       </Text>
 
       <Box position="relative">
-        {!isFirstSlide && (
+        {!isFirst && (
           <Box
             position="absolute"
             top="50%"
@@ -66,7 +62,7 @@ const TopRankedAlbums = ({ albums = mockAlbums }) => {
           </Box>
         )}
 
-        {!isLastSlide && (
+        {!isLast && (
           <Box
             position="absolute"
             top="50%"
@@ -88,28 +84,36 @@ const TopRankedAlbums = ({ albums = mockAlbums }) => {
         )}
 
         <Slider ref={sliderRef} {...settings}>
-          {albums.map((album, index) => (
-            <Box key={album.id} px={2} boxSizing="border-box">
-              <VStack spacing={2} align="start" w={`${boxSize}px`} maxW="100%">
-                <Box w="100%" h={`${boxSize}px`}>
+          {albums.map((a, i) => (
+            <Box key={a.id} mr={i === albums.length - 1 ? 0 : 4}>
+              <VStack spacing={2} align="start" w={`${boxSize}px`}>
+                <Box w={`${boxSize}px`} h={`${boxSize}px`}>
                   <Image
-                    src={album.coverImage}
-                    alt={album.title}
+                    src={a.imagePath ? `http://localhost:8084/${a.imagePath}` : ""}
+                    alt={a.title}
                     w="100%"
                     h="100%"
                     objectFit="cover"
                     borderRadius="md"
                     boxShadow="md"
+                    cursor="pointer"
+                    onClick={() => navigate(`/review/${a.id}`)}
                   />
                 </Box>
                 <Text fontSize="2xl" color="gray.600" fontWeight="bold">
-                  #{index + 1}
+                  #{i + 1}
                 </Text>
-                <Text fontSize="lg" fontWeight="semibold" whiteSpace="normal">
-                  {album.title}
+                <Text
+                  fontSize="lg"
+                  fontWeight="semibold"
+                  whiteSpace="normal"
+                  cursor="pointer"
+                  onClick={() => navigate(`/review/${a.id}`)}
+                >
+                  {a.title}
                 </Text>
                 <Text fontSize="md" color="gray.600" whiteSpace="normal">
-                  {album.artist}
+                  {a.artists.map((ar) => ar.name).join(", ")}
                 </Text>
               </VStack>
             </Box>

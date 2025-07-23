@@ -149,7 +149,7 @@ const CreateReview = () => {
         <VStack spacing={4}>
           {/* Apple Music 앨범 검색 - 모달 */}
           <Button w="100%" colorScheme="purple" variant="outline" onClick={onAppleOpen}>
-            앨범 검색하기
+            앨범 정보 검색
           </Button>
           <AppleMusicSearchModal
             isOpen={isAppleOpen}

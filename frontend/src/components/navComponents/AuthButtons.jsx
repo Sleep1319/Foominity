@@ -1,5 +1,8 @@
 import React, { useState } from "react";
-import { Button, HStack } from "@chakra-ui/react";
+import { Button, HStack, Avatar, IconButton } from "@chakra-ui/react";
+import { Link as RouterLink } from "react-router-dom";
+import { SearchIcon } from "@chakra-ui/icons";
+import SearchNavbar from "./SearchNavBar";
 import AuthModal from "../../view/Sign/AuthModal";
 
 const whiteNeonText = `
@@ -35,7 +38,7 @@ const AuthButtons = () => {
         </Button>
       </HStack>
 
-      {/* 로그인/회원가입 탭 전환형 모달 */}
+      {/*  로그인 모달 */}
       <AuthModal isOpen={isLoginOpen} onClose={() => setLoginOpen(false)} />
     </>
   );

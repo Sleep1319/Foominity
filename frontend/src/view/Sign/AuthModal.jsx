@@ -122,7 +122,7 @@ const AuthModal = ({ isOpen, onClose }) => {
                     onClose();
                   }}
                 >
-                  비밀번호 변경
+                  비밀번호 찾기
                 </Link>
                 <Divider orientation="vertical" h="12px" borderColor="gray.300" />
                 <Link

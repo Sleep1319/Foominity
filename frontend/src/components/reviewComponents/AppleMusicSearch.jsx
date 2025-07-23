@@ -40,9 +40,9 @@ const AppleMusicSearch = ({ onAlbumSelect }) => {
   };
 
   return (
-    <Box w="100%" mt={8} p={4} bg="gray.50" borderRadius="md">
+    <Box w="100%" mt={8} p={4} bg="gray.50" borderRadius="md" mb={4}>
       <Text fontWeight="bold" fontSize="lg" mb={2}>
-        앨범 검색
+        {/* 앨범 검색 */}
       </Text>
       <VStack spacing={2} align="stretch">
         <Box display="flex" gap={2}>
