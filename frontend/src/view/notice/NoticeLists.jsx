@@ -6,8 +6,8 @@ const NoticeLists = () => {
   return (
     <div>
       <Box p={6}>
-        <Text fontSize="3xl" fontWeight="bold" pb={2} textAlign="center">
-          Notice
+        <Text fontSize="3xl" fontWeight="extrabold" pb={2} textAlign="center" mt={20}>
+          Magazine
         </Text>
         <NoticeList />
       </Box>

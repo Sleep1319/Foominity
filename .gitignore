@@ -44,7 +44,12 @@ out/
 
 ### VS Code ###
 .vscode/
+
+
 application.yml
+docker-compose.yml
+Dockerfile
+frontendDockerfile
 
 uploads/
 src/main/java/com/example/reactbootserver/ReactBootServerApplication.java

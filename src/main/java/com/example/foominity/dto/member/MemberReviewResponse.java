@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ParticipatedReviewResponse {
+public class MemberReviewResponse {
     private Long id;
     private String title;
     private String imagePath;

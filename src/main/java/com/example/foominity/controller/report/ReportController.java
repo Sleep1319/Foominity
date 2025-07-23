@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.foominity.dto.report.ReportCreateRequest;
 import com.example.foominity.dto.report.ReportResponse;
+import com.example.foominity.dto.report.ReportStatusUpdateRequest;
 import com.example.foominity.service.report.ReportService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,11 +16,13 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @Slf4j
@@ -37,9 +40,9 @@ public class ReportController {
 
     @GetMapping("/api/report")
     public ResponseEntity<List<ReportResponse>> findAllReports() {
-    List<ReportResponse> res = reportService.findAllReports(); // 전체 조회용 서비스 메서드
-    return ResponseEntity.ok(res);
-}
+        List<ReportResponse> res = reportService.findAllReports(); // 전체 조회용 서비스 메서드
+        return ResponseEntity.ok(res);
+    }
 
     @GetMapping("/api/report/{id}")
     public ResponseEntity<ReportResponse> findById(@PathVariable Long id) {
@@ -59,6 +62,13 @@ public class ReportController {
         return ResponseEntity.ok().build();
     }
 
-    
+    @PutMapping("/api/report/{id}/status")
+    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestBody ReportStatusUpdateRequest req,
+            HttpServletRequest tokenRequest) {
+        System.out.println("==== 컨트롤러 req: " + req);
+        System.out.println("==== 컨트롤러 status: " + req.getStatus());
+        reportService.updateStatus(id, req.getStatus(), tokenRequest);
+        return ResponseEntity.ok().build();
+    }
 
 }

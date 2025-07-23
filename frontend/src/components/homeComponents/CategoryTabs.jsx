@@ -5,13 +5,7 @@ import React from "react";
 const CategoryTabs = () => (
   <Box mb={8}>
     <HStack spacing={4}>
-      <Button
-        as={RouterLink}
-        to="/review"
-        bg="white"
-        color="black"
-        _hover={{ bg: "white" }} // ✅ hover 시 색 유지
-      >
+      <Button as={RouterLink} to="/review" bg="white" color="black" _hover={{ bg: "white" }}>
         Review
       </Button>
       <Button as={RouterLink} to="/board" bg="white" color="black" _hover={{ bg: "white" }}>
