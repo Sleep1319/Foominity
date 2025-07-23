@@ -25,6 +25,7 @@ import com.example.foominity.domain.member.Member;
 import com.example.foominity.domain.member.Point;
 import com.example.foominity.domain.member.ReviewLike;
 import com.example.foominity.dto.artist.ArtistResponse;
+import com.example.foominity.dto.artist.ArtistSimpleResponse;
 import com.example.foominity.dto.category.ReviewCategoryResponse;
 import com.example.foominity.dto.member.MemberReviewResponse;
 import com.example.foominity.exception.ForbiddenActionException;
@@ -69,6 +70,7 @@ public class ReviewService {
         private final ReviewCommentRepository reviewCommentRepository;
         private final ReviewLikeRepository reviewLikeRepository;
 
+        // 리뷰 전체 조회
         public Page<ReviewSimpleResponse> findAll(int page) {
                 PageRequest pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "id"));
                 Page<Review> reviews = reviewRepository.findAll(pageable);
@@ -78,11 +80,20 @@ public class ReviewService {
                                         List<AlbumArtist> albumArtists = albumArtistRepository
                                                         .findByReviewId(review.getId());
 
-                                        List<ArtistResponse> artistResponses = albumArtists.stream().map(
-                                                        a -> new ArtistResponse(
-                                                                        a.getArtist().getId(),
-                                                                        a.getArtist().getName()))
-                                                        .toList();
+                                        List<ArtistSimpleResponse> artistSimpleResponses = albumArtists.stream()
+                                                        .map(a -> {
+                                                                Artist artist = a.getArtist();
+                                                                ImageFile artistImageFile = artist.getImageFile();
+                                                                String artistImagePath = (artistImageFile != null)
+                                                                                ? artistImageFile.getSavePath()
+                                                                                : null;
+
+                                                                return new ArtistSimpleResponse(
+                                                                                artist.getId(),
+                                                                                artist.getName(),
+                                                                                artistImagePath);
+
+                                                        }).toList();
 
                                         List<ReviewCategory> reviewCategory = reviewCategoryRepository
                                                         .findByReviewId(review.getId());
@@ -99,7 +110,7 @@ public class ReviewService {
                                                         review.getId(),
                                                         review.getTitle(),
                                                         reviewCommentService.getAverageStarPoint(review.getId()),
-                                                        artistResponses,
+                                                        artistSimpleResponses,
                                                         categoryResponses,
                                                         imagePath);
                                 })
@@ -109,6 +120,7 @@ public class ReviewService {
 
         }
 
+        // 리뷰 개별 조회
         public ReviewResponse readReview(Long id) {
                 Review review = reviewRepository.findById(id).orElseThrow(NotFoundReviewException::new);
 
@@ -122,11 +134,20 @@ public class ReviewService {
                                                 rc.getCategory().getCategoryName()))
                                 .toList();
 
-                List<ArtistResponse> artistResponses = albumArtists.stream().map(
-                                a -> new ArtistResponse(
-                                                a.getArtist().getId(),
-                                                a.getArtist().getName()))
-                                .toList();
+                List<ArtistSimpleResponse> artistSimpleResponses = albumArtists.stream()
+                                .map(a -> {
+                                        Artist artist = a.getArtist();
+                                        ImageFile artistImageFile = artist.getImageFile();
+                                        String artistImagePath = (artistImageFile != null)
+                                                        ? artistImageFile.getSavePath()
+                                                        : null;
+
+                                        return new ArtistSimpleResponse(
+                                                        artist.getId(),
+                                                        artist.getName(),
+                                                        artistImagePath);
+
+                                }).toList();
 
                 ImageFile imageFile = review.getImageFile();
                 String imagePath = (imageFile != null) ? imageFile.getSavePath() : null;
@@ -136,12 +157,62 @@ public class ReviewService {
                                 review.getTitle(),
                                 review.getReleased(),
                                 review.getTracklist(),
-                                artistResponses,
+                                artistSimpleResponses,
                                 categoryResponses,
                                 reviewCommentService.getAverageStarPoint(review.getId()),
                                 imagePath);
         }
 
+        // 특정 아티스트 리뷰 조회
+        public List<ReviewSimpleResponse> getReviewsByArtist(Long id) {
+
+                List<Review> reviews = reviewRepository.findReviewsByArtist(id);
+
+                return reviews.stream()
+                                .map(review -> {
+                                        List<AlbumArtist> albumArtists = albumArtistRepository
+                                                        .findByReviewId(review.getId());
+
+                                        List<ArtistSimpleResponse> artistSimpleResponses = albumArtists.stream()
+                                                        .map(a -> {
+                                                                Artist artist = a.getArtist();
+                                                                ImageFile artistImageFile = artist.getImageFile();
+                                                                String artistImagePath = (artistImageFile != null)
+                                                                                ? artistImageFile.getSavePath()
+                                                                                : null;
+
+                                                                return new ArtistSimpleResponse(
+                                                                                artist.getId(),
+                                                                                artist.getName(),
+                                                                                artistImagePath);
+
+                                                        }).toList();
+
+                                        List<ReviewCategory> reviewCategory = reviewCategoryRepository
+                                                        .findByReviewId(review.getId());
+                                        List<ReviewCategoryResponse> categoryResponses = reviewCategory.stream()
+                                                        .map(rc -> new ReviewCategoryResponse(
+                                                                        rc.getCategory().getId(),
+                                                                        rc.getCategory().getCategoryName()))
+                                                        .toList();
+
+                                        ImageFile imageFile = review.getImageFile();
+                                        String imagePath = (imageFile != null) ? imageFile.getSavePath() : null;
+
+                                        return new ReviewSimpleResponse(
+                                                        review.getId(),
+                                                        review.getTitle(),
+                                                        reviewCommentService.getAverageStarPoint(review.getId()),
+                                                        artistSimpleResponses,
+                                                        categoryResponses,
+                                                        imagePath);
+
+                                })
+                                .toList();
+
+        }
+
+        // 리뷰 생성
         @Transactional
         public void createReview(ReviewRequest req, HttpServletRequest tokenRequest) {
                 String token = jwtTokenProvider.resolveTokenFromCookie(tokenRequest);
@@ -189,6 +260,7 @@ public class ReviewService {
 
         }
 
+        // 리뷰 수정
         @Transactional
         public void updateReview(Long reviewId, ReviewUpdateRequest req, HttpServletRequest tokenRequest) {
                 Member member = getAdminMember(tokenRequest);
@@ -269,7 +341,8 @@ public class ReviewService {
                         var artistResp = albumArtistRepository
                                         .findByReviewId(review.getId())
                                         .stream()
-                                        .map(a -> new ArtistResponse(a.getArtist().getId(), a.getArtist().getName()))
+                                        .map(a -> new ArtistSimpleResponse(a.getArtist().getId(),
+                                                        a.getArtist().getName()))
                                         .toList();
 
                         // 카테고리
@@ -314,7 +387,8 @@ public class ReviewService {
                         // 아티스트 목록
                         var artistResp = albumArtistRepository.findByReviewId(review.getId())
                                         .stream()
-                                        .map(a -> new ArtistResponse(a.getArtist().getId(), a.getArtist().getName()))
+                                        .map(a -> new ArtistSimpleResponse(a.getArtist().getId(),
+                                                        a.getArtist().getName()))
                                         .toList();
 
                         // 카테고리 목록
@@ -362,7 +436,8 @@ public class ReviewService {
                         var artistDtos = albumArtistRepository
                                         .findByReviewId(review.getId())
                                         .stream()
-                                        .map(a -> new ArtistResponse(a.getArtist().getId(), a.getArtist().getName()))
+                                        .map(a -> new ArtistSimpleResponse(a.getArtist().getId(),
+                                                        a.getArtist().getName()))
                                         .toList();
 
                         // 카테고리 목록 DTO

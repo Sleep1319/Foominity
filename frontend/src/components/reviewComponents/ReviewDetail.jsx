@@ -58,7 +58,13 @@ const ReviewDetail = () => {
         {/* 앨범 정보 */}
         <Box display="flex" justifyContent="center" px={6} py={10}>
           <Box display="flex" alignItems="flex-end" gap={6}>
-            <Image src={review.imagePath} alt={review.title} boxSize="420px" objectFit="cover" borderRadius="md" />
+            <Image
+              src={`http://localhost:8084/${review.imagePath}`}
+              alt={review.title}
+              boxSize="420px"
+              objectFit="cover"
+              borderRadius="md"
+            />
             <Box display="flex" flexDirection="row" alignItems="flex-end" gap={8} h="420px">
               <Box display="flex" flexDirection="column" justifyContent="flex-end">
                 <Text fontSize="3xl" fontWeight="bold" mb={2}>

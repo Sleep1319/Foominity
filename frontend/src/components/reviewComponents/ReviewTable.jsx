@@ -195,7 +195,14 @@ const ReviewTable = () => {
                         </Box>
                       </RouterLink>
                     </Td>
-                    <Td textAlign="center">{review.artists?.map((artist) => artist.name).join(", ") || "정보 없음"}</Td>
+                    <Td textAlign="center">
+                      {review.artists?.map((artist, idx) => (
+                        <span key={artist.id}>
+                          <RouterLink to={`/artist/${artist.id}`}>{artist.name}</RouterLink>
+                          {idx < review.artists.length - 1 && ", "}
+                        </span>
+                      )) || "정보 없음"}
+                    </Td>
                     <Td textAlign="center">
                       {review.categories?.map((category) => category.categoryName).join(", ") || "정보 없음"}
                     </Td>
