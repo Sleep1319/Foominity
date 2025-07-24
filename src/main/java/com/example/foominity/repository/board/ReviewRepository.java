@@ -11,16 +11,24 @@ import java.util.Optional;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
-    Optional<List<Review>> findTop4ByOrderByCreatedDateDesc();
+  Optional<List<Review>> findTop4ByOrderByCreatedDateDesc();
 
-    // @Query(" select r from Review r left join Like l on r.id = l.review.id group
-    // by r.id order by COUNT(l) desc ")
-    // Optional<List<Review>> getTop3LikeReviews(Pageable pageable);
+  // @Query(" select r from Review r left join Like l on r.id = l.review.id group
+  // by r.id order by COUNT(l) desc ")
+  // Optional<List<Review>> getTop3LikeReviews(Pageable pageable);
 
-    @Query("""
-            SELECT DISTINCT rc.review
-              FROM ReviewComment rc
-             WHERE rc.member.id = :memberId
-             """)
-    List<Review> findParticipatedReviews(Long memberId);
+  @Query("""
+      SELECT DISTINCT rc.review
+        FROM ReviewComment rc
+       WHERE rc.member.id = :memberId
+       """)
+  List<Review> findParticipatedReviews(Long memberId);
+
+  @Query("""
+      SELECT aa.review
+      FROM AlbumArtist aa
+      WHERE aa.artist.id = :artistId
+      """)
+  List<Review> findReviewsByArtist(Long artistId);
+
 }

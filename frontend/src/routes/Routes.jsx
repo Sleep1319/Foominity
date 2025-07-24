@@ -27,14 +27,21 @@ import ReportCreateRun from "../view/report/ReportCreateRun.jsx";
 import ReportLists from "../view/report/ReportLists.jsx";
 import DeleteComplete from "../view/member/DeleteComplete.jsx";
 import MyMusic from "../view/member/MyMusic.jsx";
-import ResetPassword from "../view/Sign/ResetPassword.jsx";
 import ParticipatedAlbumsList from "../components/memberComponents/ParticipatedAlbumsList.jsx";
+
+import FindPassword from "../view/Sign/FindPassword.jsx";
+import LoginPage from "../view/Sign/LoginPage.jsx";
+import ChangePassword from "../view/Sign/ChangePassword.jsx";
+
+import ArtistDetails from "../view/artist/ArtistDetails.jsx";
+
 
 function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
-      <Route path="/resetpassword" element={<ResetPassword />} />
+      <Route path="/changepassword" element={<ChangePassword />} />
+      <Route path="/findpassword" element={<FindPassword />} />
       <Route path="/report" element={<ReportLists />} />
       <Route path="/report/:id" element={<ReportDetails />} />
       <Route path="/notice" element={<NoticeLists />} />
@@ -42,8 +49,9 @@ function AppRoutes() {
       <Route path="/review" element={<Review />} />
       <Route path="/review/:id" element={<ReviewDetails />} />
       <Route path="/deletecomplete" element={<DeleteComplete />} />
+      <Route path="/artist/:id" element={<ArtistDetails />} />
       <Route element={<ProtectedRoute requireAuth={false} />}>
-        <Route path="/login" element={<Login />} />
+        <Route path="/loginpage" element={<LoginPage />} />
         <Route path="/register" element={<Register />} />
         <Route path="/social-sign-up" element={<SocialRegister />} />
       </Route>

@@ -10,12 +10,14 @@ const AppleMusicSearchModal = ({ isOpen, onClose, onAlbumSelect }) => {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="2xl" scrollBehavior="inside">
+    <Modal isOpen={isOpen} onClose={onClose} size="2xl" scrollBehavior="inside" zIndex={2000} isCentered>
       <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>앨범 검색</ModalHeader>
+      <ModalContent maxH="80vh">
+        <ModalHeader textAlign="center" mb="-40px">
+          앨범 검색
+        </ModalHeader>
         <ModalCloseButton />
-        <ModalBody>
+        <ModalBody overflowY="auto">
           <AppleMusicSearch onAlbumSelect={handleSelect} />
         </ModalBody>
       </ModalContent>

@@ -10,5 +10,7 @@ public interface AlbumArtistRepository extends JpaRepository<AlbumArtist, Long> 
 
     List<AlbumArtist> findByReviewId(Long reviewId);
 
+    List<AlbumArtist> findByArtistId(Long artistId);
+
     void deleteByReviewId(Long reviewId);
 }

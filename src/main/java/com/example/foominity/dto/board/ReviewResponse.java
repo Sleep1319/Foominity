@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.example.foominity.dto.artist.ArtistResponse;
+import com.example.foominity.dto.artist.ArtistSimpleResponse;
 import com.example.foominity.dto.category.ReviewCategoryResponse;
 
 import lombok.AllArgsConstructor;
@@ -20,7 +21,7 @@ public class ReviewResponse {
     private LocalDate released;
 
     private List<String> tracklist;
-    private List<ArtistResponse> artists;
+    private List<ArtistSimpleResponse> artists;
     private List<ReviewCategoryResponse> categories;
 
     private float averageStarPoint;
@@ -36,6 +37,5 @@ public class ReviewResponse {
         this.averageStarPoint = averageStarPoint;
         this.imagePath = imagePath;
     }
-
 
 }

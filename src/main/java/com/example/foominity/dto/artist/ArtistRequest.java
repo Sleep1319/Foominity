@@ -3,6 +3,8 @@ package com.example.foominity.dto.artist;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.validation.constraints.NotBlank;
@@ -24,4 +26,7 @@ public class ArtistRequest {
     private LocalDate born;
 
     private String nationality;
+
+    private MultipartFile image;
+
 }

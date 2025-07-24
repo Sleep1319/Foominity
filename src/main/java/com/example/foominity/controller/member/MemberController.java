@@ -2,13 +2,16 @@ package com.example.foominity.controller.member;
 
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,6 +24,7 @@ import com.example.foominity.domain.member.Member;
 import com.example.foominity.dto.member.MemberRequest;
 import com.example.foominity.dto.member.MemberReviewResponse;
 import com.example.foominity.dto.member.NicknameChangeRequest;
+import com.example.foominity.dto.member.PasswordChangeRequest;
 import com.example.foominity.dto.member.ProfileImageResponse;
 import com.example.foominity.dto.member.UserInfoResponse;
 import com.example.foominity.exception.NotFoundMemberException;
@@ -45,6 +49,7 @@ public class MemberController {
     private final ImageService imageService;
     private final MemberService memberService;
     private final ReviewService reviewService;
+    private final PasswordEncoder passwordEncoder;
 
     // 유저 정보 불러오기
     @GetMapping("/user")
@@ -159,4 +164,53 @@ public class MemberController {
         return ResponseEntity.ok(list);
     }
 
+    // import 생략
+    @PostMapping("/check-password")
+    public ResponseEntity<?> checkPassword(
+            HttpServletRequest request,
+            @RequestBody Map<String, String> body) {
+        String currentPassword = body.get("currentPassword");
+
+        // JWT 토큰에서 사용자 추출 (이미 구현된 코드 참고)
+        String token = jwtTokenProvider.resolveTokenFromCookie(request);
+        if (token == null || !jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity.status(401).build();
+        }
+        Long memberId = jwtTokenProvider.getUserIdFromToken(token);
+        Member member = memberRepository.findById(memberId).orElseThrow(NotFoundMemberException::new);
+
+        // 비밀번호 비교
+        if (!passwordEncoder.matches(currentPassword, member.getPassword())) {
+            return ResponseEntity.status(400).body(Map.of("message", "비밀번호가 일치하지 않습니다."));
+        }
+
+        // 성공
+        return ResponseEntity.ok(Map.of("success", true));
+    }
+
+    @PutMapping("/change-password")
+    public ResponseEntity<?> changePassword(
+            HttpServletRequest request,
+            @RequestBody PasswordChangeRequest req) {
+        String token = jwtTokenProvider.resolveTokenFromCookie(request);
+        if (token == null || !jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity.status(401).build();
+        }
+        Long memberId = jwtTokenProvider.getUserIdFromToken(token);
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        // 현재 비밀번호 검증
+        if (!passwordEncoder.matches(req.getCurrentPassword(), member.getPassword())) {
+            return ResponseEntity.badRequest().body(Map.of("error", "현재 비밀번호가 틀렸습니다."));
+        }
+        // 새 비밀번호가 기존 비번과 같은지 체크
+        if (passwordEncoder.matches(req.getNewPassword(), member.getPassword())) {
+            return ResponseEntity.badRequest().body(Map.of("error", "기존 비밀번호와 동일한 비밀번호는 사용할 수 없습니다."));
+        }
+        // 새 비번 저장
+        member.setPassword(passwordEncoder.encode(req.getNewPassword()));
+        memberRepository.save(member);
+        return ResponseEntity.ok(Map.of("message", "비밀번호가 성공적으로 변경되었습니다."));
+    }
 }
