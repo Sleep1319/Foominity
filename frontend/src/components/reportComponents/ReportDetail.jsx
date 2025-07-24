@@ -25,7 +25,6 @@ import {
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { FaRegEye } from "react-icons/fa";
 import { useUser } from "../../context/UserContext";
 import ReportCommentForm from "../commentComponents/ReportCommentForm";
 import CommentList from "../commentComponents/CommentList";
@@ -66,8 +65,6 @@ const getTargetTypeLabel = (targetType) => {
       return "자유게시판";
     case "REVIEW":
       return "리뷰게시판";
-    case "REPORT":
-      return "신고게시판";
     default:
       return targetType || "-";
   }
@@ -86,7 +83,7 @@ const ReportDetail = () => {
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const [statusLoading, setStatusLoading] = useState(false);
-  const [commentRefreshKey, setCommentRefreshKey] = useState(0);
+  // const [commentRefreshKey, setCommentRefreshKey] = useState(0);
   const toast = useToast();
   const { state: user } = useUser();
 
@@ -188,10 +185,6 @@ const ReportDetail = () => {
       <Flex justify="space-between" align="center" mb={6}>
         <Text color="gray.600" fontSize="md">
           {formatDate(report.createdDate)}
-        </Text>
-        <Text>
-          <Icon as={FaRegEye} mr={1} />
-          {(report.views / 2).toFixed(0)}
         </Text>
       </Flex>
       <Divider my={4} />
@@ -311,14 +304,14 @@ const ReportDetail = () => {
       </Flex>
 
       {/* --- 댓글 리스트 --- */}
-      <Divider my={12} />
+      {/* <Divider my={12} />
       <Box px={2}>
         <CommentList type="reports" id={report.id} key={commentRefreshKey} />
-      </Box>
+      </Box> */}
       {/* --- 댓글 작성 폼 --- */}
-      <Box px={2} mt={2}>
+      {/* <Box px={2} mt={2}>
         <ReportCommentForm reportId={report.id} onSuccess={() => setCommentRefreshKey((k) => k + 1)} />
-      </Box>
+      </Box> */}
     </Box>
   );
 };

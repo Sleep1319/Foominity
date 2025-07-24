@@ -2,7 +2,6 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import Home from "../view/home/Home.jsx";
 
-import Login from "../view/Sign/Login.jsx";
 import Register from "../view/Sign/Register.jsx";
 
 import ProtectedRoute from "./ProtectedRoute";
@@ -34,7 +33,6 @@ import LoginPage from "../view/Sign/LoginPage.jsx";
 import ChangePassword from "../view/Sign/ChangePassword.jsx";
 
 import ArtistDetails from "../view/artist/ArtistDetails.jsx";
-
 
 function AppRoutes() {
   return (

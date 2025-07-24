@@ -57,7 +57,7 @@ const UserSection = () => {
   );
 
   return (
-    <Box display="flex" alignItems="center" gap={3} position="fixed" top="20px" right="20px" zIndex="1000">
+    <Box display="flex" alignItems="center" gap={3} top="20px" right="20px" zIndex="1000">
       <Menu>
         <MenuButton>
           <Avatar
