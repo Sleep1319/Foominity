@@ -15,6 +15,7 @@ export function UserProvider({ children }) {
         setState(response.data);
       } catch (error) {
         setState(null);
+        console.log("에러", error);
       } finally {
         setIsLoading(false);
       }
@@ -27,7 +28,7 @@ export function UserProvider({ children }) {
     try {
       await axios.post("/api/logout", { withCredentials: true });
     } catch (error) {
-      alert("로그아웃 요청 실패");
+      alert("로그아웃 요청 실패", error);
     }
 
     setState(null);

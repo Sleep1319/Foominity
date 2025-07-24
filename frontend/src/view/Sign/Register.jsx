@@ -138,7 +138,7 @@ const Register = () => {
     try {
       await axios.post("/api/sign-up", form);
       alert("회원가입이 성공적으로 완료되었습니다.");
-      window.location.href = "/login";
+      window.location.href = "/loginpage";
     } catch (err) {
       toast({ title: "회원가입 실패", description: err.response?.data?.error, status: "error" });
     }

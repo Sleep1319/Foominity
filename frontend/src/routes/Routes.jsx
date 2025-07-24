@@ -2,12 +2,9 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import Home from "../view/home/Home.jsx";
 
-import Login from "../view/Sign/Login.jsx";
 import Register from "../view/Sign/Register.jsx";
 
 import ProtectedRoute from "./ProtectedRoute";
-import Profile from "../view/member/Profile.jsx";
-import EditProfile from "../view/member/EditProfile.jsx";
 import MyPage from "../view/member/MyPage.jsx";
 import ReportDetails from "../view/report/ReportDetails.jsx";
 import NoticeDetails from "../view/notice/NoticeDetails.jsx";
@@ -34,7 +31,6 @@ import LoginPage from "../view/Sign/LoginPage.jsx";
 import ChangePassword from "../view/Sign/ChangePassword.jsx";
 
 import ArtistDetails from "../view/artist/ArtistDetails.jsx";
-
 
 function AppRoutes() {
   return (

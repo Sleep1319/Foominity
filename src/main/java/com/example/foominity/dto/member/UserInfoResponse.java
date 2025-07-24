@@ -16,6 +16,7 @@ public class UserInfoResponse {
     private String nickname;
     private String roleName;
     private String avatar;
+    private String socialType;
 
     // 추가(컨트롤러 주석부분이랑)
     public UserInfoResponse(Member member) {
@@ -27,6 +28,8 @@ public class UserInfoResponse {
         this.avatar = member.getProfileImage() != null
                 ? "/uploads/" + Paths.get(member.getProfileImage().getSavePath()).getFileName().toString()
                 : null;
+        this.socialType = member.getSocialType();
+
     }
 
 }

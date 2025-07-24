@@ -32,7 +32,8 @@ const TopRankedAlbums = () => {
 
   const isFirst = currentIndex === 0;
   const isLast = currentIndex + slidesToShow >= albums.length;
-  const boxSize = 210;
+  // const boxSize = 210;
+  const boxSize = 160;
 
   return (
     <Box maxW="1500px" mx="auto" px={4} py={8}>
