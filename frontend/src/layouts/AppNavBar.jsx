@@ -47,7 +47,7 @@ const AppNavbar = () => {
             Board
           </Button>
           <Button as={RouterLink} to="/notice" variant="ghost" color="black" _hover={{ bg: "transparent" }}>
-            Notice
+            Magazine
           </Button>
           <Button as={RouterLink} to="/report" variant="ghost" color="black" _hover={{ bg: "transparent" }}>
             Report

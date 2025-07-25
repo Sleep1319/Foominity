@@ -56,7 +56,7 @@ const NoticeDetail = () => {
   useEffect(() => {
     const fetchNotice = async () => {
       try {
-        const res = await axios.get(`/api/notices/${id}`);
+        const res = await axios.get(`/api/notices/${id}`, { withCredentials: true });
         setNotice(res.data);
       } catch (err) {
         const message = err.response?.data?.message || err.message || "공지 조회 중 오류가 발생했습니다.";
@@ -72,7 +72,7 @@ const NoticeDetail = () => {
       }
     };
     fetchNotice();
-  }, [id]);
+  }, [id, toast]);
 
   if (loading) {
     return (
@@ -82,36 +82,57 @@ const NoticeDetail = () => {
     );
   }
 
-  if (!notice) return null;
+  if (!notice)
+    return (
+      <Text textAlign="center" mt={10}>
+        공지 정보를 찾을 수 없습니다.
+      </Text>
+    );
 
   return (
-    <Box maxW="1000px" mx="auto" px={{ base: 6, md: 10 }} py={20} mt={20}>
+    <Box maxW="900px" mx="auto" px={{ base: 4, md: 8 }} py={16} mt={16}>
       <Link as={RouterLink} to="/notice" _hover={{ textDecoration: "underline" }}>
-        <Text fontSize="sm" fontWeight="bold" color="black" mb={2} textTransform="uppercase">
+        <Text fontSize="sm" fontWeight="bold" color="black" mb={3} textTransform="uppercase">
           Magazine
         </Text>
       </Link>
+
       <Heading
         fontSize={{ base: "3xl", md: "4xl" }}
         fontWeight="extrabold"
         fontFamily="Georgia"
-        mb={4}
-        lineHeight="1.4"
+        mb={5}
+        lineHeight="1.3"
         letterSpacing="-0.5px"
       >
         {notice.title}
       </Heading>
+
       <Box w="20%" h="2px" bg="red" mb={6} />
-      <Text fontSize="sm" color="gray.500" mb={10}>
+
+      <Text fontSize="sm" color="gray.500" mb={8}>
         {new Date(notice.createdDate).toLocaleDateString("ko-KR")}
       </Text>
-      <Box width="100%" height="400px" bg="gray.100" borderRadius="md" mb={12} />
+
+      {notice.imagePath ? (
+        <Box mb={10}>
+          <img
+            src={`http://localhost:8084/${notice.imagePath}`}
+            alt={notice.title}
+            style={{ width: "100%", maxHeight: 420, objectFit: "cover", borderRadius: 8 }}
+          />
+        </Box>
+      ) : (
+        <Box w="100%" h="420px" bg="gray.100" borderRadius="md" mb={10} />
+      )}
+
       <VStack spacing={6} align="stretch">
-        <Text fontSize="md" whiteSpace="pre-line" color="gray.800" lineHeight="1.9" textAlign="left">
+        <Text fontSize="md" whiteSpace="pre-line" color="gray.800" lineHeight="1.8" textAlign="left">
           {notice.content}
         </Text>
       </VStack>
-      <Flex justify="flex-end" mt={12} gap={2}>
+
+      <Flex justify="flex-end" mt={12} gap={3}>
         <Button
           color="white"
           bg="black"
@@ -122,6 +143,7 @@ const NoticeDetail = () => {
         >
           목록
         </Button>
+
         {user?.roleName === "ADMIN" && (
           <>
             <Button color="white" bg="red.500" size="sm" fontSize="sm" _hover={{ bg: "red.600" }} onClick={onOpen}>

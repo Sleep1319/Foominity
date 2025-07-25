@@ -47,8 +47,14 @@ public class Artist {
         this.imageFile = imageFile;
     }
 
-    public void update(String name, ImageFile imageFile) {
+    public void update(String name, LocalDate born, String nationality, ImageFile imageFile) {
         this.name = name;
+        this.born = born;
+        this.nationality = nationality;
         this.imageFile = imageFile;
+    }
+
+    public ImageFile getImageFile() {
+        return imageFile;
     }
 }

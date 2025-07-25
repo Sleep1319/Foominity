@@ -31,7 +31,10 @@ import LoginPage from "../view/Sign/LoginPage.jsx";
 import ChangePassword from "../view/Sign/ChangePassword.jsx";
 
 import ArtistDetails from "../view/artist/ArtistDetails.jsx";
+
 import OtherUserProfile from "../view/member/OtherUserProfile.jsx";
+
+import ArtistEdits from "../view/artist/ArtistEdits.jsx";
 
 function AppRoutes() {
   return (
@@ -58,6 +61,7 @@ function AppRoutes() {
         <Route path="/mypage/*" element={<MyPage />} />
         <Route path="/mymusic/" element={<MyMusic />} />
         <Route path="/review/create" element={<CreateReview />} />
+        <Route path="/artist/update/:id" element={<ArtistEdits />} />
       </Route>
       <Route path="/mymusic/participatedalbumslist" element={<ParticipatedAlbumsList />} />
 

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.example.foominity.config.jwt.JwtTokenProvider;
 import com.example.foominity.domain.board.Review;
+import com.example.foominity.domain.image.ImageFile;
 import com.example.foominity.domain.member.Member;
 import com.example.foominity.dto.board.ReviewResponse;
 import com.example.foominity.exception.NotFoundReviewException;
@@ -25,6 +26,7 @@ import com.example.foominity.exception.NotFoundMemberException;
 import com.example.foominity.exception.NotFoundNoticeException;
 import com.example.foominity.repository.member.MemberRepository;
 import com.example.foominity.repository.notice.NoticeRepository;
+import com.example.foominity.service.image.ImageService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +39,7 @@ public class NoticeService {
     private final NoticeRepository noticeRepository;
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final ImageService imageService;
 
     public Page<NoticeResponse> findAll(int page) {
         PageRequest pageable = PageRequest.of(page, 4, Sort.by(Sort.Direction.DESC, "id"));
@@ -44,7 +47,8 @@ public class NoticeService {
 
         List<NoticeResponse> noticeResponseList = notices.stream()
                 .map(notice -> new NoticeResponse(notice.getId(), notice.getTitle(), notice.getContent(),
-                        notice.getCreatedDate()))
+                        notice.getCreatedDate(),
+                        notice.getImageFile().getSavePath()))
 
                 .toList();
         return new PageImpl<>(noticeResponseList, pageable, notices.getTotalElements());
@@ -56,7 +60,8 @@ public class NoticeService {
                 notice.getId(),
                 notice.getTitle(),
                 notice.getContent(),
-                notice.getCreatedDate());
+                notice.getCreatedDate(),
+                notice.getImageFile().getSavePath());
     }
 
     @Transactional
@@ -73,7 +78,21 @@ public class NoticeService {
             throw new ForbiddenActionException();
         }
 
-        noticeRepository.save(req.toEntity(req));
+        // 이미지파일 생성 (image or imagePath 둘 다 지원!)
+        ImageFile imageFile = null;
+        if (req.getImage() != null && !req.getImage().isEmpty()) {
+            imageFile = imageService.imageUpload(req.getImage());
+        } else if (req.getImagePath() != null && !req.getImagePath().isBlank()) {
+            imageFile = imageService.getImageByPath(req.getImagePath());
+        } else {
+            throw new IllegalArgumentException("이미지 정보가 없습니다.");
+        }
+
+        Notice notice = req.toEntity();
+
+        notice.setImageFile(imageFile);
+
+        noticeRepository.save(notice);
     }
 
     @Transactional
@@ -128,7 +147,8 @@ public class NoticeService {
                         notice.getId(),
                         notice.getTitle(),
                         notice.getContent(),
-                        notice.getCreatedDate()))
+                        notice.getCreatedDate(),
+                        notice.getImageFile().getSavePath()))
                 .toList();
     }
 
@@ -140,7 +160,8 @@ public class NoticeService {
                         notice.getId(),
                         notice.getTitle(),
                         notice.getContent(),
-                        notice.getCreatedDate()))
+                        notice.getCreatedDate(),
+                        notice.getImageFile().getSavePath()))
                 .toList();
 
     }

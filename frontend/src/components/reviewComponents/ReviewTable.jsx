@@ -71,12 +71,27 @@ const ReviewGrid = () => {
               </AspectRatio>
 
               <VStack align="start" spacing={1} p={3}>
-                <Text fontSize="md" fontWeight="semibold" noOfLines={2}>
-                  {r.title}
-                </Text>
-                <Text fontSize="sm" color="gray.600" noOfLines={1}>
+                <Box>
+                  {r.artists?.map((a) => (
+                    <Text
+                      key={a.id}
+                      fontWeight="bold"
+                      cursor="pointer"
+                      color="gray.600"
+                      _hover={{ color: "black" }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/artist/${a.id}`);
+                      }}
+                    >
+                      {a.name}
+                    </Text>
+                  )) || <Text>정보 없음</Text>}
+                </Box>
+
+                {/* <Text fontSize="sm" color="gray.600" noOfLines={1}>
                   {r.artists?.map((a) => a.name).join(", ") || "정보 없음"}
-                </Text>
+                </Text> */}
                 {/* <Text fontSize="sm" color="gray.600" noOfLines={1}>
                   {r.categories?.map((c) => c.categoryName).join(", ") || "정보 없음"}
                 </Text> */}
