@@ -70,6 +70,7 @@ public class ArtistService {
                     return new ArtistSimpleResponse(
                             artist.getId(),
                             artist.getName(),
+                            categoryResponses,
                             imagePath);
                 })
                 .toList();
