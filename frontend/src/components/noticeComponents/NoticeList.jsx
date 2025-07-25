@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Flex, VStack, Text, Button, SimpleGrid, useBreakpointValue, HStack } from "@chakra-ui/react";
+import { Box, Flex, VStack, Text, Button, SimpleGrid, useBreakpointValue, HStack, Image } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useUser } from "../../context/UserContext";
@@ -11,7 +11,7 @@ const NoticeList = () => {
   const navigate = useNavigate();
   const { state: user } = useUser();
 
-  // 1. 페이지 먼저 복원
+  // 페이지 복원 및 초기 데이터 로드
   useEffect(() => {
     const savedPage = sessionStorage.getItem("noticeListPage");
     if (savedPage !== null) {
@@ -20,7 +20,6 @@ const NoticeList = () => {
     }
   }, []);
 
-  // 2. 데이터 로드
   useEffect(() => {
     const fetchNotices = async () => {
       try {
@@ -33,7 +32,6 @@ const NoticeList = () => {
     fetchNotices();
   }, []);
 
-  // 3. 데이터+페이지 세팅 후 스크롤 복원
   useEffect(() => {
     if (notices.length > 0) {
       const savedY = sessionStorage.getItem("noticeScrollY");
@@ -46,7 +44,6 @@ const NoticeList = () => {
     }
   }, [notices, page]);
 
-  // 4. 리스트 클릭 시 스크롤 위치와 페이지 저장 후 상세 이동
   const handleNoticeClick = (noticeId) => {
     sessionStorage.setItem("noticeScrollY", window.scrollY);
     sessionStorage.setItem("noticeListPage", page);
@@ -83,7 +80,20 @@ const NoticeList = () => {
       <Flex direction={useBreakpointValue({ base: "column", md: "row" })} gap={14}>
         {main && (
           <Box flex="2" onClick={() => handleNoticeClick(main.id)} _hover={{ cursor: "pointer" }}>
-            <Box w="100%" h="550px" bg="gray.300" mb={6} borderRadius="md" />
+            {main.imagePath ? (
+              <Box w="100%" h="550px" mb={6} borderRadius="md" overflow="hidden">
+                <Image
+                  src={`http://localhost:8084/${main.imagePath}`}
+                  alt="공지 이미지"
+                  w="100%"
+                  h="100%"
+                  objectFit="cover"
+                  borderRadius="md"
+                />
+              </Box>
+            ) : (
+              <Box w="100%" h="550px" bg="gray.300" mb={6} borderRadius="md" />
+            )}
             <Text
               fontSize="3xl"
               fontWeight="extrabold"
@@ -103,7 +113,20 @@ const NoticeList = () => {
         <VStack flex="1" spacing={10}>
           {sideNotices.map((notice) => (
             <Box key={notice.id} w="100%" onClick={() => handleNoticeClick(notice.id)} _hover={{ cursor: "pointer" }}>
-              <Box w="100%" h="250px" bg="gray.200" mb={4} borderRadius="md" />
+              {notice.imagePath ? (
+                <Box w="100%" h="250px" mb={4} borderRadius="md" overflow="hidden">
+                  <Image
+                    src={`http://localhost:8084/${notice.imagePath}`}
+                    alt="공지 이미지"
+                    w="100%"
+                    h="100%"
+                    objectFit="cover"
+                    borderRadius="md"
+                  />
+                </Box>
+              ) : (
+                <Box w="100%" h="250px" bg="gray.200" mb={4} borderRadius="md" />
+              )}
               <Text
                 fontSize="xl"
                 fontWeight="bold"
@@ -136,7 +159,20 @@ const NoticeList = () => {
               pb={6}
               borderBottom="1px solid black"
             >
-              <Box w="100%" h="200px" bg="gray.100" mb={4} borderRadius="md" />
+              {notice.imagePath ? (
+                <Box w="100%" h="200px" mb={4} borderRadius="md" overflow="hidden">
+                  <Image
+                    src={`http://localhost:8084/${notice.imagePath}`}
+                    alt="공지 이미지"
+                    w="100%"
+                    h="100%"
+                    objectFit="cover"
+                    borderRadius="md"
+                  />
+                </Box>
+              ) : (
+                <Box w="100%" h="200px" bg="gray.100" mb={4} borderRadius="md" />
+              )}
               <Text
                 fontSize="lg"
                 fontWeight="semibold"

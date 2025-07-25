@@ -36,6 +36,11 @@ public class Notice extends BaseEntity {
     @Column(nullable = false)
     private boolean mainNotice = false;
 
+    // 앨범 이미지
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "image_file_id")
+    private ImageFile imageFile;
+
     public Notice(String title, String content) {
         this.title = title;
         this.content = content;
@@ -47,5 +52,9 @@ public class Notice extends BaseEntity {
 
     public void cancelNotice() {
         this.mainNotice = false;
+    }
+
+    public void setImageFile(ImageFile imageFile) {
+        this.imageFile = imageFile;
     }
 }
