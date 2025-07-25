@@ -2,7 +2,7 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import Home from "../view/home/Home.jsx";
 
-import Login from "../view/Sign/Login.jsx";
+// import Login from "../view/Sign/Login.jsx";
 import Register from "../view/Sign/Register.jsx";
 
 import ProtectedRoute from "./ProtectedRoute";
