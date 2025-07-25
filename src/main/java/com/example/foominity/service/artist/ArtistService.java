@@ -146,20 +146,32 @@ public class ArtistService {
     @Transactional
     public void updateArtist(Long artistId, ArtistUpdateRequest req, HttpServletRequest tokenRequest) {
         Member member = getAdminMember(tokenRequest);
-
-        Artist artist = artistRepository.findById(artistId).orElseThrow(NotFoundArtistException::new);
+        Artist artist = artistRepository.findById(artistId)
+                .orElseThrow(NotFoundArtistException::new);
 
         ImageFile imageFile = artist.getImageFile();
 
-        artist.update(req.getName(), imageFile);
+        // 이미지 변경 시에만 처리
+        if (req.getImage() != null && !req.getImage().isEmpty()) {
+            if (imageFile != null) {
+                imageService.deleteImageFile(imageFile);
+            }
+            imageFile = imageService.imageUpload(req.getImage());
+        }
 
+        // 이름과 이미지 업데이트
+        artist.update(req.getName(), req.getBorn(), req.getNationality(), imageFile);
+
+        // 카테고리 재설정
         artistCategoryRepository.deleteByArtistId(artistId);
-
         List<Category> categories = categoryRepository.findAllById(req.getCategoryIds());
         for (Category category : categories) {
             artistCategoryRepository.save(new ArtistCategory(artist, category));
         }
 
+        // 추가 필드가 있다면 여기에 적용
+        // artist.setBorn(req.getBorn());
+        // artist.setNationality(req.getNationality());
     }
 
     // 아티스트 삭제
