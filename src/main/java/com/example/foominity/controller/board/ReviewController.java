@@ -51,13 +51,6 @@ public class ReviewController {
         return ResponseEntity.ok(reviewService.readReview(id));
     }
 
-    // 특정 아티스트의 앨범 리스트
-    @GetMapping("/")
-    public ResponseEntity<List<ReviewSimpleResponse>> getReviewsArtist(@PathVariable Long id) {
-        List<ReviewSimpleResponse> res = reviewService.getReviewsByArtist(id);
-        return ResponseEntity.ok(res);
-    }
-
     // 생성 (메타데이터 + 이미지 한 번에 업로드)
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> createReview(

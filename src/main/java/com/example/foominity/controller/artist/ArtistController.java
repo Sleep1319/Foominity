@@ -10,6 +10,7 @@ import com.example.foominity.dto.artist.ArtistUpdateRequest;
 import com.example.foominity.dto.board.ReviewSimpleResponse;
 import com.example.foominity.dto.category.CategoryResponse;
 import com.example.foominity.service.artist.ArtistService;
+import com.example.foominity.service.board.ReviewService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 public class ArtistController {
 
     private final ArtistService artistService;
+    private final ReviewService reviewService;
 
     @GetMapping("/api/artists")
     public ResponseEntity<?> getArtistList(@RequestParam(defaultValue = "0") int page) {
@@ -46,6 +48,13 @@ public class ArtistController {
         return ResponseEntity.ok(artistService.readArtist(id));
     }
 
+    // 특정 아티스트의 앨범 리스트
+    @GetMapping("/api/artists/{id}/reviews")
+    public ResponseEntity<List<ReviewSimpleResponse>> getReviewsByArtist(@PathVariable Long id) {
+        List<ReviewSimpleResponse> res = reviewService.getReviewsByArtist(id);
+        return ResponseEntity.ok(res);
+    }
+
     @PostMapping(value = "/api/artists", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> createArtist(
             @Valid @ModelAttribute ArtistRequest req,
@@ -54,10 +63,10 @@ public class ArtistController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/api/artists/{id}")
+    @PutMapping(value = "/api/artists/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> updateArtist(
             @PathVariable Long id,
-            @Valid @RequestBody ArtistUpdateRequest req,
+            @Valid @ModelAttribute ArtistUpdateRequest req,
             HttpServletRequest tokenRequest) {
         artistService.updateArtist(id, req, tokenRequest);
 
