@@ -105,7 +105,9 @@ const MyRequests = () => {
   useEffect(() => {
     const fetchReports = async () => {
       try {
-        const res = await axios.get(`/api/report/my?page=${page}&size=${pageSize}`);
+        const res = await axios.get(`/api/report/my?page=${page}&size=${pageSize}`, {
+          withCredentials: true,
+        });
         // 구조분해 할당 시 fallback value 추가!
         const { content = [], totalPages = 1, totalElements = 0, size = 20 } = res.data || {};
         setReports(content);

@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,6 +25,7 @@ import com.example.foominity.domain.member.Member;
 import com.example.foominity.dto.member.MemberRequest;
 import com.example.foominity.dto.member.MemberReviewResponse;
 import com.example.foominity.dto.member.NicknameChangeRequest;
+import com.example.foominity.dto.member.OtherUserProfileResponse;
 import com.example.foominity.dto.member.PasswordChangeRequest;
 import com.example.foominity.dto.member.ProfileImageResponse;
 import com.example.foominity.dto.member.UserInfoResponse;
@@ -164,7 +166,6 @@ public class MemberController {
         return ResponseEntity.ok(list);
     }
 
-    // import 생략
     @PostMapping("/check-password")
     public ResponseEntity<?> checkPassword(
             HttpServletRequest request,
@@ -213,4 +214,10 @@ public class MemberController {
         memberRepository.save(member);
         return ResponseEntity.ok(Map.of("message", "비밀번호가 성공적으로 변경되었습니다."));
     }
+
+    @GetMapping("/users/{id}/profile")
+    public ResponseEntity<OtherUserProfileResponse> getOtherUserProfile(@PathVariable Long id) {
+        return ResponseEntity.ok(memberService.getOtherUserProfile(id));
+    }
+
 }

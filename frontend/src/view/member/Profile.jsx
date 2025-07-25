@@ -1,19 +1,21 @@
-import { Avatar, Box, HStack, Text, VStack, Flex, Button, Input } from "@chakra-ui/react";
+import { Avatar, Box, HStack, Text, VStack, Flex, Button, Icon } from "@chakra-ui/react";
 import React, { useState } from "react";
-// import { useNavigate } from "react-router-dom";
+import { FaUser, FaEnvelope, FaUserTag, FaIdBadge, FaEye } from "react-icons/fa";
+import { useNavigate } from "react-router-dom"; // ✅ 주석 해제
 import { useUser } from "../../context/UserContext.jsx";
 import DeleteModal from "../../view/Member/DeleteModal.jsx";
-import axios from "axios";
 import MyPostsTable from "../../components/memberComponents/MyPostsTable.jsx";
 import SettingsButton from "../../components/memberComponents/SettingsButton.jsx";
 import MyRequests from "../../components/memberComponents/MyRequests.jsx";
-axios.defaults.baseURL = "http://localhost:8084"; // 기본 백엔드 주소
-axios.defaults.withCredentials = true;
 
 const Profile = () => {
-  // const navigate = useNavigate();
+  const navigate = useNavigate(); // ✅ 사용
   const { state } = useUser();
   const [isDeleteOpen, setDeleteOpen] = useState(false);
+
+  const handlePreview = () => {
+    navigate(`/users/${state.memberId}/profile`);
+  };
 
   return (
     <>
@@ -29,6 +31,10 @@ const Profile = () => {
       >
         마이페이지
       </Text>
+      {/* 미리보기 버튼 */}
+      <Button size="sm" leftIcon={<FaEye />} bg="white" color="black" ml="584px" mb="-115px" onClick={handlePreview}>
+        내 프로필 미리보기
+      </Button>
 
       <Flex maxW="3xl" mx="auto" mt={70} align="center" justify="flex-start">
         <Flex mb={6} align="center" justify="space-between" height={190}>
@@ -40,6 +46,7 @@ const Profile = () => {
 
             <VStack align="start" spacing={4}>
               <HStack>
+                <Icon as={FaUser} />
                 <Text fontWeight="bold" w="80px">
                   닉네임
                 </Text>
@@ -48,18 +55,21 @@ const Profile = () => {
                 </Text>
               </HStack>
               <HStack>
+                <Icon as={FaIdBadge} />
                 <Text fontWeight="bold" w="80px">
-                  유저명
+                  이름
                 </Text>
                 <Text>{state.username}</Text>
               </HStack>
               <HStack>
+                <Icon as={FaEnvelope} />
                 <Text fontWeight="bold" w="80px">
                   이메일
                 </Text>
                 <Text>{state.email}</Text>
               </HStack>
               <HStack>
+                <Icon as={FaUserTag} />
                 <Text fontWeight="bold" w="80px">
                   등급
                 </Text>

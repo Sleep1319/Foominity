@@ -31,11 +31,13 @@ import LoginPage from "../view/Sign/LoginPage.jsx";
 import ChangePassword from "../view/Sign/ChangePassword.jsx";
 
 import ArtistDetails from "../view/artist/ArtistDetails.jsx";
+import OtherUserProfile from "../view/member/OtherUserProfile.jsx";
 
 function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
+      <Route path="/users/:id/profile" element={<OtherUserProfile />} />
       <Route path="/changepassword" element={<ChangePassword />} />
       <Route path="/findpassword" element={<FindPassword />} />
       <Route path="/report" element={<ReportLists />} />

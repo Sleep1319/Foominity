@@ -25,7 +25,7 @@ const SettingsButton = ({ items: customItems }) => {
 
   // 기본 메뉴 아이템 정의
   const defaultItems = [
-    { title: "프로필 편집", href: "/mypage/editprofile" },
+    { title: "내 프로필 편집", href: "/mypage/editprofile" },
     // { title: "비밀번호 변경", href: "/changepassword" },
     ...(user?.socialType == null ? [{ title: "비밀번호 변경", href: "/changepassword" }] : []),
     {
@@ -49,7 +49,7 @@ const SettingsButton = ({ items: customItems }) => {
             variant="outline"
             size="sm"
             borderRadius={0}
-            w="130px"
+            w="135px"
             mb="142px"
             // ml="-45px"
             ml="-68px"
@@ -67,7 +67,7 @@ const SettingsButton = ({ items: customItems }) => {
             borderRadius="0"
             border="1px solid"
             borderColor="gray.200"
-            w="130px"
+            w="135px"
             bg="white"
             // boxShadow="lg"
           >
