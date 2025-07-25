@@ -1,5 +1,6 @@
 package com.example.foominity.repository.report;
 
+// import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -15,4 +16,8 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
     Page<Report> findAll(Pageable pageable);
 
     Optional<Report> findById(Long id);
+
+    // List<Report> findByMemberIdOrderByIdDesc(Long memberId);
+
+    Page<Report> findByMemberId(Long memberId, Pageable pageable);
 }

@@ -3,7 +3,7 @@ import { Box } from "@chakra-ui/react";
 import SliderBox from "@/components/homeComponents/SliderBox.jsx";
 import CommunityTabs from "@/components/homeComponents/CommunityTabs.jsx";
 import { motion } from "framer-motion";
-import TopRankedAlbums from "../../components/homeComponents/TopRankedAlbums";
+import TopRankedAlbums from "../../components/reviewComponents/TopRankedAlbums";
 import AppNavbar from "../../layouts/AppNavBar";
 
 const MotionBox = motion(Box);

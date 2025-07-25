@@ -8,7 +8,6 @@ const MyPage = () => {
   const { state, updateUser, isLoading } = useUser();
 
   if (isLoading || !state) return null;
-
   return (
     <Routes>
       <Route index element={<Profile />} />

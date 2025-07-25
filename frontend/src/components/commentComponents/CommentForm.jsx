@@ -84,7 +84,7 @@ const CommentForm = ({ commentCount, isLoggedIn, onSubmit, showStarRating = fals
             whiteSpace="pre-wrap"
             minHeight="100px"
             cursor="pointer"
-            onClick={() => navigate("/login")}
+            onClick={() => navigate("/loginpage")}
           >
             댓글 쓰기 권한이 없습니다. 로그인 하시겠습니까?
           </Box>

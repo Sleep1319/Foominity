@@ -1,5 +1,6 @@
 package com.example.foominity.config.jwt;
 
+import com.example.foominity.controller.sign.socialType;
 import com.example.foominity.domain.member.Member;
 import com.example.foominity.domain.member.Role;
 import com.example.foominity.dto.member.UserInfoResponse;
@@ -137,8 +138,9 @@ public class JwtTokenProvider {
         String nickname = claims.get("nickname", String.class);
         String role = claims.get("role", String.class);
         String avatar = claims.get("avatar", String.class);
+        String socialType = claims.get("socialType", String.class);
 
-        return new UserInfoResponse(id, email, username, nickname, role, avatar);
+        return new UserInfoResponse(id, email, username, nickname, role, avatar, socialType);
     }
 
     // 인증용

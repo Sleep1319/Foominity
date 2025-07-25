@@ -6,6 +6,7 @@ import DeleteModal from "../../view/Member/DeleteModal.jsx";
 import axios from "axios";
 import MyPostsTable from "../../components/memberComponents/MyPostsTable.jsx";
 import SettingsButton from "../../components/memberComponents/SettingsButton.jsx";
+import MyRequests from "../../components/memberComponents/MyRequests.jsx";
 axios.defaults.baseURL = "http://localhost:8084"; // 기본 백엔드 주소
 axios.defaults.withCredentials = true;
 
@@ -70,46 +71,6 @@ const Profile = () => {
 
         <VStack ml={153} mr={7}>
           <SettingsButton />
-
-          {/* <Button
-            w="110px"
-            bg="white"
-            mb={4}
-            onClick={() => navigate("/mypage/editprofile")}
-            _hover={{
-              borderWidth: "2px",
-              bg: "black",
-              color: "white",
-            }}
-          >
-            프로필 편집
-          </Button>
-          <Button
-            w="110px"
-            bg="white"
-            mb={4}
-            onClick={() => navigate("/resetpassword")}
-            _hover={{
-              borderWidth: "2px",
-              bg: "black",
-              color: "white",
-            }}
-          >
-            비밀번호 변경
-          </Button>
-          <Button
-            w="110px"
-            bg="white"
-            color="red"
-            _hover={{
-              bg: "red",
-              color: "white",
-            }}
-            onClick={() => setDeleteOpen(true)}
-          >
-            회원 탈퇴
-          </Button>
-         */}
         </VStack>
       </Flex>
 
@@ -118,6 +79,7 @@ const Profile = () => {
           나의 게시물
         </Text>
         <MyPostsTable />
+        <MyRequests />
       </Box>
       <DeleteModal isOpen={isDeleteOpen} onClose={() => setDeleteOpen(false)} />
     </>

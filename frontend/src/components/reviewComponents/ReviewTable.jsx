@@ -3,6 +3,7 @@ import axios from "axios";
 import { Box, Image, Text, SimpleGrid, Spinner, Center, AspectRatio, VStack, Button, Input } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../context/UserContext";
+import TopRankedAlbums from "./TopRankedAlbums";
 
 const ReviewGrid = () => {
   const { state, isLoading } = useUser();
@@ -28,67 +29,67 @@ const ReviewGrid = () => {
     );
   }
 
-    return (
-        <Box maxW="1200px" mx="auto" px={4} py={8}>
-            {state?.roleName === "ADMIN" && (
-                <Box textAlign="right" mb={4}>
-                    <Button colorScheme="blue" onClick={() => navigate("/review/create")}>
-                        리뷰 작성
-                    </Button>
-                </Box>
-            )}
-            {/* 검색창 */}
-            <Input
-                placeholder="앨범 제목으로 검색"
-                mb={6}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-            />
+  return (
+    <Box maxW="1200px" mx="auto" px={4} py={8}>
+      {state?.roleName === "ADMIN" && (
+        <Box textAlign="right" mb={4}>
+          <Button colorScheme="blue" onClick={() => navigate("/review/create")}>
+            리뷰 작성
+          </Button>
+        </Box>
+      )}
+      {/* 검색창 */}
+      <Input
+        placeholder="앨범 제목으로 검색"
+        mb={6}
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+      <TopRankedAlbums />
+      {filtered.length === 0 ? (
+        <Text>{searchTerm ? "검색된 결과가 없습니다." : "아직 평가한 앨범이 없습니다."}</Text>
+      ) : (
+        <SimpleGrid columns={{ base: 1, sm: 2, md: 4 }} spacing={6}>
+          {filtered.map((r) => (
+            <Box
+              key={r.id}
+              borderWidth="1px"
+              borderRadius="md"
+              overflow="hidden"
+              boxShadow="sm"
+              _hover={{ boxShadow: "md" }}
+              cursor="pointer"
+              onClick={() => navigate(`/review/${r.id}`)}
+            >
+              {/* 정사각 비율로 앨범 커버 */}
+              <AspectRatio ratio={1} w="100%">
+                <Image
+                  src={r.imagePath ? `http://localhost:8084/${r.imagePath}` : ""}
+                  alt={r.title}
+                  objectFit="cover"
+                />
+              </AspectRatio>
 
-            {filtered.length === 0 ? (
-                <Text>{searchTerm ? "검색된 결과가 없습니다." : "아직 평가한 앨범이 없습니다."}</Text>
-            ) : (
-                <SimpleGrid columns={{ base: 1, sm: 2, md: 4 }} spacing={6}>
-                    {filtered.map((r) => (
-                        <Box
-                            key={r.id}
-                            borderWidth="1px"
-                            borderRadius="md"
-                            overflow="hidden"
-                            boxShadow="sm"
-                            _hover={{ boxShadow: "md" }}
-                            cursor="pointer"
-                            onClick={() => navigate(`/review/${r.id}`)}
-                        >
-                            {/* 정사각 비율로 앨범 커버 */}
-                            <AspectRatio ratio={1} w="100%">
-                                <Image
-                                    src={r.imagePath ? `http://localhost:8084/${r.imagePath}` : ""}
-                                    alt={r.title}
-                                    objectFit="cover"
-                                />
-                            </AspectRatio>
-
-                            <VStack align="start" spacing={1} p={3}>
-                                <Text fontSize="md" fontWeight="semibold" noOfLines={2}>
-                                    {r.title}
-                                </Text>
-                                <Text fontSize="sm" color="gray.600" noOfLines={1}>
-                                    {r.artists?.map((a) => a.name).join(", ") || "정보 없음"}
-                                </Text>
-                                {/* <Text fontSize="sm" color="gray.600" noOfLines={1}>
+              <VStack align="start" spacing={1} p={3}>
+                <Text fontSize="md" fontWeight="semibold" noOfLines={2}>
+                  {r.title}
+                </Text>
+                <Text fontSize="sm" color="gray.600" noOfLines={1}>
+                  {r.artists?.map((a) => a.name).join(", ") || "정보 없음"}
+                </Text>
+                {/* <Text fontSize="sm" color="gray.600" noOfLines={1}>
                   {r.categories?.map((c) => c.categoryName).join(", ") || "정보 없음"}
                 </Text> */}
-                                <Text fontSize="sm">
-                                    평균별점: {typeof r.averageStarPoint === "number" ? r.averageStarPoint.toFixed(1) : "0.0"}
-                                </Text>
-                            </VStack>
-                        </Box>
-                    ))}
-                </SimpleGrid>
-            )}
-        </Box>
-    );
+                <Text fontSize="sm">
+                  평균별점: {typeof r.averageStarPoint === "number" ? r.averageStarPoint.toFixed(1) : "0.0"}
+                </Text>
+              </VStack>
+            </Box>
+          ))}
+        </SimpleGrid>
+      )}
+    </Box>
+  );
 };
 
 export default ReviewGrid;

@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -179,6 +180,27 @@ public class ReportService {
             throw new ForbiddenActionException();
         }
         return report;
+    }
+
+    // 내 report 조회
+    public Page<ReportResponse> findMyReportsPaged(Long memberId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+        Page<Report> pageResult = reportRepository.findByMemberId(memberId, pageable);
+        List<ReportResponse> responses = pageResult.getContent().stream()
+                .map(report -> new ReportResponse(
+                        report.getId(),
+                        report.getMember().getId(),
+                        report.getMember().getNickname(),
+                        report.getType(),
+                        report.getTargetId(),
+                        report.getTargetType(),
+                        report.getTitle(),
+                        report.getReason(),
+                        report.getStatus().name(),
+                        report.getViews(),
+                        report.getCreatedDate()))
+                .toList();
+        return new PageImpl<>(responses, pageable, pageResult.getTotalElements());
     }
 
 }
