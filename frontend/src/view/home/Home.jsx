@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Box } from "@chakra-ui/react";
+import axios from "axios"; // 추가
 import SliderBox from "@/components/homeComponents/SliderBox.jsx";
 import CommunityTabs from "@/components/homeComponents/CommunityTabs.jsx";
 import { motion } from "framer-motion";
@@ -13,6 +14,20 @@ function Home() {
   const lastScrollY = useRef(0);
   const scrollLock = useRef(false);
   const [showTabs, setShowTabs] = useState(false);
+  const [latestNotices, setLatestNotices] = useState([]); // 최신 공지 상태 추가
+
+  // 최신 공지 4개 불러오기
+  useEffect(() => {
+    const fetchLatestNotices = async () => {
+      try {
+        const res = await axios.get("/api/notices");
+        setLatestNotices(res.data || []); // 에러 방지를 위해 fallback 처리
+      } catch (err) {
+        console.error("최신 공지 불러오기 실패:", err);
+      }
+    };
+    fetchLatestNotices();
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -54,7 +69,7 @@ function Home() {
   return (
     <>
       <AppNavbar />
-      <SliderBox />
+      <SliderBox notices={latestNotices} />
 
       <Box ref={categoryRef} mt={20}>
         <MotionBox
