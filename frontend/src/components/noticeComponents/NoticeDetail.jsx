@@ -53,6 +53,12 @@ const NoticeDetail = () => {
     }
   };
 
+  const extractSummary = (text) => {
+    if (!text) return "";
+    const firstSentence = text.split(/(?<=[.?!])\s+/)[0];
+    return firstSentence;
+  };
+
   useEffect(() => {
     const fetchNotice = async () => {
       try {
@@ -89,6 +95,8 @@ const NoticeDetail = () => {
       </Text>
     );
 
+  const summary = extractSummary(notice?.content);
+
   return (
     <Box maxW="900px" mx="auto" px={{ base: 4, md: 8 }} py={16} mt={16}>
       <Link as={RouterLink} to="/notice" _hover={{ textDecoration: "underline" }}>
@@ -101,7 +109,7 @@ const NoticeDetail = () => {
         fontSize={{ base: "3xl", md: "4xl" }}
         fontWeight="extrabold"
         fontFamily="Georgia"
-        mb={5}
+        mb={2}
         lineHeight="1.3"
         letterSpacing="-0.5px"
       >
@@ -109,6 +117,10 @@ const NoticeDetail = () => {
       </Heading>
 
       <Box w="20%" h="2px" bg="red" mb={6} />
+
+      <Text fontSize="md" fontWeight="medium" color="gray.600" mb={6}>
+        {summary}
+      </Text>
 
       <Text fontSize="sm" color="gray.500" mb={8}>
         {new Date(notice.createdDate).toLocaleDateString("ko-KR")}

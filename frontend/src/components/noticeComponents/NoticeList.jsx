@@ -11,7 +11,11 @@ const NoticeList = () => {
   const navigate = useNavigate();
   const { state: user } = useUser();
 
-  // 페이지 복원 및 초기 데이터 로드
+  const extractSummary = (text) => {
+    if (!text) return "";
+    return text.split(/(?<=[.?!])\s+/)[0]; // 마침표, 물음표, 느낌표 기준 첫 문장 추출
+  };
+
   useEffect(() => {
     const savedPage = sessionStorage.getItem("noticeListPage");
     if (savedPage !== null) {
@@ -77,6 +81,7 @@ const NoticeList = () => {
           </Button>
         )}
       </Flex>
+
       <Flex direction={useBreakpointValue({ base: "column", md: "row" })} gap={14}>
         {main && (
           <Box flex="2" onClick={() => handleNoticeClick(main.id)} _hover={{ cursor: "pointer" }}>
@@ -98,18 +103,22 @@ const NoticeList = () => {
               fontSize="3xl"
               fontWeight="extrabold"
               fontFamily="Georgia"
-              mb={4}
+              mb={2}
               lineHeight="short"
               letterSpacing="-0.5px"
               _hover={{ textDecoration: "underline" }}
             >
               {main.title}
             </Text>
+            <Text fontSize="md" color="gray.600" mb={4}>
+              {extractSummary(main.content)}
+            </Text>
             <Text fontSize="sm" color="gray.600">
               {formatDate(main.createdDate)}
             </Text>
           </Box>
         )}
+
         <VStack flex="1" spacing={10}>
           {sideNotices.map((notice) => (
             <Box key={notice.id} w="100%" onClick={() => handleNoticeClick(notice.id)} _hover={{ cursor: "pointer" }}>
@@ -117,7 +126,7 @@ const NoticeList = () => {
                 <Box w="100%" h="250px" mb={4} borderRadius="md" overflow="hidden">
                   <Image
                     src={`http://localhost:8084/${notice.imagePath}`}
-                    alt="공지 이미지"
+                    alt="매거진 이미지"
                     w="100%"
                     h="100%"
                     objectFit="cover"
@@ -131,12 +140,15 @@ const NoticeList = () => {
                 fontSize="xl"
                 fontWeight="bold"
                 fontFamily="Georgia"
-                mb={2}
+                mb={1}
                 letterSpacing="-0.4px"
                 noOfLines={2}
                 _hover={{ textDecoration: "underline" }}
               >
                 {notice.title}
+              </Text>
+              <Text fontSize="sm" color="gray.500" noOfLines={2} mb={1}>
+                {extractSummary(notice.content)}
               </Text>
               <Text fontSize="sm" color="gray.600">
                 {formatDate(notice.createdDate)}
@@ -145,6 +157,7 @@ const NoticeList = () => {
           ))}
         </VStack>
       </Flex>
+
       <Box mt={20}>
         <Box w="100%" h="1px" bg="gray.400" my={16} />
         <SimpleGrid columns={[1, null, 3]} spacing={10}>
@@ -160,10 +173,10 @@ const NoticeList = () => {
               borderBottom="1px solid black"
             >
               {notice.imagePath ? (
-                <Box w="100%" h="200px" mb={4} borderRadius="md" overflow="hidden">
+                <Box w="100%" h="230px" mb={4} borderRadius="md" overflow="hidden">
                   <Image
                     src={`http://localhost:8084/${notice.imagePath}`}
-                    alt="공지 이미지"
+                    alt="매거진 이미지"
                     w="100%"
                     h="100%"
                     objectFit="cover"
@@ -177,11 +190,14 @@ const NoticeList = () => {
                 fontSize="lg"
                 fontWeight="semibold"
                 fontFamily="Georgia"
-                mb={2}
-                noOfLines={3}
+                mb={1}
+                noOfLines={2}
                 _hover={{ textDecoration: "underline" }}
               >
                 {notice.title}
+              </Text>
+              <Text fontSize="sm" color="gray.500" noOfLines={2} mb={1}>
+                {extractSummary(notice.content)}
               </Text>
               <Text fontSize="sm" color="gray.600" mt="auto">
                 {formatDate(notice.createdDate)}
@@ -189,6 +205,7 @@ const NoticeList = () => {
             </Box>
           ))}
         </SimpleGrid>
+
         <HStack spacing={2} justify="center" mt={12}>
           <Button
             size="sm"
