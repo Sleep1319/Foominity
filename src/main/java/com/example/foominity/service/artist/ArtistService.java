@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.foominity.config.jwt.JwtTokenProvider;
 import com.example.foominity.domain.artist.Artist;
+import com.example.foominity.domain.board.Review;
 import com.example.foominity.domain.category.ArtistCategory;
 import com.example.foominity.domain.category.Category;
 import com.example.foominity.domain.image.ImageFile;
@@ -24,10 +25,12 @@ import com.example.foominity.exception.NotFoundArtistException;
 import com.example.foominity.exception.NotFoundMemberException;
 import com.example.foominity.exception.UnauthorizedException;
 import com.example.foominity.repository.artist.ArtistRepository;
+import com.example.foominity.repository.board.ReviewRepository;
 import com.example.foominity.repository.category.ArtistCategoryRepository;
 import com.example.foominity.repository.category.CategoryRepository;
 import com.example.foominity.repository.image.ImageRepository;
 import com.example.foominity.repository.member.MemberRepository;
+import com.example.foominity.service.board.ReviewService;
 import com.example.foominity.service.image.ImageService;
 import com.example.foominity.util.AuthUtil;
 
@@ -44,6 +47,9 @@ public class ArtistService {
     private final ArtistCategoryRepository artistCategoryRepository;
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
+
+    private final ReviewRepository reviewRepository;
+    private final ReviewService reviewService;
 
     private final ImageRepository imageRepository;
     private final ImageService imageService;
@@ -182,9 +188,16 @@ public class ArtistService {
 
         Artist artist = artistRepository.findById(artistId).orElseThrow(NotFoundArtistException::new);
 
-        ImageFile imageFile = artist.getImageFile();
+        List<Review> reviews = reviewRepository.findReviewsByArtist(artistId);
+        for (Review review : reviews) {
+            reviewService.deleteReview(review.getId(), tokenRequest);
+        }
 
-        imageService.deleteImageFile(imageFile);
+        ImageFile imageFile = artist.getImageFile();
+        if (imageFile != null) {
+            imageService.deleteImageFile(imageFile);
+        }
+
         artistCategoryRepository.deleteByArtistId(artistId);
         artistRepository.delete(artist);
     }
