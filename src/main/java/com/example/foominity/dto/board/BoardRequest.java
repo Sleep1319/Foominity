@@ -21,7 +21,10 @@ public class BoardRequest {
     @NotNull
     private String content;
 
+    @NotNull
+    private String category;
+
     public Board toEntity(BoardRequest req, Member member) {
-        return new Board(req.getTitle(), req.getContent(), member);
+        return new Board(req.getTitle(), req.getContent(), req.getCategory(), member);
     }
 }

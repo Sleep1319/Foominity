@@ -12,6 +12,7 @@ import {
   useToast,
   Flex,
   Spinner,
+  Select,
 } from "@chakra-ui/react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
@@ -26,6 +27,9 @@ const BoardUpdate = () => {
   const toast = useToast();
   const navigate = useNavigate();
 
+  const CATEGORY_LIST = ["일반", "음악", "후기", "정보", "질문"];
+  const [category, setCategory] = useState(CATEGORY_LIST[0]);
+
   // 1. 기존 게시글 데이터 받아오기
   useEffect(() => {
     const fetchBoard = async () => {
@@ -33,6 +37,7 @@ const BoardUpdate = () => {
         const res = await axios.get(`/api/board/${id}`);
         setTitle(res.data.title);
         setContent(res.data.content);
+        setCategory(res.data.category);
       } catch (err) {
         console.log(err);
         setError("게시글 정보를 불러올 수 없습니다.");
@@ -54,7 +59,7 @@ const BoardUpdate = () => {
     try {
       await axios.put(
         `/api/board/update/${id}`,
-        { title, content }
+        { title, content, category }
         // 필요시 memberId 추가
       );
       toast({
@@ -106,6 +111,17 @@ const BoardUpdate = () => {
       </Heading>
       <form onSubmit={handleSubmit}>
         <VStack spacing={6} align="stretch">
+          <FormControl>
+            <FormLabel>카테고리</FormLabel>
+            <Select value={category} onChange={(e) => setCategory(e.target.value)}>
+              {CATEGORY_LIST.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </Select>
+          </FormControl>
+
           <FormControl isInvalid={!!error && !title.trim()}>
             <FormLabel>제목</FormLabel>
             <Input

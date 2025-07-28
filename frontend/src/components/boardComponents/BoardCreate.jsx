@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Box,
   Heading,
@@ -11,10 +11,13 @@ import {
   VStack,
   useToast,
   Flex,
+  Select,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useUser } from "../../context/UserContext";
+import { Editor } from "@toast-ui/react-editor";
+import "@toast-ui/editor/dist/toastui-editor.css";
 
 const BoardCreate = () => {
   const { state: user } = useUser();
@@ -24,10 +27,15 @@ const BoardCreate = () => {
   const [error, setError] = useState("");
   const toast = useToast();
   const navigate = useNavigate();
+  const CATEGORY_LIST = ["일반", "음악", "후기", "정보", "질문"];
+  const [category, setCategory] = useState(CATEGORY_LIST[0]);
+
+  const editorRef = useRef();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    const content = editorRef.current?.getInstance().getMarkdown();
     if (!title.trim() || !content.trim()) {
       setError("제목과 내용을 모두 입력하세요.");
       return;
@@ -38,6 +46,7 @@ const BoardCreate = () => {
         title,
         content,
         memberId: user.memberId, // memberid는 가져오기
+        category,
       });
       toast({
         title: "게시글이 등록되었습니다.",
@@ -57,6 +66,18 @@ const BoardCreate = () => {
     console.log("memberId:", user?.id);
   };
 
+  useEffect(() => {
+    const style = document.createElement("style");
+    style.innerHTML = `
+    .toastui-editor-tabs { display: none !important; }
+    .toastui-editor-contents .toastui-editor-placeholder { display: none !important; }
+  `;
+    document.head.appendChild(style);
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
+
   return (
     <Box maxW="700px" mx="auto" py={10} px={4}>
       <Heading as="h2" size="lg" mb={8} textAlign="left">
@@ -64,6 +85,16 @@ const BoardCreate = () => {
       </Heading>
       <form onSubmit={handleSubmit}>
         <VStack spacing={6} align="stretch">
+          <FormControl>
+            <FormLabel>카테고리</FormLabel>
+            <Select value={category} onChange={(e) => setCategory(e.target.value)}>
+              {CATEGORY_LIST.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </Select>
+          </FormControl>
           <FormControl isInvalid={!!error && (!title.trim() || !content.trim())}>
             <FormLabel>제목</FormLabel>
             <Input
@@ -74,17 +105,22 @@ const BoardCreate = () => {
             />
           </FormControl>
 
-          <FormControl isInvalid={!!error && (!title.trim() || !content.trim())}>
-            <FormLabel>내용</FormLabel>
-            <Textarea
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="내용을 입력하세요"
-              rows={10}
-              maxLength={2000}
-            />
-            {error && <FormErrorMessage>{error}</FormErrorMessage>}
-          </FormControl>
+          <Box id="board-create" maxW="700px" mx="auto" py={10} px={4}>
+            <FormControl isInvalid={!!error}>
+              <FormLabel>내용</FormLabel>
+              <Editor
+                ref={editorRef}
+                initialValue=""
+                previewStyle="vertical"
+                height="400px"
+                initialEditType="wysiwyg"
+                useCommandShortcut={true}
+                hideModeSwitch={true}
+                placeholder="내용을 입력하세요"
+              />
+              {error && <FormErrorMessage>{error}</FormErrorMessage>}
+            </FormControl>
+          </Box>
 
           <Flex gap={3}>
             <Button colorScheme="blue" type="submit" isLoading={isSubmitting} px={10}>

@@ -30,17 +30,22 @@ public class Board extends BaseEntity {
     @Column(nullable = false, columnDefinition = "int default 0")
     private int views;
 
+    @Column(nullable = false, columnDefinition = "varchar(10) default '일반'")
+    private String category; // 종류: 일반, 음악, 후기, 정보, 질문
+
     @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
     private List<BoardComment> boardComments;
 
-    public void update(String title, String content) {
+    public void update(String title, String content, String category) {
         this.title = title;
         this.content = content;
+        this.category = category;
     }
 
-    public Board(String title, String content, Member member) {
+    public Board(String title, String content, String category, Member member) {
         this.title = title;
         this.content = content;
+        this.category = category;
         this.member = member;
         this.views = 0;
     }

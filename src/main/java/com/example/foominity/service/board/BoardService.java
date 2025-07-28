@@ -52,6 +52,7 @@ public class BoardService {
                         board.getMember().getId(),
                         board.getMember().getNickname(),
                         board.getViews(),
+                        board.getCategory(),
                         board.getCreatedDate(),
                         board.getUpdatedDate()))
                 .toList();
@@ -59,26 +60,48 @@ public class BoardService {
                 boards.getTotalElements());
     }
 
-    public List<BoardResponse> findByTitle(String keyword) {
-        List<Board> boards;
+    // public List<BoardResponse> findByTitle(String keyword) {
+    // List<Board> boards;
 
-        if (keyword == null || keyword.trim().isEmpty()) {
-            boards = boardRepository.findAllByOrderByCreatedDateDesc();
-        } else {
-            boards = boardRepository.findByTitleContainingIgnoreCaseOrderByCreatedDateDesc(keyword);
-        }
+    // if (keyword == null || keyword.trim().isEmpty()) {
+    // boards = boardRepository.findAllByOrderByCreatedDateDesc();
+    // } else {
+    // boards =
+    // boardRepository.findByTitleContainingIgnoreCaseOrderByCreatedDateDesc(keyword);
+    // }
 
-        return boards.stream()
-                .map(board -> new BoardResponse(
-                        board.getId(),
-                        board.getTitle(),
-                        board.getContent(),
-                        board.getMember().getId(),
-                        board.getMember().getNickname(),
-                        board.getViews(),
-                        board.getCreatedDate(),
-                        board.getUpdatedDate()))
-                .collect(Collectors.toList());
+    // return boards.stream()
+    // .map(board -> new BoardResponse(
+    // board.getId(),
+    // board.getTitle(),
+    // board.getContent(),
+    // board.getMember().getId(),
+    // board.getMember().getNickname(),
+    // board.getViews(),
+    // board.getCategory(),
+    // board.getCreatedDate(),
+    // board.getUpdatedDate()))
+    // .collect(Collectors.toList());
+    // }
+
+    // 검색
+    public Page<BoardResponse> findByKeyword(String keyword, int page) {
+        PageRequest pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
+        Page<Board> boards = boardRepository.findByTitleContainingIgnoreCase(keyword, pageable);
+        return boards.map(BoardResponse::from);
+    }
+
+    public Page<BoardResponse> findByCategory(String category, int page) {
+        PageRequest pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
+        Page<Board> boards = boardRepository.findByCategory(category, pageable);
+        Page<BoardResponse> boardResponses = boards.map(BoardResponse::from);
+        return boardResponses;
+    }
+
+    public Page<BoardResponse> findByCategoryAndKeyword(String category, String keyword, int page) {
+        PageRequest pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
+        Page<Board> boards = boardRepository.findByCategoryAndTitleContainingIgnoreCase(category, keyword, pageable);
+        return boards.map(BoardResponse::from);
     }
 
     @Transactional(readOnly = false) // 조회수 증가를 위해 추가
@@ -94,6 +117,7 @@ public class BoardService {
                 board.getMember().getId(),
                 board.getMember().getNickname(),
                 board.getViews(),
+                board.getCategory(),
                 board.getCreatedDate(),
                 board.getUpdatedDate());
     }
@@ -115,7 +139,7 @@ public class BoardService {
     @Transactional
     public void updateBoard(Long id, BoardUpdateRequest req, HttpServletRequest tokenRequest) {
         Board board = validateBoardOwnership(id, tokenRequest);
-        board.update(req.getTitle(), req.getContent());
+        board.update(req.getTitle(), req.getContent(), req.getCategory());
     }
 
     @Transactional
@@ -144,9 +168,12 @@ public class BoardService {
         Board board = boardRepository.findById(id).orElseThrow(NotFoundBoardException::new);
 
         // 관리자 통과시키기
-        // if (member.getRole().getId() == 4L) {
-        // return board;
-        // }
+        if (member.getRole().getId() == 4L) {
+            return board;
+        }
+        if (member.getRole().getId() == 4L) {
+            return board;
+        }
 
         if (!board.getMember().getId().equals(member.getId())) {
             throw new ForbiddenActionException();

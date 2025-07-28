@@ -3,67 +3,67 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
   Box,
-  Heading,
   SimpleGrid,
   Card,
   CardBody,
   Text,
   Flex,
   Icon,
-  // Menu,
-  // MenuButton,
-  // MenuList,
-  // MenuItem,
   Button,
   HStack,
   Input,
   InputGroup,
   InputRightElement,
+  Tabs,
+  TabList,
+  Tab,
 } from "@chakra-ui/react";
 import { FaRegEye } from "react-icons/fa";
 import { SearchIcon } from "@chakra-ui/icons";
 import { useUser } from "../../context/UserContext";
 
-// 페이지 갯수
 const BOARDS_PER_PAGE = 7;
+const CATEGORY_LIST = ["전체", "일반", "음악", "후기", "정보", "질문"];
 
-const BoardList = () => {
-  const [boards, setBoards] = useState([]);
+const BoardList = ({ currentId }) => {
+  // 🔵 "카테고리+검색" 동시 필터를 위한 state 통합
+  const [boardList, setBoardList] = useState([]); // 게시글 목록 (카테고리/검색 결과)
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchKeyword, setSearchKeyword] = useState("");
-  const [submittedKeyword, setSubmittedKeyword] = useState("");
+
+  // 🔵 탭(카테고리) 상태
+  const [selectedCategory, setSelectedCategory] = useState("전체");
+
+  // 🔵 검색 관련 상태
+  const [searchKeyword, setSearchKeyword] = useState(""); // 입력중
+  const [submittedKeyword, setSubmittedKeyword] = useState(""); // 실제 검색 실행(Submit) 시
 
   const navigate = useNavigate();
+  const { state: user } = useUser();
 
-  // 게시글 가져오기
+  // 🔵 탭/검색어 중 하나라도 바뀌면 게시글 목록 새로 불러옴!
   useEffect(() => {
     const fetchBoards = async () => {
-      try {
-        const response = await axios.get("/api/board/search", {
-          params: {
-            keyword: submittedKeyword,
-          },
-        });
-        setBoards(response.data);
-        setCurrentPage(1);
-      } catch (err) {
-        console.error("검색 실패:", err);
-      }
+      let params = {};
+      if (selectedCategory !== "전체") params.category = selectedCategory; // 선택된 카테고리(전체 제외)
+      if (submittedKeyword.trim() !== "") params.keyword = submittedKeyword; // 검색어
+      // → 둘 다 없으면 전체, 하나만 있으면 단독, 둘 다 있으면 동시 필터
+      const res = await axios.get("/api/board/page", { params });
+      setBoardList(res.data.content || []);
+      setCurrentPage(1); // 필터 바뀌면 항상 1페이지로 이동
     };
-
     fetchBoards();
-  }, [submittedKeyword]);
+  }, [selectedCategory, submittedKeyword]);
 
-  // 페이징
-  const totalPages = Math.ceil(boards.length / BOARDS_PER_PAGE);
+  // 🟢 페이지네이션 계산 (항상 boardList 기준!)
+  const totalPages = Math.ceil(boardList.length / BOARDS_PER_PAGE);
   const startIndex = (currentPage - 1) * BOARDS_PER_PAGE;
-  const currentBoards = boards.slice(startIndex, startIndex + BOARDS_PER_PAGE);
+  const currentBoards = boardList.slice(startIndex, startIndex + BOARDS_PER_PAGE);
 
+  // 페이지 블록 계산
   const PAGE_BLOCK = 10;
   const currentBlock = Math.floor((currentPage - 1) / PAGE_BLOCK);
   const blockStart = currentBlock * PAGE_BLOCK + 1;
   const blockEnd = Math.min(blockStart + PAGE_BLOCK - 1, totalPages);
-
   const pageNumbers = [];
   for (let i = blockStart; i <= blockEnd; i++) {
     pageNumbers.push(i);
@@ -73,53 +73,45 @@ const BoardList = () => {
     if (!dateString) return "";
     const date = new Date(dateString);
     const now = new Date();
-
-    // 오늘 여부 체크
     const isToday =
       date.getFullYear() === now.getFullYear() &&
       date.getMonth() === now.getMonth() &&
       date.getDate() === now.getDate();
-
     if (isToday) {
-      // 시간, 분만 반환 (ex: 16:31)
       const hours = String(date.getHours()).padStart(2, "0");
       const minutes = String(date.getMinutes()).padStart(2, "0");
       return `${hours}:${minutes}`;
     } else {
-      // 날짜만 반환 (ex: 2025.6.24)
       return `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`;
     }
   }
 
-  const { state: user, isLoading } = useUser();
-
-  console.log(isLoading); // 경고 없애기용 (임시)
-
   return (
     <Box p={6} maxW="1200px" mx="auto">
-      {/* 헤딩과 검색어 영역 */}
-      <Flex align="center" justify="space-between" mb={6}>
-        <Heading as="h2" size="xl" cursor="pointer" onClick={() => navigate("/board")}>
-          자유게시판
-        </Heading>
-        {/* 
-        <Menu isLazy>
-          <MenuButton as={Button} size="sm">
-            카테고리
-          </MenuButton>
-          <MenuList>
-            <MenuItem>발라드</MenuItem>
-            <MenuItem>트로트</MenuItem>
-            <MenuItem>힙합</MenuItem>
-            <MenuItem>록</MenuItem>
-          </MenuList>
-        </Menu> */}
-      </Flex>
-      <Flex px={4} py={2} fontWeight="semibold" fontSize="sm" color="gray.600" borderBottom="1px solid #e2e8f0">
-        <Text flex="1">번호</Text>
+      {/* 🔵 카테고리 탭: 선택 시 selectedCategory 변경 */}
+      <Tabs onChange={(idx) => setSelectedCategory(CATEGORY_LIST[idx])}>
+        <TabList>
+          {CATEGORY_LIST.map((cat) => (
+            <Tab key={cat}>{cat}</Tab>
+          ))}
+        </TabList>
+      </Tabs>
 
-        <Text flex="1">제목</Text>
-
+      {/* 표 헤더 */}
+      <Flex mt={3} px={4} py={2} fontWeight="semibold" fontSize="sm" color="gray.600" borderBottom="1px solid #e2e8f0">
+        <Flex w="100%">
+          <Box display="flex">
+            <Text minW="40px" mr={3} textAlign="left" ml={7}>
+              탭
+            </Text>
+            <Text minW="50px" textAlign="left">
+              번호
+            </Text>
+          </Box>
+          <Box flex="1" display="flex" justifyContent="center">
+            <Text textAlign="center">제목</Text>
+          </Box>
+        </Flex>
         <Flex minW="300px" justify="space-between">
           <Text w="130px" textAlign="center">
             글쓴이
@@ -131,33 +123,37 @@ const BoardList = () => {
             조회수
           </Text>
         </Flex>
-        {/* 검색어 + 메뉴 */}
       </Flex>
 
-      {/* 게시글 목록을 그리드 형태로 표시 */}
+      {/* 게시글 목록 */}
       <SimpleGrid spacing={4} columns={{ base: 1, md: 1, lg: 1 }}>
         {currentBoards.map((board) => (
           <Card key={board.id} borderRadius="lg" shadow="md" _hover={{ shadow: "lg" }} mb={2}>
             <CardBody p={0}>
               <Flex align="center" minH="64px" px={4}>
-                {/* 번호 */}
+                <Text ml={5}>{board.category}</Text>
                 <Text w="80px" color="gray.400" fontSize="sm" textAlign="center">
                   {board.id}
                 </Text>
-                {/* 게시글 제목 */}
                 <Text
                   flex="1"
-                  fontWeight="bold"
+                  fontWeight={String(board.id) === String(currentId) ? "bold" : "normal"}
                   fontSize="lg"
-                  cursor="pointer"
-                  onClick={() => navigate(`/board/${board.id}`)}
-                  _hover={{ color: "blue.500", textDecoration: "underline" }}
+                  color={String(board.id) === String(currentId) ? "blue.700" : "inherit"}
+                  bg={String(board.id) === String(currentId) ? "gray.100" : "none"}
+                  cursor={String(board.id) === String(currentId) ? "default" : "pointer"}
+                  onClick={() => {
+                    if (String(board.id) !== String(currentId)) navigate(`/board/${board.id}`);
+                  }}
+                  _hover={{
+                    color: String(board.id) === String(currentId) ? "blue.700" : "blue.500",
+                    textDecoration: String(board.id) === String(currentId) ? "none" : "underline",
+                  }}
                   noOfLines={2}
                   ml={2}
                 >
                   {board.title}
                 </Text>
-                {/* 오른쪽 영역: 글쓴이, 날짜, 조회수 */}
                 <Flex gap={6} minW="320px" justify="flex-end" align="center" ml={4}>
                   <Text w="100px" textAlign="center" color="gray.500" fontSize="sm">
                     {board.nickname}
@@ -178,14 +174,11 @@ const BoardList = () => {
 
       {/* 페이지네이션 */}
       <HStack spacing={2} justify="center" mt={8}>
-        {/* 이전 블록 버튼 */}
         {blockStart > 1 && (
           <Button size="sm" variant="outline" onClick={() => setCurrentPage(blockStart - 1)}>
             이전
           </Button>
         )}
-
-        {/* 실제 페이지 번호 버튼 */}
         {pageNumbers.map((num) => (
           <Button
             key={num}
@@ -196,8 +189,6 @@ const BoardList = () => {
             {num}
           </Button>
         ))}
-
-        {/* 다음 블록 버튼 */}
         {blockEnd < totalPages && (
           <Button size="sm" variant="outline" onClick={() => setCurrentPage(blockEnd + 1)}>
             다음
@@ -205,7 +196,7 @@ const BoardList = () => {
         )}
       </HStack>
 
-      {/* 제목 검색 */}
+      {/* 🔵 제목 검색: 입력 후 엔터/버튼으로 submittedKeyword를 변경 */}
       <Box mt={8}>
         <Flex gap={4} align="center">
           <Text mb={2} fontWeight="bold" whiteSpace="nowrap">
@@ -214,9 +205,9 @@ const BoardList = () => {
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              setSubmittedKeyword(searchKeyword); // 검색 실행
+              setSubmittedKeyword(searchKeyword); // 실제 검색 실행!
             }}
-            style={{ flex: 1 }} // form도 옆으로 늘어나게
+            style={{ flex: 1 }}
           >
             <InputGroup maxW="400px">
               <Input

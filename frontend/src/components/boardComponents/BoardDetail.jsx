@@ -19,6 +19,8 @@ import { useUser } from "../../context/UserContext";
 import axios from "axios";
 import BoardCommentForm from "@/components/commentComponents/BoardCommentForm.jsx";
 import CommentList from "@/components/commentComponents/CommenList.jsx";
+import BoardList from "./BoardList";
+import { Viewer } from "@toast-ui/react-editor";
 
 const BoardDetail = () => {
   const { state: user } = useUser();
@@ -78,6 +80,7 @@ const BoardDetail = () => {
 
   useEffect(() => {
     fetchBoard();
+    window.scrollTo(0, 0);
   }, [id]);
 
   if (loading) {
@@ -101,23 +104,30 @@ const BoardDetail = () => {
   return (
     <Box display="flex" justifyContent="center" px={6} py={10}>
       <Box flex="1" maxW="900px">
-        <Text
-          fontSize="2xl"
-          fontWeight="medium"
-          pb={2}
-          textAlign="left"
+        <Box
+          as="button"
+          w="100%"
+          py={8}
+          border="none"
+          background="none"
           borderBottom="1px solid gray"
-          mb={5}
           cursor="pointer"
-          onClick={() => window.location.reload()}
+          onClick={() => navigate("/board")}
+          display="flex"
+          justifyContent="flex-start"
+          alignItems="center"
+          pl={2}
         >
-          자유게시판
-        </Text>
-        <Heading as="h1" size="xl" textAlign="left" pb={2} mt={10} borderBottom="1px solid gray" mb={10}>
+          <Text fontSize="2xl" fontWeight="medium">
+            자유게시판
+          </Text>
+        </Box>
+
+        <Heading as="h1" size="xl" textAlign="left" pb={2} mt={100} borderBottom="1px solid gray" mb={30}>
           {board.title}
         </Heading>
 
-        <Flex textAlign="left" fontSize="lg" fontWeight="light" mt={2} borderBottom="1px solid gray" pb={4}>
+        <Flex textAlign="left" fontSize="lg" fontWeight="light" borderBottom="1px solid gray" pb={4}>
           <Text pr={4}>{board.nickname}</Text>
           <Spacer /> {/* Spacer로 왼쪽 오른쪽 나누기 */}
           <Text px={4}>{board.createdDate?.split("T")[0]}</Text>
@@ -131,17 +141,11 @@ const BoardDetail = () => {
           </Text>
         </Flex>
 
-        <Box mt={18}>
-          <Text
-            fontSize="md"
-            whiteSpace="pre-wrap"
-            textAlign="left"
-            borderBottom="1px solid gray"
-            pb={4}
-            mt={10}
-            mb={10}
-          >
-            {board.content}
+        <Box mt={50} borderBottom="1px solid gray">
+          <Text fontSize="md" whiteSpace="pre-wrap" textAlign="left" pb={4} mt={100} mb={200}>
+            <Box mt={6}>
+              <Viewer initialValue={board.content} />
+            </Box>
           </Text>
         </Box>
 
@@ -168,11 +172,7 @@ const BoardDetail = () => {
         {/*    {board.commentCount ?? 0}*/}
         {/*  </Text>*/}
         {/*</HStack>*/}
-
-        <CommentList key={commentKey} type="boards" id={id} />
-        <BoardCommentForm boardId={id} commentCount={board.commentCount || 0} onSuccess={handleCommentSuccess} />
-
-        <Box mt={5}>
+        <Box mt={5} mb={5}>
           <HStack>
             <Flex justify="space-between" mb={2} align="center">
               <Button bg="black" color="white" size="sm" ml={2} onClick={() => navigate("/board")}>
@@ -195,27 +195,15 @@ const BoardDetail = () => {
             </Flex>
           </HStack>
         </Box>
-        {/*<Box mt={4} borderBottom="2px solid gray" pb={14}>*/}
-        {/*  <Text fontWeight="bold" mb={2}>*/}
-        {/*    댓글 달기*/}
-        {/*  </Text>*/}
-        {/*  {isLoggedIn ? (*/}
-        {/*    <Textarea placeholder="댓글을 입력하세요..." />*/}
-        {/*  ) : (*/}
-        {/*    <Box*/}
-        {/*      p={8}*/}
-        {/*      border="1px solid gray"*/}
-        {/*      borderRadius="md"*/}
-        {/*      color="gray.600"*/}
-        {/*      whiteSpace="pre-wrap"*/}
-        {/*      minHeight="100px"*/}
-        {/*      cursor="pointer"*/}
-        {/*      onClick={() => navigate("/login")}*/}
-        {/*    >*/}
-        {/*      댓글 쓰기 권한이 없습니다. 로그인 하시겠습니까?*/}
-        {/*    </Box>*/}
-        {/*  )}*/}
-        {/*</Box>*/}
+
+        <Box borderTop="1px solid gray">
+          <CommentList key={commentKey} type="boards" id={id} />
+          <BoardCommentForm boardId={id} commentCount={board.commentCount || 0} onSuccess={handleCommentSuccess} />
+        </Box>
+
+        <Box mt={50}>
+          <BoardList currentId={id} />
+        </Box>
       </Box>
     </Box>
   );
