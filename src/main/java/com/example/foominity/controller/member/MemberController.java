@@ -157,15 +157,6 @@ public class MemberController {
         return ResponseEntity.ok(list);
     }
 
-    // 좋아요 누른 앨범들 불러오기
-    @GetMapping("/me/liked-albums")
-    public ResponseEntity<List<MemberReviewResponse>> getMyLikedReviews(HttpServletRequest req) {
-        String token = jwtTokenProvider.resolveTokenFromCookie(req);
-        Long memberId = jwtTokenProvider.getUserIdFromToken(token);
-        List<MemberReviewResponse> list = reviewService.getLikedReviews(memberId);
-        return ResponseEntity.ok(list);
-    }
-
     @PostMapping("/check-password")
     public ResponseEntity<?> checkPassword(
             HttpServletRequest request,
@@ -215,9 +206,26 @@ public class MemberController {
         return ResponseEntity.ok(Map.of("message", "비밀번호가 성공적으로 변경되었습니다."));
     }
 
+    // 좋아요 누른 앨범들 조회
+    @GetMapping("/me/liked-albums")
+    public ResponseEntity<List<MemberReviewResponse>> getMyLikedReviews(HttpServletRequest req) {
+        String token = jwtTokenProvider.resolveTokenFromCookie(req);
+        Long memberId = jwtTokenProvider.getUserIdFromToken(token);
+        List<MemberReviewResponse> list = reviewService.getLikedReviews(memberId);
+        return ResponseEntity.ok(list);
+    }
+
+    // 특정 유저 정보 조회
     @GetMapping("/users/{id}/profile")
     public ResponseEntity<OtherUserProfileResponse> getOtherUserProfile(@PathVariable Long id) {
         return ResponseEntity.ok(memberService.getOtherUserProfile(id));
+    }
+
+    // 특정 멤버의 좋아요 누른 앨범들 조회
+    @GetMapping("/users/{id}/liked-albums")
+    public ResponseEntity<List<MemberReviewResponse>> getLikedReviewsByMember(@PathVariable Long id) {
+        List<MemberReviewResponse> liked = reviewService.getLikedReviews(id);
+        return ResponseEntity.ok(liked);
     }
 
 }

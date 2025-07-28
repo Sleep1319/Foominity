@@ -25,7 +25,7 @@ const AppNavbar = () => {
       w="100%"
       bg="whiteAlpha.200"
       backdropFilter="blur(80px)"
-      zIndex="9999"
+      zIndex="1000"
     >
       {/* Search Navbar (검색창 토글) */}
       <SearchNavbar isVisible={isSearchVisible} onClose={() => setSearchVisible(false)} />
