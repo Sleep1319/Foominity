@@ -7,13 +7,10 @@ import com.example.foominity.domain.board.ReviewComment;
 import com.example.foominity.domain.image.ImageFile;
 import com.example.foominity.domain.report.Report;
 import com.example.foominity.domain.report.ReportComment;
-import com.example.foominity.domain.sign.SocialType;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -23,8 +20,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -66,30 +61,33 @@ public class Member extends BaseEntity {
     @OneToOne(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Point point;
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
-    private List<Like> like;
-
-    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
-    private List<ReviewComment> reviewComment;
-
-    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
-    private List<Board> board;
-
-    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
-    private List<BoardComment> boardComment;
-
-    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
-    private List<Report> report;
-
-    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
-    private List<ReportComment> reportComment;
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "profile_image_id")
+    private ImageFile profileImage;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<ReviewLike> reviewLike;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "profile_image_id")
-    private ImageFile profileImage;
+    // Like 엔티티 지울지 말지 정하기 (리뷰 코멘트에 해당하는 좋아요임)
+    // @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    // private List<Like> like;
+
+    // ===============================================================
+
+    // @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    // private List<ReviewComment> reviewComment;
+
+    // @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    // private List<Board> board;
+
+    // @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    // private List<BoardComment> boardComment;
+
+    // @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    // private List<Report> report;
+
+    // @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    // private List<ReportComment> reportComment;
 
     // ================================================================
     public Member(String email, String password, String userName, String nickname, Role role) {
