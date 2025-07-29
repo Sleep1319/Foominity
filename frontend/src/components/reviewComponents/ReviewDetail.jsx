@@ -21,6 +21,8 @@ const ReviewDetail = () => {
   const [likeCount, setLikeCount] = useState(0);
   const [liked, setLiked] = useState(false);
 
+  const [recommendations, setRecommendations] = useState([]);
+
   const fetchReview = () => {
     axios
       .get(`/api/reviews/${id}`, { withCredentials: true })
@@ -93,7 +95,23 @@ const ReviewDetail = () => {
   useEffect(() => {
     fetchReview();
     fetchLikeInfo();
+
+    axios
+      .get(`/api/reviews/${id}/recommend`)
+      .then((res) => {
+        console.log("🎯 추천 앨범 리스트:", res.data);
+        setRecommendations(res.data);
+      })
+      .catch((err) => console.error("추천 앨범 불러오기 실패:", err));
   }, [id]);
+
+  useEffect(() => {
+    if (recommendations.length > 0) {
+      recommendations.forEach((album) => {
+        console.log("✅ 추천 앨범 제목:", album.title);
+      });
+    }
+  }, [recommendations]);
 
   if (loading) {
     return (
@@ -201,6 +219,56 @@ const ReviewDetail = () => {
                 </Box>
               </Box>
             </Box>
+          </Box>
+
+          <Box mt={10}>
+            <Text fontSize="2xl" fontWeight="bold" mb={4}>
+              유사한 앨범 추천
+            </Text>
+            {recommendations.length === 0 ? (
+              <Text>추천 앨범이 없습니다.</Text>
+            ) : (
+              <HStack spacing={4} overflowX="auto">
+                {recommendations.map((album) => (
+                  <Box
+                    key={album.id}
+                    onClick={() => navigate(`/review/${album.id}`)}
+                    cursor="pointer"
+                    borderWidth="1px"
+                    borderRadius="md"
+                    overflow="hidden"
+                    minW="200px"
+                    w="200px"
+                    h="280px" // ✅ 전체 박스 높이 고정
+                  >
+                    <Image
+                      src={album.imagePath ? `http://localhost:8084/${album.imagePath}` : ""}
+                      alt={album.title}
+                      boxSize="200px"
+                      objectFit="cover"
+                    />
+
+                    <Box p={2} h="60px">
+                      {" "}
+                      {/* ✅ 텍스트 영역 높이 고정 */}
+                      <Text
+                        fontSize="md"
+                        fontWeight="semibold"
+                        whiteSpace="normal"
+                        wordBreak="break-word"
+                        lineHeight="1.2"
+                        noOfLines={2} // ✅ 최대 2줄
+                      >
+                        {album.title}
+                      </Text>
+                      <Text fontSize="sm" color="gray.600" isTruncated>
+                        {album.artists.map((a) => a.name).join(", ")}
+                      </Text>
+                    </Box>
+                  </Box>
+                ))}
+              </HStack>
+            )}
           </Box>
 
           <ReviewCommentForm reviewId={id} commentCount={review.commentCount || 0} onSuccess={handleCommentSuccess} />
