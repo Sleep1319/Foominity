@@ -14,10 +14,12 @@ import {
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { useUser } from "@/context/UserContext";
 
 const ArtistDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { state } = useUser();
 
   const [artist, setArtist] = useState(null);
   const [reviews, setReviews] = useState([]);
@@ -41,6 +43,21 @@ const ArtistDetail = () => {
 
     fetchData();
   }, [id]);
+
+  const handleDelete = () => {
+    if (window.confirm("정말 삭제하시겠습니까?")) {
+      axios
+        .delete(`/api/artists/${id}`, { withCredentials: true })
+        .then(() => {
+          alert("아티스트가 삭제되었습니다.");
+          navigate("/review?tab=artist");
+        })
+        .catch((err) => {
+          console.error("아티스트 삭제 실패:", err);
+          alert("삭제에 실패했습니다.");
+        });
+    }
+  };
 
   if (loading) {
     return (
@@ -67,6 +84,22 @@ const ArtistDetail = () => {
             />
           </Box>
         )}
+
+        {/* ✅ 삭제 버튼: 관리자만 */}
+        {state?.roleName === "ADMIN" && (
+          <Box display="flex" justifyContent="flex-end" mb={2}>
+            <Text
+              fontSize="sm"
+              color="red.500"
+              cursor="pointer"
+              onClick={handleDelete}
+              _hover={{ textDecoration: "underline" }}
+            >
+              삭제하기
+            </Text>
+          </Box>
+        )}
+
         <Text fontSize="3xl" fontWeight="bold" pb={4}>
           {artist.name}
         </Text>

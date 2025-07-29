@@ -22,6 +22,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -55,6 +56,7 @@ public class ArtistController {
         return ResponseEntity.ok(res);
     }
 
+    // 생성
     @PostMapping(value = "/api/artists", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> createArtist(
             @Valid @ModelAttribute ArtistRequest req,
@@ -63,6 +65,7 @@ public class ArtistController {
         return ResponseEntity.ok().build();
     }
 
+    // 수정
     @PutMapping(value = "/api/artists/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> updateArtist(
             @PathVariable Long id,
@@ -70,6 +73,15 @@ public class ArtistController {
             HttpServletRequest tokenRequest) {
         artistService.updateArtist(id, req, tokenRequest);
 
+        return ResponseEntity.ok().build();
+    }
+
+    // 삭제
+    @DeleteMapping("/api/artists/{id}")
+    public ResponseEntity<Void> deleteArtist(
+            @PathVariable Long id,
+            HttpServletRequest tokRequest) {
+        artistService.deleteArtist(id, tokRequest);
         return ResponseEntity.ok().build();
     }
 
