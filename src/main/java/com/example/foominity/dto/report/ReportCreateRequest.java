@@ -28,7 +28,7 @@ public class ReportCreateRequest {
     @NotBlank
     private String reason;
 
-    public Report toEntity(Member member) {
-        return new Report(this.title, this.reason, this.type, this.targetId, this.targetType, member);
+    public Report toEntity(Long memberId, String nickname) {
+        return new Report(this.title, this.reason, this.type, this.targetId, this.targetType, memberId, nickname);
     }
 }

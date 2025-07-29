@@ -114,7 +114,7 @@ public class ReportService {
         Long memberId = jwtTokenProvider.getUserIdFromToken(token);
         Member member = memberRepository.findById(memberId).orElseThrow(NotFoundMemberException::new);
 
-        reportRepository.save(req.toEntity(member));
+        reportRepository.save(req.toEntity(member.getId(), member.getNickname()));
 
     }
 
