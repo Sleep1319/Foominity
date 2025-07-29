@@ -66,13 +66,13 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
 
             if (member.getSocialType() == null) {
                 // 일반 회원이 같은 이메일로 이미 존재하는 경우 → 로그인 차단
-                response.sendRedirect("http://localhost:5173/sign-in?reason=email-already-registered");
+                response.sendRedirect("http://localhost:5173/loginpage?reason=email-already-registered");
                 return;
             }
 
             if (!member.getSocialType().equals(socialType)) {
                 // 다른 소셜 로그인으로 가입된 경우
-                response.sendRedirect("http://localhost:5173/sign-in?reason=provider-mismatch");
+                response.sendRedirect("http://localhost:5173/loginpage?reason=provider-mismatch");
                 return;
             }
 

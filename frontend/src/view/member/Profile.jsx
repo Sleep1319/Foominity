@@ -1,7 +1,7 @@
 import { Avatar, Box, HStack, Text, VStack, Flex, Button, Icon } from "@chakra-ui/react";
 import React, { useState } from "react";
 import { FaUser, FaEnvelope, FaUserTag, FaIdBadge, FaEye } from "react-icons/fa";
-import { useNavigate } from "react-router-dom"; // ✅ 주석 해제
+import { useNavigate } from "react-router-dom";
 import { useUser } from "../../context/UserContext.jsx";
 import DeleteModal from "../../view/Member/DeleteModal.jsx";
 import MyPostsTable from "../../components/memberComponents/MyPostsTable.jsx";
@@ -9,7 +9,7 @@ import SettingsButton from "../../components/memberComponents/SettingsButton.jsx
 import MyRequests from "../../components/memberComponents/MyRequests.jsx";
 
 const Profile = () => {
-  const navigate = useNavigate(); // ✅ 사용
+  const navigate = useNavigate(); // 사용
   const { state } = useUser();
   const [isDeleteOpen, setDeleteOpen] = useState(false);
 
@@ -84,13 +84,13 @@ const Profile = () => {
         </VStack>
       </Flex>
 
-      <Box maxW="3xl" mx="auto" px={4} mt={8} mb={20}>
-        <Text fontSize={20} mb={4} fontWeight="bold">
-          나의 게시물
-        </Text>
+      <Box maxW="3xl" mx="auto" px={4} mt={8}>
         <MyPostsTable />
+      </Box>
+      <Box maxW="3xl" mx="auto" px={4} mt={8} mb={20}>
         <MyRequests />
       </Box>
+
       <DeleteModal isOpen={isDeleteOpen} onClose={() => setDeleteOpen(false)} />
     </>
   );

@@ -270,9 +270,6 @@ const EditProfile = ({ nickname: initialNickname, avatar, onNicknameChange }) =>
         </Button>
       </Flex>
       <Box maxW="3xl" mx="auto" px={4} mt={8} mb={20}>
-        <Text fontSize={20} mb={4} fontWeight="bold">
-          나의 게시물
-        </Text>
         <MyPostsTable />
       </Box>
     </>

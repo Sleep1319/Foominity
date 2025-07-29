@@ -95,3 +95,5 @@ src/main/java/com/example/reactbootserver/service/SignService.java
 node_modules
 /src/main/java/com/example/foominity/controller/serverTestController.java
 /frontend.zip
+/my.cnf
+/mysqlDockerfile

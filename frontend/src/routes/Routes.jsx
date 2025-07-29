@@ -32,15 +32,14 @@ import ChangePassword from "../view/Sign/ChangePassword.jsx";
 
 import ArtistDetails from "../view/artist/ArtistDetails.jsx";
 
-import OtherUserProfile from "../view/member/OtherUserProfile.jsx";
-
 import ArtistEdits from "../view/artist/ArtistEdits.jsx";
+import PublicProfile from "../view/member/PublicProfile.jsx";
 
 function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
-      <Route path="/users/:id/profile" element={<OtherUserProfile />} />
+      <Route path="/users/:id/profile" element={<PublicProfile />} />
       <Route path="/changepassword" element={<ChangePassword />} />
       <Route path="/findpassword" element={<FindPassword />} />
       <Route path="/report" element={<ReportLists />} />

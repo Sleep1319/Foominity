@@ -2,6 +2,7 @@ import { Avatar, Box, HStack, Text, VStack, Flex, Button, Input } from "@chakra-
 import { useUser } from "../../context/UserContext.jsx";
 import LikedAlbums from "../../components/memberComponents/LikedAlbums.jsx";
 import ParticipatedAlbums from "../../components/memberComponents/ParticipatedAlbums.jsx";
+import OtherUserLikedAlbums from "../../components/memberComponents/PublicProfileLikedAlbums.jsx";
 
 const MyMusic = () => {
   const { state } = useUser();
