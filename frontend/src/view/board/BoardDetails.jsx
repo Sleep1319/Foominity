@@ -7,6 +7,7 @@ const BoardDetails = () => {
   return (
     <div>
       <BoardDetail />
+      <BoardList />
     </div>
   );
 };
