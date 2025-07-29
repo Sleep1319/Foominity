@@ -39,14 +39,19 @@ public class BoardController {
     }
 
     @GetMapping("/api/board/page")
-    public ResponseEntity<?> findAll(@RequestParam(defaultValue = "0") int page) {
-        Page<BoardResponse> res = boardService.findAll(page);
-        return ResponseEntity.ok(res);
-    }
-
-    @GetMapping("/api/board/search")
-    public ResponseEntity<List<BoardResponse>> searchBoards(@RequestParam String keyword) {
-        return ResponseEntity.ok(boardService.findByTitle(keyword));
+    public ResponseEntity<?> findBoards(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String keyword) {
+        if ((category == null || category.equals("전체")) && (keyword == null || keyword.isBlank())) {
+            return ResponseEntity.ok(boardService.findAll(page));
+        } else if (category != null && !category.equals("전체") && (keyword == null || keyword.isBlank())) {
+            return ResponseEntity.ok(boardService.findByCategory(category, page));
+        } else if ((category == null || category.equals("전체")) && keyword != null && !keyword.isBlank()) {
+            return ResponseEntity.ok(boardService.findByKeyword(keyword, page));
+        } else {
+            return ResponseEntity.ok(boardService.findByCategoryAndKeyword(category, keyword, page));
+        }
     }
 
     @GetMapping("/api/board/{id}")

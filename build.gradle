@@ -4,11 +4,6 @@ plugins {
 	id 'io.spring.dependency-management' version '1.1.7'
 }
 
-	// DB 실행 하기 위해 임시로 추가
-// bootRun {
-//     mainClass = 'com.example.foominity.FoominityApplication'
-// }
-
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
 

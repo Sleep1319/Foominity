@@ -19,6 +19,9 @@ import { FaRegEye, FaRegComment } from "react-icons/fa";
 import { useUser } from "../../context/UserContext";
 import axios from "axios";
 import BoardCommentForm from "@/components/commentComponents/BoardCommentForm.jsx";
+// import CommentList from "@/components/commentComponents/CommenList.jsx";
+import BoardList from "./BoardList";
+import { Viewer } from "@toast-ui/react-editor";
 import CommentList from "../commentComponents/CommentList";
 
 const BoardDetail = () => {
@@ -35,18 +38,21 @@ const BoardDetail = () => {
   const grayText = useColorModeValue("gray.700", "white");
   const blueText = useColorModeValue("blue.400", "blue.200");
 
+  const fetchBoard = async () => {
+    try {
+      // 백엔드에서 해당 id의 게시글 정보를 GET으로 가져옵니다
+      const res = await axios.get(`/api/board/${id}`);
+      setBoard(res.data);
+    } catch (err) {
+      console.error(err);
+      setBoard(null);
+    }
+    setLoading(false);
+  };
+
   useEffect(() => {
-    (async () => {
-      try {
-        const res = await axios.get(`/api/board/${id}`, { withCredentials: true });
-        setBoard(res.data);
-      } catch (err) {
-        console.error(err);
-        setBoard(null);
-      } finally {
-        setLoading(false);
-      }
-    })();
+    fetchBoard();
+    window.scrollTo(0, 0);
   }, [id]);
 
   const handleDelete = async () => {
@@ -82,25 +88,30 @@ const BoardDetail = () => {
   return (
     <Box display="flex" justifyContent="center" px={6} py={10}>
       <Box flex="1" maxW="900px">
-        {/* 게시글 헤더 */}
-        <Text
-          fontSize="2xl"
-          fontWeight="medium"
-          pb={2}
-          textAlign="left"
+        <Box
+          as="button"
+          w="100%"
+          py={8}
+          border="none"
+          background="none"
           borderBottom="1px solid gray"
-          mb={5}
           cursor="pointer"
-          onClick={() => window.location.reload()}
+          onClick={() => navigate("/board")}
+          display="flex"
+          justifyContent="flex-start"
+          alignItems="center"
+          pl={2}
         >
-          자유게시판
-        </Text>
-        <Heading as="h1" size="xl" textAlign="left" pb={2} mt={10} borderBottom="1px solid gray" mb={10}>
+          <Text fontSize="2xl" fontWeight="medium">
+            자유게시판
+          </Text>
+        </Box>
+
+        <Heading as="h1" size="2xl" textAlign="left" pb={2} mt={100} borderBottom="1px solid gray" mb={30}>
           {board.title}
         </Heading>
 
-        {/* 메타 정보 */}
-        <Flex textAlign="left" fontSize="lg" fontWeight="light" mt={2} borderBottom="1px solid gray" pb={4}>
+        <Flex textAlign="left" fontSize="lg" fontWeight="light" borderBottom="1px solid gray" pb={4}>
           <Text pr={4}>{board.nickname}</Text>
           <Spacer />
           <Text px={4}>{board.createdDate?.split("T")[0]}</Text>
@@ -115,22 +126,12 @@ const BoardDetail = () => {
         </Flex>
 
         {/* 내용 */}
-        <Box mt={18}>
-          <Text
-            fontSize="md"
-            whiteSpace="pre-wrap"
-            textAlign="left"
-            borderBottom="1px solid gray"
-            pb={4}
-            mt={10}
-            mb={10}
-          >
-            {board.content}
-          </Text>
+        <Box mt={25} mb={150} pb={4}>
+          <Viewer initialValue={board.content} />
         </Box>
 
         {/* 댓글 */}
-        <CommentList key={commentKey} type="boards" id={id} />
+        <CommentList key={commentKey} type="boards" id={id} borderTop="1px solid gray" />
         <BoardCommentForm boardId={id} commentCount={board.commentCount || 0} onSuccess={handleCommentSuccess} />
 
         {/* 버튼들 */}

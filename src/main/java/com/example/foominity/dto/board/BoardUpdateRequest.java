@@ -18,9 +18,13 @@ public class BoardUpdateRequest {
     @NotNull
     private String content;
 
+    @NotNull
+    private String category;
+
     public class ReviewUpdateRequest {
         private String title;
         private String content;
+        private String category;
         private Float starPoint;
         private List<Long> categoryIds;
     }
