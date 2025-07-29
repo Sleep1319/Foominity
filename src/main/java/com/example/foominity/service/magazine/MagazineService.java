@@ -1,13 +1,11 @@
-package com.example.foominity.service.notice;
+package com.example.foominity.service.magazine;
 
 import java.util.List;
 
 import com.example.foominity.config.jwt.JwtTokenProvider;
-import com.example.foominity.domain.board.Review;
 import com.example.foominity.domain.image.ImageFile;
 import com.example.foominity.domain.member.Member;
-import com.example.foominity.dto.board.ReviewResponse;
-import com.example.foominity.exception.NotFoundReviewException;
+import com.example.foominity.domain.notice.Magazine;
 import com.example.foominity.exception.UnauthorizedException;
 
 import org.springframework.data.domain.Page;
@@ -17,15 +15,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.foominity.domain.notice.Notice;
-import com.example.foominity.dto.notice.NoticeRequest;
-import com.example.foominity.dto.notice.NoticeResponse;
-import com.example.foominity.dto.notice.NoticeUpdateRequest;
+import com.example.foominity.dto.magazine.MagazineRequest;
+import com.example.foominity.dto.magazine.MagazineResponse;
 import com.example.foominity.exception.ForbiddenActionException;
 import com.example.foominity.exception.NotFoundMemberException;
 import com.example.foominity.exception.NotFoundNoticeException;
 import com.example.foominity.repository.member.MemberRepository;
-import com.example.foominity.repository.notice.NoticeRepository;
+import com.example.foominity.repository.notice.MagazineRepository;
 import com.example.foominity.service.image.ImageService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,29 +30,29 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
-public class NoticeService {
+public class MagazineService {
 
-    private final NoticeRepository noticeRepository;
+    private final MagazineRepository magazineRepository;
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final ImageService imageService;
 
-    public Page<NoticeResponse> findAll(int page) {
+    public Page<MagazineResponse> findAll(int page) {
         PageRequest pageable = PageRequest.of(page, 4, Sort.by(Sort.Direction.DESC, "id"));
-        Page<Notice> notices = noticeRepository.findAll(pageable);
+        Page<Magazine> notices = magazineRepository.findAll(pageable);
 
-        List<NoticeResponse> noticeResponseList = notices.stream()
-                .map(notice -> new NoticeResponse(notice.getId(), notice.getTitle(), notice.getContent(),
+        List<MagazineResponse> magazineResponseList = notices.stream()
+                .map(notice -> new MagazineResponse(notice.getId(), notice.getTitle(), notice.getContent(),
                         notice.getCreatedDate(),
                         notice.getImageFile().getSavePath()))
 
                 .toList();
-        return new PageImpl<>(noticeResponseList, pageable, notices.getTotalElements());
+        return new PageImpl<>(magazineResponseList, pageable, notices.getTotalElements());
     }
 
-    public NoticeResponse findByID(Long id) {
-        Notice notice = noticeRepository.findById(id).orElseThrow(NotFoundNoticeException::new);
-        return new NoticeResponse(
+    public MagazineResponse findByID(Long id) {
+        Magazine notice = magazineRepository.findById(id).orElseThrow(NotFoundNoticeException::new);
+        return new MagazineResponse(
                 notice.getId(),
                 notice.getTitle(),
                 notice.getContent(),
@@ -65,7 +61,7 @@ public class NoticeService {
     }
 
     @Transactional
-    public void createNotice(NoticeRequest req, HttpServletRequest Request) {
+    public void createNotice(MagazineRequest req, HttpServletRequest Request) {
         String token = jwtTokenProvider.resolveTokenFromCookie(Request);
         if (!jwtTokenProvider.validateToken(token)) {
             throw new UnauthorizedException();
@@ -88,11 +84,11 @@ public class NoticeService {
             throw new IllegalArgumentException("이미지 정보가 없습니다.");
         }
 
-        Notice notice = req.toEntity();
+        Magazine notice = req.toEntity();
 
         notice.setImageFile(imageFile);
 
-        noticeRepository.save(notice);
+        magazineRepository.save(notice);
     }
 
     @Transactional
@@ -109,8 +105,8 @@ public class NoticeService {
             throw new ForbiddenActionException();
         }
 
-        Notice notice = noticeRepository.findById(id).orElseThrow(NotFoundNoticeException::new);
-        noticeRepository.delete(notice);
+        Magazine notice = magazineRepository.findById(id).orElseThrow(NotFoundNoticeException::new);
+        magazineRepository.delete(notice);
 
     }
 
@@ -128,22 +124,22 @@ public class NoticeService {
             throw new ForbiddenActionException();
         }
 
-        noticeRepository.findByMainNoticeTrue().ifPresent(mainNotice -> {
+        magazineRepository.findByMainNoticeTrue().ifPresent(mainNotice -> {
             mainNotice.cancelNotice();
-            noticeRepository.save(mainNotice);
+            magazineRepository.save(mainNotice);
         });
-        noticeRepository.findById(newMainNoticeId)
+        magazineRepository.findById(newMainNoticeId)
                 .map(newMain -> {
                     newMain.changeNotice();
-                    return noticeRepository.save(newMain);
+                    return magazineRepository.save(newMain);
                 })
                 .orElseThrow(NotFoundNoticeException::new);
     }
 
-    public List<NoticeResponse> findAllNotices() {
-        List<Notice> notices = noticeRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
+    public List<MagazineResponse> findAllNotices() {
+        List<Magazine> notices = magazineRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
         return notices.stream()
-                .map(notice -> new NoticeResponse(
+                .map(notice -> new MagazineResponse(
                         notice.getId(),
                         notice.getTitle(),
                         notice.getContent(),
@@ -152,11 +148,11 @@ public class NoticeService {
                 .toList();
     }
 
-    public List<NoticeResponse> getLatest() {
-        List<Notice> noticeList = noticeRepository.findTop4ByOrderByIdDesc().orElseThrow(NotFoundNoticeException::new);
+    public List<MagazineResponse> getLatest() {
+        List<Magazine> noticeList = magazineRepository.findTop4ByOrderByIdDesc().orElseThrow(NotFoundNoticeException::new);
 
         return noticeList.stream()
-                .map(notice -> new NoticeResponse(
+                .map(notice -> new MagazineResponse(
                         notice.getId(),
                         notice.getTitle(),
                         notice.getContent(),

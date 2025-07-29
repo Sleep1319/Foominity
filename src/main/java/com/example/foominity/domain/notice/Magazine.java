@@ -2,7 +2,6 @@ package com.example.foominity.domain.notice;
 
 import com.example.foominity.domain.BaseEntity;
 import com.example.foominity.domain.image.ImageFile;
-import com.example.foominity.domain.member.Member;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -12,7 +11,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.OneToOne;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,7 +18,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 @Entity
-public class Notice extends BaseEntity {
+public class Magazine extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,7 +39,7 @@ public class Notice extends BaseEntity {
     @JoinColumn(name = "image_file_id")
     private ImageFile imageFile;
 
-    public Notice(String title, String content) {
+    public Magazine(String title, String content) {
         this.title = title;
         this.content = content;
     }
