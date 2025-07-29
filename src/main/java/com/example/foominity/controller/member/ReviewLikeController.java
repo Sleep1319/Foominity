@@ -1,4 +1,3 @@
-// src/main/java/com/example/foominity/controller/member/ReviewLikeController.java
 package com.example.foominity.controller.member;
 
 import java.util.HashMap;
