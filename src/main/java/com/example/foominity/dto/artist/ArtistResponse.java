@@ -19,17 +19,14 @@ public class ArtistResponse {
     private LocalDate born;
     private String nationality;
     private List<ArtistCategoryResponse> categories;
+    private String imagePath;
 
-    public ArtistResponse(Long id, String name, LocalDate born, String nationality) {
+    public ArtistResponse(Long id, String name, LocalDate born, String nationality, String imagePath) {
         this.id = id;
         this.name = name;
         this.born = born;
         this.nationality = nationality;
-    }
-
-    public ArtistResponse(Long id, String name) {
-        this.id = id;
-        this.name = name;
+        this.imagePath = imagePath;
     }
 
 }

@@ -16,27 +16,10 @@ const whiteNeonText = `
 
 const AuthButtons = () => {
   const [isLoginOpen, setLoginOpen] = useState(false);
-  const [isNavVisible, setIsNavVisible] = useState(false);
-
-  const showNav = () => setIsNavVisible(true);
-  const hideNav = () => setIsNavVisible(false);
 
   return (
     <>
-      {/* 상단 네브바  */}
-      <SearchNavbar isVisible={isNavVisible} onMouseEnter={showNav} onMouseLeave={hideNav} />
-
       <HStack spacing={4} align="center">
-        {/* 돋보기 버튼 */}
-        <IconButton
-          aria-label="Search"
-          icon={<SearchIcon />}
-          variant="ghost"
-          onMouseEnter={showNav}
-          bg="transparent"
-          _hover={{ bg: "transparent" }}
-        />
-
         <Button
           variant="ghost"
           color="black"
@@ -49,7 +32,7 @@ const AuthButtons = () => {
             textDecoration: "underline",
             bg: "transparent",
           }}
-          onClick={() => setLoginOpen(true)} // 클릭 시 모달 열기
+          onClick={() => setLoginOpen(true)}
         >
           SIGN
         </Button>

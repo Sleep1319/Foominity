@@ -1,9 +1,18 @@
 import React from "react";
 import { Box } from "@chakra-ui/react";
 
-const SliderBoxIndicator = ({ total, currentIndex, onDotClick }) => {
+const SliderBoxIndicator = ({ total, currentIndex, onDotClick, useAbsolute = true }) => {
   return (
-    <Box position="absolute" bottom="30px" left="50%" transform="translateX(-50%)" display="flex" gap="8px" zIndex="10">
+    <Box
+      position={useAbsolute ? "absolute" : "static"}
+      bottom={useAbsolute ? "30px" : undefined}
+      left={useAbsolute ? "50%" : undefined}
+      transform={useAbsolute ? "translateX(-50%)" : undefined}
+      display="flex"
+      gap="8px"
+      zIndex="10"
+      justifyContent={useAbsolute ? undefined : "flex-start"}
+    >
       {Array.from({ length: total }).map((_, idx) => (
         <Box
           as="button"

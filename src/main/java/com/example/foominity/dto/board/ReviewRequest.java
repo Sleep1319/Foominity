@@ -29,4 +29,5 @@ public class ReviewRequest {
     private List<Long> categoryIds;
 
     private MultipartFile image;
+    private String imagePath;
 }

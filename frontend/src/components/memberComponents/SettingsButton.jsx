@@ -12,6 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { HiCog } from "react-icons/hi";
 import DeleteModal from "../../view/Member/DeleteModal";
+import { useUser } from "../../context/UserContext";
 
 const SettingsButton = ({ items: customItems }) => {
   // 모달 오픈 상태 관리
@@ -20,10 +21,13 @@ const SettingsButton = ({ items: customItems }) => {
   // Popover 열림 상태 수동 관리
   const { isOpen, onOpen, onClose } = useDisclosure();
 
+  const { state: user } = useUser();
+
   // 기본 메뉴 아이템 정의
   const defaultItems = [
-    { title: "프로필 편집", href: "/mypage/editprofile" },
-    { title: "비밀번호 변경", href: "/resetpassword" },
+    { title: "내 프로필 편집", href: "/mypage/editprofile" },
+    // { title: "비밀번호 변경", href: "/changepassword" },
+    ...(user?.socialType == null ? [{ title: "비밀번호 변경", href: "/changepassword" }] : []),
     {
       title: "회원 탈퇴",
       action: () => setDeleteOpen(true),
@@ -45,7 +49,7 @@ const SettingsButton = ({ items: customItems }) => {
             variant="outline"
             size="sm"
             borderRadius={0}
-            w="130px"
+            w="135px"
             mb="142px"
             // ml="-45px"
             ml="-68px"
@@ -63,7 +67,7 @@ const SettingsButton = ({ items: customItems }) => {
             borderRadius="0"
             border="1px solid"
             borderColor="gray.200"
-            w="130px"
+            w="135px"
             bg="white"
             // boxShadow="lg"
           >

@@ -1,10 +1,7 @@
 import { Avatar, Box, HStack, Text, VStack, Flex, Button, Input } from "@chakra-ui/react";
 import { useUser } from "../../context/UserContext.jsx";
-import axios from "axios";
 import LikedAlbums from "../../components/memberComponents/LikedAlbums.jsx";
 import ParticipatedAlbums from "../../components/memberComponents/ParticipatedAlbums.jsx";
-axios.defaults.baseURL = "http://localhost:8084"; // 기본 백엔드 주소
-axios.defaults.withCredentials = true;
 
 const MyMusic = () => {
   const { state } = useUser();
@@ -20,7 +17,11 @@ const MyMusic = () => {
         pb={2}
         mt={4}
         ml={5}
+        h="85px"
       >
+        {/* {state.nickname} 님의 음악 */}
+      </Text>
+      <Text ml="21px" mt="5px" fontWeight="semibold" fontSize=" xl">
         {state.nickname} 님의 음악
       </Text>
 

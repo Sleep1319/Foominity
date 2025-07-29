@@ -1,4 +1,3 @@
-// src/components/common/LoginRequiredModal.jsx
 import React from "react";
 import {
   Modal,
@@ -34,7 +33,7 @@ const LoginRequiredModal = ({ isOpen, onClose }) => {
         </ModalHeader>
         <ModalBody textAlign="center">로그인을 하신 후 이용해 주시기 바랍니다.</ModalBody>
         <ModalFooter justifyContent="center" display="flex">
-          <Button bg="white" color="black" onClick={() => navigate("/login")}>
+          <Button bg="white" color="black" onClick={() => navigate("/loginpage")}>
             로그인
           </Button>
           <Button variant="ghost" ml={3} onClick={onClose}>

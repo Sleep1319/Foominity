@@ -8,6 +8,7 @@ import com.example.foominity.config.jwt.JwtTokenProvider;
 import com.example.foominity.domain.member.Member;
 import com.example.foominity.dto.member.MemberRequest;
 import com.example.foominity.dto.member.NicknameChangeRequest;
+import com.example.foominity.dto.member.OtherUserProfileResponse;
 import com.example.foominity.exception.NotFoundMemberException;
 import com.example.foominity.exception.UnauthorizedException;
 import com.example.foominity.repository.member.MemberRepository;
@@ -63,4 +64,12 @@ public class MemberService {
         }
         member.changeNickname(req.getNickname());
     }
+
+    // 다른 유저 프로필 조회
+    public OtherUserProfileResponse getOtherUserProfile(Long id) {
+        Member member = memberRepository.findById(id).orElseThrow(NotFoundMemberException::new);
+
+        return new OtherUserProfileResponse(member);
+    }
+
 }

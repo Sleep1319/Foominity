@@ -13,9 +13,11 @@ import com.example.foominity.config.jwt.JwtTokenProvider;
 import com.example.foominity.domain.artist.Artist;
 import com.example.foominity.domain.category.ArtistCategory;
 import com.example.foominity.domain.category.Category;
+import com.example.foominity.domain.image.ImageFile;
 import com.example.foominity.domain.member.Member;
 import com.example.foominity.dto.artist.ArtistRequest;
 import com.example.foominity.dto.artist.ArtistResponse;
+import com.example.foominity.dto.artist.ArtistSimpleResponse;
 import com.example.foominity.dto.artist.ArtistUpdateRequest;
 import com.example.foominity.dto.category.ArtistCategoryResponse;
 import com.example.foominity.exception.NotFoundArtistException;
@@ -24,7 +26,9 @@ import com.example.foominity.exception.UnauthorizedException;
 import com.example.foominity.repository.artist.ArtistRepository;
 import com.example.foominity.repository.category.ArtistCategoryRepository;
 import com.example.foominity.repository.category.CategoryRepository;
+import com.example.foominity.repository.image.ImageRepository;
 import com.example.foominity.repository.member.MemberRepository;
+import com.example.foominity.service.image.ImageService;
 import com.example.foominity.util.AuthUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,31 +45,37 @@ public class ArtistService {
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
 
+    private final ImageRepository imageRepository;
+    private final ImageService imageService;
+
     // 아티스트 전체 조회
-    public Page<ArtistResponse> getArtistList(int page) {
+    public Page<ArtistSimpleResponse> getArtistList(int page) {
         PageRequest pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "id"));
         Page<Artist> artists = artistRepository.findAll(pageable);
 
-        List<ArtistResponse> artistResponsesList = artists.stream().map(artist -> {
-            List<ArtistCategory> artistCategories = artistCategoryRepository.findByArtistId(artist.getId());
+        List<ArtistSimpleResponse> artistSimpleResponsesList = artists.stream()
+                .map(artist -> {
+                    List<ArtistCategory> artistCategories = artistCategoryRepository
+                            .findByArtistId(artist.getId());
 
-            List<ArtistCategoryResponse> categoryResponses = artistCategories.stream()
-                    .map(ar -> new ArtistCategoryResponse(
-                            ar.getCategory().getId(),
-                            ar.getCategory().getCategoryName()))
-                    .toList();
+                    List<ArtistCategoryResponse> categoryResponses = artistCategories.stream()
+                            .map(ar -> new ArtistCategoryResponse(
+                                    ar.getCategory().getId(),
+                                    ar.getCategory().getCategoryName()))
+                            .toList();
 
-            return new ArtistResponse(
-                    artist.getId(),
-                    artist.getName(),
-                    artist.getBorn(),
-                    artist.getNationality(),
-                    categoryResponses);
+                    ImageFile imageFile = artist.getImageFile();
+                    String imagePath = (imageFile != null) ? imageFile.getSavePath() : null;
 
-        })
+                    return new ArtistSimpleResponse(
+                            artist.getId(),
+                            artist.getName(),
+                            categoryResponses,
+                            imagePath);
+                })
                 .toList();
 
-        return new PageImpl<>(artistResponsesList, pageable, artists.getTotalElements());
+        return new PageImpl<>(artistSimpleResponsesList, pageable, artists.getTotalElements());
 
     }
 
@@ -81,12 +91,16 @@ public class ArtistService {
                         ac.getCategory().getCategoryName()))
                 .toList();
 
+        ImageFile imageFile = artist.getImageFile();
+        String imagePath = (imageFile != null) ? imageFile.getSavePath() : null;
+
         return new ArtistResponse(
                 artist.getId(),
                 artist.getName(),
                 artist.getBorn(),
                 artist.getNationality(),
-                categoryResponses);
+                categoryResponses,
+                imagePath);
 
     }
 
@@ -104,13 +118,24 @@ public class ArtistService {
 
         AuthUtil.validateAdmin(member);
 
+        ImageFile imageFile = null;
+        if (req.getImage() != null && !req.getImage().isEmpty()) {
+            imageFile = imageService.imageUpload(req.getImage());
+        } else {
+            throw new IllegalArgumentException();
+        }
+
+        // 아티스트 생성
         Artist artist = new Artist(
                 req.getName(),
                 req.getBorn(),
-                req.getNationality());
+                req.getNationality(),
+                imageFile);
 
+        // 아티스트 저장
         artist = artistRepository.save(artist);
 
+        // 카테고리 저장
         List<Category> categories = categoryRepository.findAllById(req.getCategoryIds());
         for (Category category : categories) {
             artistCategoryRepository.save(new ArtistCategory(artist, category));
@@ -122,17 +147,32 @@ public class ArtistService {
     @Transactional
     public void updateArtist(Long artistId, ArtistUpdateRequest req, HttpServletRequest tokenRequest) {
         Member member = getAdminMember(tokenRequest);
+        Artist artist = artistRepository.findById(artistId)
+                .orElseThrow(NotFoundArtistException::new);
 
-        Artist artist = artistRepository.findById(artistId).orElseThrow(NotFoundArtistException::new);
-        artist.update(req.getName());
+        ImageFile imageFile = artist.getImageFile();
 
+        // 이미지 변경 시에만 처리
+        if (req.getImage() != null && !req.getImage().isEmpty()) {
+            if (imageFile != null) {
+                imageService.deleteImageFile(imageFile);
+            }
+            imageFile = imageService.imageUpload(req.getImage());
+        }
+
+        // 이름과 이미지 업데이트
+        artist.update(req.getName(), req.getBorn(), req.getNationality(), imageFile);
+
+        // 카테고리 재설정
         artistCategoryRepository.deleteByArtistId(artistId);
-
         List<Category> categories = categoryRepository.findAllById(req.getCategoryIds());
         for (Category category : categories) {
             artistCategoryRepository.save(new ArtistCategory(artist, category));
         }
 
+        // 추가 필드가 있다면 여기에 적용
+        // artist.setBorn(req.getBorn());
+        // artist.setNationality(req.getNationality());
     }
 
     // 아티스트 삭제
@@ -142,6 +182,9 @@ public class ArtistService {
 
         Artist artist = artistRepository.findById(artistId).orElseThrow(NotFoundArtistException::new);
 
+        ImageFile imageFile = artist.getImageFile();
+
+        imageService.deleteImageFile(imageFile);
         artistCategoryRepository.deleteByArtistId(artistId);
         artistRepository.delete(artist);
     }

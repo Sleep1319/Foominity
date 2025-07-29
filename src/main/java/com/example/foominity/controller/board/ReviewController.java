@@ -13,13 +13,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.example.foominity.config.jwt.JwtTokenProvider;
 import com.example.foominity.dto.board.ReviewRequest;
 import com.example.foominity.dto.board.ReviewResponse;
 import com.example.foominity.dto.board.ReviewSimpleResponse;
 import com.example.foominity.dto.board.ReviewUpdateRequest;
-import com.example.foominity.dto.member.ParticipatedReviewResponse;
 import com.example.foominity.service.board.ReviewService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/api/reviews")
@@ -28,7 +28,6 @@ import com.example.foominity.service.board.ReviewService;
 public class ReviewController {
 
     private final ReviewService reviewService;
-    private final JwtTokenProvider jwtTokenProvider;
 
     /** 전체 조회 */
     @GetMapping
@@ -78,15 +77,6 @@ public class ReviewController {
             HttpServletRequest tokenRequest) {
         reviewService.deleteReview(id, tokenRequest);
         return ResponseEntity.ok().build();
-    }
-
-    @GetMapping("/me/participated-reviews")
-    public ResponseEntity<List<ParticipatedReviewResponse>> getMyParticipatedReviews(
-            HttpServletRequest req) {
-        String token = jwtTokenProvider.resolveTokenFromCookie(req);
-        Long memberId = jwtTokenProvider.getUserIdFromToken(token);
-        List<ParticipatedReviewResponse> list = reviewService.getParticipatedReviews(memberId);
-        return ResponseEntity.ok(list);
     }
 
 }

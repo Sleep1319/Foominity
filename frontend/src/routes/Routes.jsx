@@ -2,12 +2,9 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import Home from "../view/home/Home.jsx";
 
-import Login from "../view/Sign/Login.jsx";
 import Register from "../view/Sign/Register.jsx";
 
 import ProtectedRoute from "./ProtectedRoute";
-import Profile from "../view/member/Profile.jsx";
-import EditProfile from "../view/member/EditProfile.jsx";
 import MyPage from "../view/member/MyPage.jsx";
 import ReportDetails from "../view/report/ReportDetails.jsx";
 import NoticeDetails from "../view/notice/NoticeDetails.jsx";
@@ -27,14 +24,25 @@ import ReportCreateRun from "../view/report/ReportCreateRun.jsx";
 import ReportLists from "../view/report/ReportLists.jsx";
 import DeleteComplete from "../view/member/DeleteComplete.jsx";
 import MyMusic from "../view/member/MyMusic.jsx";
-import ResetPassword from "../view/Sign/ResetPassword.jsx";
 import ParticipatedAlbumsList from "../components/memberComponents/ParticipatedAlbumsList.jsx";
+
+import FindPassword from "../view/Sign/FindPassword.jsx";
+import LoginPage from "../view/Sign/LoginPage.jsx";
+import ChangePassword from "../view/Sign/ChangePassword.jsx";
+
+import ArtistDetails from "../view/artist/ArtistDetails.jsx";
+
+import OtherUserProfile from "../view/member/OtherUserProfile.jsx";
+
+import ArtistEdits from "../view/artist/ArtistEdits.jsx";
 
 function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
-      <Route path="/resetpassword" element={<ResetPassword />} />
+      <Route path="/users/:id/profile" element={<OtherUserProfile />} />
+      <Route path="/changepassword" element={<ChangePassword />} />
+      <Route path="/findpassword" element={<FindPassword />} />
       <Route path="/report" element={<ReportLists />} />
       <Route path="/report/:id" element={<ReportDetails />} />
       <Route path="/notice" element={<NoticeLists />} />
@@ -42,8 +50,9 @@ function AppRoutes() {
       <Route path="/review" element={<Review />} />
       <Route path="/review/:id" element={<ReviewDetails />} />
       <Route path="/deletecomplete" element={<DeleteComplete />} />
+      <Route path="/artist/:id" element={<ArtistDetails />} />
       <Route element={<ProtectedRoute requireAuth={false} />}>
-        <Route path="/login" element={<Login />} />
+        <Route path="/loginpage" element={<LoginPage />} />
         <Route path="/register" element={<Register />} />
         <Route path="/social-sign-up" element={<SocialRegister />} />
       </Route>
@@ -52,6 +61,7 @@ function AppRoutes() {
         <Route path="/mypage/*" element={<MyPage />} />
         <Route path="/mymusic/" element={<MyMusic />} />
         <Route path="/review/create" element={<CreateReview />} />
+        <Route path="/artist/update/:id" element={<ArtistEdits />} />
       </Route>
       <Route path="/mymusic/participatedalbumslist" element={<ParticipatedAlbumsList />} />
 

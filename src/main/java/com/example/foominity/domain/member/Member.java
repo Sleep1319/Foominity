@@ -84,6 +84,9 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<ReportComment> reportComment;
 
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    private List<ReviewLike> reviewLike;
+
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "profile_image_id")
     private ImageFile profileImage;

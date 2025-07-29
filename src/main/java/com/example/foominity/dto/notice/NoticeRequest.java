@@ -1,5 +1,7 @@
 package com.example.foominity.dto.notice;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.example.foominity.domain.member.Member;
 import com.example.foominity.domain.notice.Notice;
 
@@ -19,7 +21,10 @@ public class NoticeRequest {
     @NotNull
     private String content;
 
-    public Notice toEntity(NoticeRequest req) {
-        return new Notice(req.getTitle(), req.getContent());
+    private MultipartFile image;
+    private String imagePath;
+
+    public Notice toEntity() {
+        return new Notice(this.title, this.content);
     }
 }

@@ -1,17 +1,19 @@
 import React, { useRef, useState } from "react";
-import { Box, Image } from "@chakra-ui/react";
+import { Box, Image, Text } from "@chakra-ui/react";
 import { BsChevronLeft, BsChevronRight } from "react-icons/bs";
 import Slider from "react-slick";
+import { useNavigate } from "react-router-dom";
 
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import SliderBoxIndicator from "./SliderBoxIndicator"; // 위치에 따라 경로 조정
+import SliderBoxIndicator from "./SliderBoxIndicator";
 
-const images = ["/images/img1.jpg", "/images/img2.jpg", "/images/img3.jpg", "/images/img4.jpg"];
-
-const SliderBox = () => {
+const SliderBox = ({ notices = [] }) => {
   const sliderRef = useRef(null);
-  const [currentIndex, setCurrentIndex] = useState(0); // 현재 인덱스 추적
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const navigate = useNavigate();
+
+  const topNotices = notices.slice(0, 4);
 
   const settings = {
     autoplay: true,
@@ -24,7 +26,7 @@ const SliderBox = () => {
     arrows: false,
     pauseOnHover: false,
     accessibility: false,
-    afterChange: (index) => setCurrentIndex(index), // 슬라이드 바뀔 때 index 업데이트
+    afterChange: (index) => setCurrentIndex(index),
   };
 
   const handleDotClick = (index) => {
@@ -73,24 +75,46 @@ const SliderBox = () => {
 
       {/* 슬라이더 */}
       <Slider ref={sliderRef} {...settings}>
-        {images.map((src, idx) => (
-          <Box key={idx} w="100%" h="100%">
+        {topNotices.map((notice) => (
+          <Box
+            key={notice.id}
+            w="100%"
+            h="100%"
+            position="relative"
+            cursor="pointer"
+            onClick={() => navigate(`/notice/${notice.id}`)}
+          >
             <Image
-              src={src}
-              alt={`slide-${idx}`}
-              tabIndex={-1}
-              w="100%"
-              h="100%"
+              src={`http://localhost:8084/${notice.imagePath}`}
+              alt={notice.title}
+              w="2000px"
+              h="960px"
               objectFit="cover"
-              userSelect="none"
               draggable={false}
+              userSelect="none"
             />
+            <Box
+              position="absolute"
+              bottom="120px"
+              left="120px"
+              color="white"
+              fontSize="4xl"
+              fontWeight="bold"
+              textShadow="0 0 10px rgba(0,0,0,0.8)"
+            >
+              <Text>{notice.title}</Text>
+              <Box mt={4}>
+                <SliderBoxIndicator
+                  total={topNotices.length}
+                  currentIndex={currentIndex}
+                  onDotClick={handleDotClick}
+                  useAbsolute={false}
+                />
+              </Box>
+            </Box>
           </Box>
         ))}
       </Slider>
-
-      {/* 커스텀 도트 인디케이터 */}
-      <SliderBoxIndicator total={images.length} currentIndex={currentIndex} onDotClick={handleDotClick} />
     </Box>
   );
 };

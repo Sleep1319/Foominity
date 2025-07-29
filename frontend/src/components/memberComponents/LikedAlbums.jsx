@@ -1,27 +1,36 @@
 import { Box, Image, Text, VStack } from "@chakra-ui/react";
 import { BsChevronLeft, BsChevronRight } from "react-icons/bs";
 import Slider from "react-slick";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-const mockAlbums = [
-  { id: 1, title: "This is a very long album title", artist: "Famous Artist", coverImage: "/images/albums/album1.jpg" },
-  { id: 2, title: "Another Album Title", artist: "Another Artist", coverImage: "/images/albums/album2.jpg" },
-  { id: 3, title: "Midnight Journey to Mars", artist: "Cosmic Voyager", coverImage: "/images/albums/album3.jpg" },
-  { id: 4, title: "Summer Sunset", artist: "Sunwave", coverImage: "/images/albums/album4.jpg" },
-  { id: 5, title: "Neon Streets", artist: "City Lights", coverImage: "/images/albums/album5.jpg" },
-  { id: 6, title: "Calm Before the Storm", artist: "Ocean Deep", coverImage: "/images/albums/album6.jpg" },
-  { id: 7, title: "Dreamscape", artist: "Lucid", coverImage: "/images/albums/album7.jpg" },
-  { id: 8, title: "Electric Pulse", artist: "Volt", coverImage: "/images/albums/album8.jpg" },
-  { id: 9, title: "Lost in Echoes", artist: "Shadow Sound", coverImage: "/images/albums/album9.jpg" },
-  { id: 10, title: "Aurora Lights", artist: "North Glow", coverImage: "/images/albums/album10.jpg" },
-];
-
-const LikedAlbums = ({ albums = mockAlbums }) => {
+const LikedAlbums = () => {
   const sliderRef = useRef(null);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [albums, setAlbums] = useState([]);
+  const navigate = useNavigate();
 
   const slidesToShow = 6.5;
   const slidesToScroll = 3.5;
+
+  useEffect(() => {
+    axios
+      .get("/api/me/liked-albums", { withCredentials: true })
+      .then((res) => {
+        // imagePath 필드로 통일!
+        const mapped = res.data.map((album) => ({
+          id: album.id,
+          imagePath: album.imagePath || album.coverImage, // 무조건 imagePath 사용
+          title: album.title,
+          artist: album.artists ? album.artists.map((a) => a.name).join(", ") : "",
+        }));
+        setAlbums(mapped);
+      })
+      .catch((err) => {
+        console.error("좋아요 앨범 불러오기 실패:", err);
+      });
+  }, []);
 
   const settings = {
     dots: false,
@@ -93,7 +102,8 @@ const LikedAlbums = ({ albums = mockAlbums }) => {
               <VStack spacing={2} align="start" w={`${boxSize}px`}>
                 <Box w={`${boxSize}px`} h={`${boxSize}px`}>
                   <Image
-                    src={album.coverImage}
+                    // src={album.coverImage}
+                    src={album.imagePath ? `http://localhost:8084/${album.imagePath}` : ""}
                     alt={album.title}
                     w="100%"
                     h="100%"
@@ -102,15 +112,23 @@ const LikedAlbums = ({ albums = mockAlbums }) => {
                     boxShadow="md"
                   />
                 </Box>
-                <Text fontSize="2xl" color="gray.600" fontWeight="bold">
+                <Text fontSize="sm" color="gray.500">
                   #{index + 1}
                 </Text>
-                <Text fontSize="lg" fontWeight="semibold" whiteSpace="normal">
+                <Text
+                  fontSize="md"
+                  fontWeight="semibold"
+                  whiteSpace="normal"
+                  noOfLines={2}
+                  cursor="pointer"
+                  onClick={() => navigate(`/review/${album.id}`)}
+                >
                   {album.title}
                 </Text>
                 <Text fontSize="md" color="gray.600" whiteSpace="normal">
                   {album.artist}
                 </Text>
+                {/* <Text fontSize="sm">평균별점: {album.averageStarPoint.toFixed(1)}</Text> */}
               </VStack>
             </Box>
           ))}
