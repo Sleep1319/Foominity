@@ -57,7 +57,7 @@ const PublicProfile = () => {
 
         {/* 프로필 정보만 먼저 */}
         <Flex maxW="3xl" mx="auto" mt={12} mb={8} align="center" justify="center">
-          <Avatar boxSize="10rem" src={avatarUrl} />
+          <Avatar border="1px solid gray" boxSize="10rem" src={avatarUrl} />
           <VStack align="start" spacing={5} ml={10}>
             <HStack>
               <Icon as={FaUser} />

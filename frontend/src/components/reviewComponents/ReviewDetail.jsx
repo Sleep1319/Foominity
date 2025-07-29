@@ -11,7 +11,7 @@ import { useUser } from "@/context/UserContext";
 const ReviewDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { state } = useUser(); // ✅ 관리자 확인용
+  const { state } = useUser(); // 관리자 확인용
   const [isModalOpen, setModalOpen] = useState(false);
 
   const [review, setReview] = useState(null);
