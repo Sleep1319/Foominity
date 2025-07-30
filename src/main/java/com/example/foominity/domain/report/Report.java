@@ -1,7 +1,6 @@
 package com.example.foominity.domain.report;
 
 import com.example.foominity.domain.BaseEntity;
-import com.example.foominity.domain.member.Member;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -47,9 +46,6 @@ public class Report extends BaseEntity {
 
     @Column
     private String nickname;
-
-//    @OneToMany(mappedBy = "report", cascade = CascadeType.REMOVE)
-//    private List<ReportComment> reportComments;
 
     public Report(String title, String reason, ReportType type, Long targetId, String targetType, Long memberId, String nickname) {
         this.title = title;

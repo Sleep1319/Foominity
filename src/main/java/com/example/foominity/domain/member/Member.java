@@ -1,12 +1,7 @@
 package com.example.foominity.domain.member;
 
 import com.example.foominity.domain.BaseEntity;
-import com.example.foominity.domain.board.Board;
-import com.example.foominity.domain.board.BoardComment;
-import com.example.foominity.domain.board.ReviewComment;
 import com.example.foominity.domain.image.ImageFile;
-import com.example.foominity.domain.report.Report;
-import com.example.foominity.domain.report.ReportComment;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -69,25 +64,6 @@ public class Member extends BaseEntity {
     private List<ReviewLike> reviewLike;
 
     // Like 엔티티 지울지 말지 정하기 (리뷰 코멘트에 해당하는 좋아요임)
-    // @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
-    // private List<Like> like;
-
-    // ===============================================================
-
-    // @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
-    // private List<ReviewComment> reviewComment;
-
-    // @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
-    // private List<Board> board;
-
-    // @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
-    // private List<BoardComment> boardComment;
-
-    // @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
-    // private List<Report> report;
-
-    // @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
-    // private List<ReportComment> reportComment;
 
     // ================================================================
     public Member(String email, String password, String userName, String nickname, Role role) {
