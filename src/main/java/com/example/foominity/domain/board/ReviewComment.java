@@ -1,6 +1,5 @@
 package com.example.foominity.domain.board;
 
-import com.example.foominity.domain.member.Member;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -21,7 +21,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
   @Query("""
       SELECT DISTINCT rc.review
         FROM ReviewComment rc
-       WHERE rc.member.id = :memberId
+       WHERE rc.memberId = :memberId
        """)
   List<Review> findParticipatedReviews(Long memberId);
 

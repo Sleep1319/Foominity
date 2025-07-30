@@ -1,8 +1,6 @@
 package com.example.foominity.domain.report;
 
 import com.example.foominity.domain.BaseEntity;
-import com.example.foominity.domain.board.Board;
-import com.example.foominity.domain.member.Member;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,19 +19,22 @@ public class ReportComment extends BaseEntity {
     @Column(nullable = false)
     private String content;
 
-    @JoinColumn(name = "member_id")
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Member member;
+    @Column(name = "member_id")
+    private Long memberId;
+
+    @Column(name = "nickname")
+    private String nickname;
 
     // 신고 게시판 아이디
     @JoinColumn(name = "report_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Report report;
 
-    public ReportComment(String content, Report report, Member member) {
+    public ReportComment(String content, Report report, Long memberId, String nickname) {
         this.content = content;
         this.report = report;
-        this.member = member;
+        this.memberId = memberId;
+        this.nickname = nickname;
     }
 
     public void changeComment(String content) {

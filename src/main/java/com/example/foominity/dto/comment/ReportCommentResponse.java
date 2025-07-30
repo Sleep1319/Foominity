@@ -25,7 +25,7 @@ public class ReportCommentResponse {
     public static ReportCommentResponse fromEntity(ReportComment comment) {
         return new ReportCommentResponse(
                 comment.getId(),
-                comment.getMember().getNickname(),
+                comment.getNickname(),
                 comment.getContent(),
                 null,
                 null);
