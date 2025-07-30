@@ -41,16 +41,16 @@ public class BoardController {
     @GetMapping("/api/board/page")
     public ResponseEntity<?> findBoards(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String subject,
             @RequestParam(required = false) String keyword) {
-        if ((category == null || category.equals("전체")) && (keyword == null || keyword.isBlank())) {
+        if ((subject == null || subject.equals("전체")) && (keyword == null || keyword.isBlank())) {
             return ResponseEntity.ok(boardService.findAll(page));
-        } else if (category != null && !category.equals("전체") && (keyword == null || keyword.isBlank())) {
-            return ResponseEntity.ok(boardService.findByCategory(category, page));
-        } else if ((category == null || category.equals("전체")) && keyword != null && !keyword.isBlank()) {
+        } else if (subject != null && !subject.equals("전체") && (keyword == null || keyword.isBlank())) {
+            return ResponseEntity.ok(boardService.findBySubject(subject, page));
+        } else if ((subject == null || subject.equals("전체")) && keyword != null && !keyword.isBlank()) {
             return ResponseEntity.ok(boardService.findByKeyword(keyword, page));
         } else {
-            return ResponseEntity.ok(boardService.findByCategoryAndKeyword(category, keyword, page));
+            return ResponseEntity.ok(boardService.findBySubjectAndKeyword(subject, keyword, page));
         }
     }
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Box,
   Heading,
@@ -16,19 +16,22 @@ import {
 } from "@chakra-ui/react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+import { Editor } from "@toast-ui/react-editor";
+import "@toast-ui/editor/dist/toastui-editor.css";
 
 const BoardUpdate = () => {
   const { id } = useParams(); // 게시글 id
   const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  // const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const toast = useToast();
   const navigate = useNavigate();
+  const editorRef = useRef();
 
-  const CATEGORY_LIST = ["일반", "음악", "후기", "정보", "질문"];
-  const [category, setCategory] = useState(CATEGORY_LIST[0]);
+  const SUBJECT_LIST = ["일반", "음악", "후기", "정보", "질문"];
+  const [subject, setSubject] = useState(SUBJECT_LIST[0]);
 
   // 1. 기존 게시글 데이터 받아오기
   useEffect(() => {
@@ -36,8 +39,12 @@ const BoardUpdate = () => {
       try {
         const res = await axios.get(`/api/board/${id}`);
         setTitle(res.data.title);
-        setContent(res.data.content);
-        setCategory(res.data.category);
+        setSubject(res.data.subject);
+        setTimeout(() => {
+          if (editorRef.current) {
+            editorRef.current.getInstance().setMarkdown(res.data.content || "");
+          }
+        }, 0);
       } catch (err) {
         console.log(err);
         setError("게시글 정보를 불러올 수 없습니다.");
@@ -47,28 +54,25 @@ const BoardUpdate = () => {
     fetchBoard();
   }, [id]);
 
-  // 2. 수정
+  // 수정
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    const content = editorRef.current?.getInstance().getMarkdown();
     if (!title.trim() || !content.trim()) {
       setError("제목과 내용을 모두 입력하세요.");
       return;
     }
     setIsSubmitting(true);
     try {
-      await axios.put(
-        `/api/board/update/${id}`,
-        { title, content, category }
-        // 필요시 memberId 추가
-      );
+      await axios.put(`/api/board/update/${id}`, { title, content, subject });
       toast({
         title: "게시글이 수정되었습니다.",
         status: "success",
         duration: 1500,
         isClosable: true,
       });
-      navigate(`/board/${id}`); // 수정 후 상세페이지로 이동
+      navigate(`/board/${id}`);
     } catch (err) {
       console.log(err);
       setError("수정에 실패했습니다. 다시 시도해주세요.");
@@ -113,8 +117,8 @@ const BoardUpdate = () => {
         <VStack spacing={6} align="stretch">
           <FormControl>
             <FormLabel>카테고리</FormLabel>
-            <Select value={category} onChange={(e) => setCategory(e.target.value)}>
-              {CATEGORY_LIST.map((cat) => (
+            <Select value={subject} onChange={(e) => setSubject(e.target.value)}>
+              {SUBJECT_LIST.map((cat) => (
                 <option key={cat} value={cat}>
                   {cat}
                 </option>
@@ -132,14 +136,17 @@ const BoardUpdate = () => {
             />
           </FormControl>
 
-          <FormControl isInvalid={!!error && !content.trim()}>
+          <FormControl isInvalid={!!error && !editorRef.current?.getInstance().getMarkdown().trim()}>
             <FormLabel>내용</FormLabel>
-            <Textarea
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
+            <Editor
+              ref={editorRef}
+              initialValue=""
+              previewStyle="vertical"
+              height="400px"
+              initialEditType="wysiwyg"
+              useCommandShortcut={true}
+              hideModeSwitch={true}
               placeholder="내용을 입력하세요"
-              rows={10}
-              maxLength={2000}
             />
             {error && <FormErrorMessage>{error}</FormErrorMessage>}
           </FormControl>

@@ -23,17 +23,14 @@ import { SearchIcon } from "@chakra-ui/icons";
 import { useUser } from "../../context/UserContext";
 
 const BOARDS_PER_PAGE = 7;
-const CATEGORY_LIST = ["전체", "일반", "음악", "후기", "정보", "질문"];
+const SUBJECT_LIST = ["전체", "일반", "음악", "후기", "정보", "질문"];
 
 const BoardList = ({ currentId }) => {
-  //  "카테고리+검색" 동시 필터를 위한 state 통합
+  //  "말머리+검색" 동시 필터를 위한 state 통합
   const [boardList, setBoardList] = useState([]); // 게시글 목록 (카테고리/검색 결과)
   const [currentPage, setCurrentPage] = useState(1);
 
-  //  탭(카테고리) 상태
-  const [selectedCategory, setSelectedCategory] = useState("전체");
-
-  //  검색 관련 상태
+  const [selectedSubject, setSelectedSubject] = useState("전체");
   const [searchKeyword, setSearchKeyword] = useState(""); // 입력중
   const [submittedKeyword, setSubmittedKeyword] = useState(""); // 실제 검색 실행(Submit) 시
 
@@ -44,7 +41,7 @@ const BoardList = ({ currentId }) => {
   useEffect(() => {
     const fetchBoards = async () => {
       let params = {};
-      if (selectedCategory !== "전체") params.category = selectedCategory; // 선택된 카테고리(전체 제외)
+      if (selectedSubject !== "전체") params.subject = selectedSubject; // 선택된 카테고리(전체 제외)
       if (submittedKeyword.trim() !== "") params.keyword = submittedKeyword; // 검색어
       // → 둘 다 없으면 전체, 하나만 있으면 단독, 둘 다 있으면 동시 필터
       const res = await axios.get("/api/board/page", { params });
@@ -52,7 +49,7 @@ const BoardList = ({ currentId }) => {
       setCurrentPage(1); // 필터 바뀌면 항상 1페이지로 이동
     };
     fetchBoards();
-  }, [selectedCategory, submittedKeyword]);
+  }, [selectedSubject, submittedKeyword]);
 
   // 페이지네이션 계산 (항상 boardList 기준!)
   const totalPages = Math.ceil(boardList.length / BOARDS_PER_PAGE);
@@ -88,10 +85,10 @@ const BoardList = ({ currentId }) => {
 
   return (
     <Box p={6} maxW="1200px" mx="auto">
-      {/* 카테고리 탭: 선택 시 selectedCategory 변경 */}
-      <Tabs variant="unstyled" onChange={(idx) => setSelectedCategory(CATEGORY_LIST[idx])}>
+      {/* 탭 선택 시 selectedSubject 변경 */}
+      <Tabs variant="unstyled" onChange={(idx) => setSelectedSubject(SUBJECT_LIST[idx])}>
         <TabList>
-          {CATEGORY_LIST.map((cat) => (
+          {SUBJECT_LIST.map((cat) => (
             <Tab
               key={cat}
               _selected={{
@@ -151,7 +148,7 @@ const BoardList = ({ currentId }) => {
           >
             <CardBody p={0}>
               <Flex align="center" minH="64px" px={4}>
-                <Text ml={5}>{board.category}</Text>
+                <Text ml={5}>{board.subejct}</Text>
                 <Text w="80px" color="gray.400" fontSize="sm" textAlign="center">
                   {board.id}
                 </Text>

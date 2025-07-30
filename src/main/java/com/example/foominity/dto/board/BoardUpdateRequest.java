@@ -19,12 +19,12 @@ public class BoardUpdateRequest {
     private String content;
 
     @NotNull
-    private String category;
+    private String subject;
 
     public class ReviewUpdateRequest {
         private String title;
         private String content;
-        private String category;
+        private String subject;
         private Float starPoint;
         private List<Long> categoryIds;
     }

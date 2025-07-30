@@ -11,6 +11,7 @@ public class BoardDTO {
 
     private Long id;
     private Long memberId;
+    private String nickname;
     private String title;
     private String content;
     private int views;
@@ -18,9 +19,10 @@ public class BoardDTO {
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
 
-    public BoardDTO(Long id, Long memberId, String title, String content, int views) {
+    public BoardDTO(Long id, Long memberId, String nickname, String title, String content, int views) {
         this.id = id;
         this.memberId = memberId;
+        this.nickname = nickname;
         this.title = title;
         this.content = content;
         this.views = views;

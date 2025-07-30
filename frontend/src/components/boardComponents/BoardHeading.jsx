@@ -10,9 +10,6 @@ const BoardHeading = () => {
         <Heading as="h2" size="xl" cursor="pointer" onClick={() => window.location.reload()}>
           자유게시판
         </Heading>
-        {/* <Heading as="h2" size="xl" cursor="pointer" onClick={() => navigate("/board")}>
-          자유게시판
-        </Heading> */}
       </Flex>
     </div>
   );

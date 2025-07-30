@@ -19,7 +19,7 @@ public class BoardResponse {
     private Long memberId;
     private String nickname;
     private int views;
-    private String category;
+    private String subject;
 
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
@@ -39,10 +39,10 @@ public class BoardResponse {
                 board.getId(),
                 board.getTitle(),
                 board.getContent(),
-                board.getMember().getId(),
-                board.getMember().getNickname(),
+                board.getMemberId(),
+                board.getNickname(),
                 board.getViews(),
-                board.getCategory(),
+                board.getSubject(),
                 board.getCreatedDate(),
                 board.getUpdatedDate());
     }

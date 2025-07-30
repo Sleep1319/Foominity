@@ -72,8 +72,8 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<ReviewComment> reviewComment;
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
-    private List<Board> board;
+    // @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    // private List<Board> board;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<BoardComment> boardComment;
