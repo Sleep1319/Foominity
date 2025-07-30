@@ -28,6 +28,7 @@ import { BsChevronLeft, BsChevronRight } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../context/UserContext";
 import Slider from "react-slick";
+import { useLocation } from "react-router-dom";
 
 const ReviewGrid = () => {
   const { state, isLoading } = useUser();
@@ -38,6 +39,12 @@ const ReviewGrid = () => {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const { isOpen, onToggle } = useDisclosure();
   const navigate = useNavigate();
+
+  // 탭 상태 관리
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const initialTabIndex = queryParams.get("tab") === "artist" ? 1 : 0;
+  const [tabIndex, setTabIndex] = useState(initialTabIndex);
 
   useEffect(() => {
     axios.get("/api/categories").then((res) => setCategories(res.data));
@@ -80,7 +87,7 @@ const ReviewGrid = () => {
 
   return (
     <Box maxW="1200px" mx="auto" px={4} py={8}>
-      <Tabs variant="enclosed">
+      <Tabs index={tabIndex} onChange={setTabIndex} variant="enclosed">
         <TabList mb={4}>
           <Tab>앨범</Tab>
           <Tab>아티스트</Tab>

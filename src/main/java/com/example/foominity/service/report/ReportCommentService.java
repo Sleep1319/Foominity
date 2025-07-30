@@ -97,7 +97,7 @@ public class ReportCommentService {
         ReportComment reportComment = reportCommentRepository.findById(commentId)
                 .orElseThrow(NotFoundReportCommentException::new);
 
-        if (!reportComment.getMember().getId().equals(member.getId())) {
+        if (!reportComment.getMemberId().equals(member.getId())) {
             throw new ForbiddenActionException();
         }
 

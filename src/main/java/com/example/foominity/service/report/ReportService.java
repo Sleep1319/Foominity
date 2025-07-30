@@ -51,8 +51,8 @@ public class ReportService {
         List<ReportResponse> reportRequestList = reports.stream()
                 .map(report -> new ReportResponse(
                         report.getId(),
-                        report.getMember().getId(),
-                        report.getMember().getNickname(),
+                        report.getMemberId(),
+                        report.getNickname(),
                         report.getType(),
                         report.getTargetId(),
                         report.getTargetType(),
@@ -91,8 +91,8 @@ public class ReportService {
         reportRepository.save(report);
         return new ReportResponse(
                 report.getId(),
-                report.getMember().getId(),
-                report.getMember().getNickname(),
+                report.getMemberId(),
+                report.getNickname(),
                 report.getType(),
                 report.getTargetId(),
                 report.getTargetType(),
@@ -114,7 +114,7 @@ public class ReportService {
         Long memberId = jwtTokenProvider.getUserIdFromToken(token);
         Member member = memberRepository.findById(memberId).orElseThrow(NotFoundMemberException::new);
 
-        reportRepository.save(req.toEntity(member));
+        reportRepository.save(req.toEntity(member.getId(), member.getNickname()));
 
     }
 
@@ -129,8 +129,8 @@ public class ReportService {
         return reports.stream()
                 .map(report -> new ReportResponse(
                         report.getId(),
-                        report.getMember().getId(),
-                        report.getMember().getNickname(),
+                        report.getMemberId(),
+                        report.getNickname(),
                         report.getType(),
                         report.getTargetId(),
                         report.getTargetType(),
@@ -176,7 +176,7 @@ public class ReportService {
 
         Report report = reportRepository.findById(id).orElseThrow(NotFoundReportException::new);
 
-        if (!report.getMember().getId().equals(member.getId())) {
+        if (!report.getMemberId().equals(member.getId())) {
             throw new ForbiddenActionException();
         }
         return report;
@@ -189,8 +189,8 @@ public class ReportService {
         List<ReportResponse> responses = pageResult.getContent().stream()
                 .map(report -> new ReportResponse(
                         report.getId(),
-                        report.getMember().getId(),
-                        report.getMember().getNickname(),
+                        report.getMemberId(),
+                        report.getNickname(),
                         report.getType(),
                         report.getTargetId(),
                         report.getTargetType(),

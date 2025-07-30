@@ -1,7 +1,6 @@
 package com.example.foominity.domain.report;
 
 import com.example.foominity.domain.BaseEntity;
-import com.example.foominity.domain.member.Member;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -42,20 +41,20 @@ public class Report extends BaseEntity {
     @Column(nullable = false, columnDefinition = "int default 0")
     private int views;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
+    @Column(name = "member_id")
+    private Long memberId;
 
-    @OneToMany(mappedBy = "report", cascade = CascadeType.REMOVE)
-    private List<ReportComment> reportComments;
+    @Column
+    private String nickname;
 
-    public Report(String title, String reason, ReportType type, Long targetId, String targetType, Member member) {
+    public Report(String title, String reason, ReportType type, Long targetId, String targetType, Long memberId, String nickname) {
         this.title = title;
         this.reason = reason;
         this.type = type;
         this.targetId = targetId;
         this.targetType = targetType;
-        this.member = member;
+        this.memberId = memberId;
+        this.nickname = nickname;
         this.status = ReportStatus.PENDING;
         this.views = 0;
     }

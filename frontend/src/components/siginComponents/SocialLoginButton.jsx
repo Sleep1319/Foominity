@@ -1,9 +1,12 @@
 import { Button, HStack, Image } from "@chakra-ui/react";
 
 const SocialLoginButton = ({ mode }) => {
-  const backendUrl = import.meta.env.VITE_BACKEND_URL;
-  const redirect = (provider) => {
+    const isLogin = mode === "login";
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    console.log("env:", backendUrl);
+    const redirect = (provider) => {
     const baseUrl = `${backendUrl}/oauth2/authorization/${provider}`;
+    console.log("baseUrl:", baseUrl);
     const finalUrl = mode === "register" ? `${baseUrl}?mode=signup` : baseUrl;
     window.location.href = finalUrl;
   };
@@ -16,7 +19,7 @@ const SocialLoginButton = ({ mode }) => {
         width="full"
         leftIcon={<Image src="/images/socialLoginButton/google_icon.png" boxSize="20px" />}
       >
-        구글로 로그인
+          구글 {isLogin ? "로그인" : "회원가입"}
       </Button>
       <Button
         colorScheme="yellow"
@@ -24,7 +27,7 @@ const SocialLoginButton = ({ mode }) => {
         width="full"
         leftIcon={<Image ml={0} src="/images/socialLoginButton/kakao_icon.png" boxSize="20px" />}
       >
-        카카오로 로그인
+          카카오 {isLogin ? "로그인" : "회원가입"}
       </Button>
     </HStack>
   );

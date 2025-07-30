@@ -4,7 +4,7 @@ import { Link as RouterLink } from "react-router-dom";
 import { useUser } from "../../context/UserContext.jsx";
 import axios from "axios";
 
-const MyPostsTable = () => {
+const MemberPostsTable = () => {
   const { state } = useUser();
   const userId = state.memberId;
   const [posts, setPosts] = useState([]);
@@ -38,6 +38,9 @@ const MyPostsTable = () => {
 
   return (
     <>
+      <Text fontSize={20} mb={4} fontWeight="bold">
+        나의 게시물
+      </Text>
       <Table variant="simple">
         <Thead>
           <Tr>
@@ -99,4 +102,4 @@ const MyPostsTable = () => {
   );
 };
 
-export default MyPostsTable;
+export default MemberPostsTable;

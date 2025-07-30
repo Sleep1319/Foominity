@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.example.foominity.domain.board.Review;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,7 +21,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
   @Query("""
       SELECT DISTINCT rc.review
         FROM ReviewComment rc
-       WHERE rc.member.id = :memberId
+       WHERE rc.memberId = :memberId
        """)
   List<Review> findParticipatedReviews(Long memberId);
 
@@ -31,4 +32,23 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
       """)
   List<Review> findReviewsByArtist(Long artistId);
 
+  @Query("SELECT r FROM Review r WHERE LOWER(r.title) = LOWER(:title)")
+  Optional<Review> findByTitle(@Param("title") String title);
+
+  // @Query("""
+  // SELECT DISTINCT r
+  // FROM Review r
+  // JOIN r.reviewCategory rc
+  // JOIN rc.category c
+  // WHERE c.categoryName IN :names
+  // """)
+  // List<Review> findByCategories(@Param("names") List<String> names);
+
+  @Query("""
+        SELECT DISTINCT rc.review
+        FROM ReviewCategory rc
+        JOIN rc.category c
+        WHERE c.categoryName IN :names
+      """)
+  List<Review> findByCategories(@Param("names") List<String> names);
 }

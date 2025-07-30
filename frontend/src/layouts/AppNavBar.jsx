@@ -3,7 +3,7 @@ import { Box, HStack, Spacer, Image, IconButton, Button } from "@chakra-ui/react
 import { Link as RouterLink } from "react-router-dom";
 import { SearchIcon } from "@chakra-ui/icons";
 
-import logoImage from "@/assets/images/doremiSOL_logo2.png";
+import logoImage from "@/assets/images/doremiSOL_lp.png";
 import { useUser } from "@/context/UserContext";
 import AuthButtons from "@/components/navComponents/AuthButtons.jsx";
 import UserSection from "@/components/navComponents/UserSection.jsx";
@@ -15,18 +15,7 @@ const AppNavbar = () => {
   const toggleSearch = () => setSearchVisible((prev) => !prev);
 
   return (
-    <Box
-      as="header"
-      px={6}
-      py={1}
-      position="fixed"
-      top="0"
-      left="0"
-      w="100%"
-      bg="whiteAlpha.200"
-      backdropFilter="blur(80px)"
-      zIndex="9999"
-    >
+    <Box as="header" px={6} py={1} position="fixed" top="0" left="0" w="100%" bg="black" zIndex="1000">
       {/* Search Navbar (검색창 토글) */}
       <SearchNavbar isVisible={isSearchVisible} onClose={() => setSearchVisible(false)} />
 
@@ -40,16 +29,16 @@ const AppNavbar = () => {
 
         {/* 카테고리 (중앙) */}
         <HStack spacing={4}>
-          <Button as={RouterLink} to="/review" variant="ghost" color="black" _hover={{ bg: "transparent" }}>
+          <Button as={RouterLink} to="/review" variant="ghost" color="white" _hover={{ bg: "transparent" }}>
             Review
           </Button>
-          <Button as={RouterLink} to="/board" variant="ghost" color="black" _hover={{ bg: "transparent" }}>
+          <Button as={RouterLink} to="/board" variant="ghost" color="white" _hover={{ bg: "transparent" }}>
             Board
           </Button>
-          <Button as={RouterLink} to="/notice" variant="ghost" color="black" _hover={{ bg: "transparent" }}>
+          <Button as={RouterLink} to="/notice" variant="ghost" color="white" _hover={{ bg: "transparent" }}>
             Magazine
           </Button>
-          <Button as={RouterLink} to="/report" variant="ghost" color="black" _hover={{ bg: "transparent" }}>
+          <Button as={RouterLink} to="/report" variant="ghost" color="white" _hover={{ bg: "transparent" }}>
             Report
           </Button>
         </HStack>
@@ -59,6 +48,7 @@ const AppNavbar = () => {
         {/* [항상 보임!] 검색 아이콘 + 로그인/유저 */}
         <IconButton
           aria-label="Toggle Search"
+          color="white"
           icon={<SearchIcon />}
           variant="ghost"
           bg="transparent"

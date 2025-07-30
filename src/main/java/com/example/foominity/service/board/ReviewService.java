@@ -28,6 +28,7 @@ import com.example.foominity.dto.artist.ArtistResponse;
 import com.example.foominity.dto.artist.ArtistSimpleResponse;
 import com.example.foominity.dto.category.ReviewCategoryResponse;
 import com.example.foominity.dto.member.MemberReviewResponse;
+import com.example.foominity.dto.openai.AlbumRecommendRequest;
 import com.example.foominity.exception.ForbiddenActionException;
 import com.example.foominity.exception.NotFoundMemberException;
 import com.example.foominity.exception.NotFoundReviewException;
@@ -463,6 +464,130 @@ public class ReviewService {
                                         categoryDtos,
                                         imagePath);
                 }).toList();
+        }
+
+        // 제목으로 조회
+        public Optional<ReviewSimpleResponse> findByTitle(String title) {
+
+                return reviewRepository.findByTitle(title)
+                                .map(review -> {
+                                        List<AlbumArtist> albumArtists = albumArtistRepository
+                                                        .findByReviewId(review.getId());
+
+                                        List<ArtistSimpleResponse> artistSimpleResponses = albumArtists.stream()
+                                                        .map(a -> {
+                                                                Artist artist = a.getArtist();
+                                                                ImageFile artistImageFile = artist.getImageFile();
+                                                                String artistImagePath = (artistImageFile != null)
+                                                                                ? artistImageFile.getSavePath()
+                                                                                : null;
+
+                                                                return new ArtistSimpleResponse(
+                                                                                artist.getId(),
+                                                                                artist.getName(),
+                                                                                artistImagePath);
+
+                                                        }).toList();
+
+                                        List<ReviewCategory> reviewCategory = reviewCategoryRepository
+                                                        .findByReviewId(review.getId());
+                                        List<ReviewCategoryResponse> categoryResponses = reviewCategory.stream()
+                                                        .map(rc -> new ReviewCategoryResponse(
+                                                                        rc.getCategory().getId(),
+                                                                        rc.getCategory().getCategoryName()))
+                                                        .toList();
+
+                                        ImageFile imageFile = review.getImageFile();
+                                        String imagePath = (imageFile != null) ? imageFile.getSavePath() : null;
+
+                                        return new ReviewSimpleResponse(
+                                                        review.getId(),
+                                                        review.getTitle(),
+                                                        reviewCommentService.getAverageStarPoint(review.getId()),
+                                                        artistSimpleResponses,
+                                                        categoryResponses,
+                                                        imagePath);
+                                });
+        }
+
+        public List<ReviewSimpleResponse> findByCategory(List<String> categories) {
+                List<Review> matched = reviewRepository.findByCategories(categories);
+
+                return matched.stream().map(review -> {
+                        List<AlbumArtist> albumArtists = albumArtistRepository
+                                        .findByReviewId(review.getId());
+
+                        List<ArtistSimpleResponse> artistSimpleResponses = albumArtists.stream()
+                                        .map(a -> {
+                                                Artist artist = a.getArtist();
+                                                ImageFile artistImageFile = artist.getImageFile();
+                                                String artistImagePath = (artistImageFile != null)
+                                                                ? artistImageFile.getSavePath()
+                                                                : null;
+
+                                                return new ArtistSimpleResponse(
+                                                                artist.getId(),
+                                                                artist.getName(),
+                                                                artistImagePath);
+
+                                        }).toList();
+
+                        List<ReviewCategory> reviewCategory = reviewCategoryRepository
+                                        .findByReviewId(review.getId());
+                        List<ReviewCategoryResponse> categoryResponses = reviewCategory.stream()
+                                        .map(rc -> new ReviewCategoryResponse(
+                                                        rc.getCategory().getId(),
+                                                        rc.getCategory().getCategoryName()))
+                                        .toList();
+
+                        ImageFile imageFile = review.getImageFile();
+                        String imagePath = (imageFile != null) ? imageFile.getSavePath() : null;
+
+                        return new ReviewSimpleResponse(
+                                        review.getId(),
+                                        review.getTitle(),
+                                        reviewCommentService.getAverageStarPoint(review.getId()),
+                                        artistSimpleResponses,
+                                        categoryResponses,
+                                        imagePath);
+                }).toList();
+        }
+
+        // 앨범 맞춤 추천 ai
+        public AlbumRecommendRequest toAlbumRecommend(ReviewResponse review) {
+
+                List<ReviewCategory> reviewCategories = reviewCategoryRepository.findByReviewId(review.getId());
+                List<AlbumArtist> albumArtists = albumArtistRepository.findByReviewId(review.getId());
+
+                List<String> categories = reviewCategories.stream()
+                                .map(rc -> rc.getCategory().getCategoryName())
+                                .toList();
+
+                List<String> artists = albumArtists.stream()
+                                .map(aa -> aa.getArtist().getName())
+                                .toList();
+
+                String categoryText = categories.isEmpty() ? "" : String.join(", ", categories) + " 장르에 속하며";
+                String artistText = artists.isEmpty() ? "" : String.join(", ", artists) + "의 색깔이 잘 드러난 작품입니다.";
+
+                String focus = String.format(
+                                "이 앨범은 %s %s 리스너들에게 인상 깊은 경험을 제공할 유사한 앨범을 추천해 주세요.",
+                                categoryText,
+                                artistText).trim();
+
+                return new AlbumRecommendRequest(
+                                review.getTitle(),
+                                artists,
+                                categories,
+                                "정석적으로, 꼼꼼하게, 똑똑하게, 냉철하게",
+                                focus);
+        }
+
+        // 앨범 맞춤 추천 ai 리팩토링
+        public AlbumRecommendRequest buildRecommendRequest(Long reviewId) {
+                ReviewResponse review = readReview(reviewId);
+                return toAlbumRecommend(review);
+
         }
 
 }

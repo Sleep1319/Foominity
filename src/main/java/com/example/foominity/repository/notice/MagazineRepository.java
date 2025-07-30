@@ -1,6 +1,6 @@
 package com.example.foominity.repository.notice;
 
-import com.example.foominity.domain.notice.Notice;
+import com.example.foominity.domain.notice.Magazine;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,13 +11,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface NoticeRepository extends JpaRepository<Notice, Long> {
+public interface MagazineRepository extends JpaRepository<Magazine, Long> {
 
-    Page<Notice> findAll(Pageable pageable);
+    Page<Magazine> findAll(Pageable pageable);
 
-    Optional<Notice> findById(Long id);
+    Optional<Magazine> findById(Long id);
 
-    Optional<List<Notice>> findTop4ByOrderByIdDesc();
+    Optional<List<Magazine>> findTop4ByOrderByIdDesc();
 
-    Optional<Notice> findByMainNoticeTrue();
+    Optional<Magazine> findByMainNoticeTrue();
 }

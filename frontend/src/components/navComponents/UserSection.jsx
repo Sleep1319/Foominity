@@ -1,7 +1,10 @@
 import { Avatar, Box, Text, Menu, MenuButton, MenuList, MenuItem, MenuDivider, Flex } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
 import { useUser } from "@/context/UserContext";
-import { FiUser, FiHome, FiLock, FiMusic, FiLogOut, FiPower, FiUnlock } from "react-icons/fi";
+import { FiUser, FiHome, FiLock, FiMusic, FiLogOut, FiPower, FiUnlock, FiMessageCircle, FiMail } from "react-icons/fi";
+import { MdSupportAgent } from "react-icons/md";
+import { HiOutlineChat } from "react-icons/hi";
+import { BsChatDots } from "react-icons/bs";
 
 const UserSection = () => {
   const { logout } = useUser();
@@ -61,6 +64,7 @@ const UserSection = () => {
       <Menu>
         <MenuButton>
           <Avatar
+            border="1px solid gray"
             size="md"
             src={state.avatar ? `http://localhost:8084${state.avatar}` : "/src/assets/images/defaultProfile.jpg"}
           />
@@ -73,6 +77,11 @@ const UserSection = () => {
           <MenuItemWithIcon icon={FiHome} label="Home" to="/" />
           <MenuItemWithIcon icon={FiUser} label="마이페이지" to="/mypage" />
           <MenuItemWithIcon icon={FiMusic} label="내 음악" to="/mymusic" />
+          {/* <MenuItemWithIcon icon={FiMessageCircle} label="문의" to="/" /> */}
+          {/* <MenuItemWithIcon icon={MdSupportAgent} label="문의" to="/" /> */}
+          {/* <MenuItemWithIcon icon={FiMail} label="문의" to="/" /> */}
+          {/* <MenuItemWithIcon icon={HiOutlineChat} label="문의" to="/" /> */}
+          <MenuItemWithIcon icon={BsChatDots} label="문의" to="/" />
 
           <MenuDivider />
 

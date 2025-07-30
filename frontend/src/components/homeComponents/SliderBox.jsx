@@ -93,16 +93,17 @@ const SliderBox = ({ notices = [] }) => {
               draggable={false}
               userSelect="none"
             />
-            <Box
-              position="absolute"
-              bottom="120px"
-              left="120px"
-              color="white"
-              fontSize="4xl"
-              fontWeight="bold"
-              textShadow="0 0 10px rgba(0,0,0,0.8)"
-            >
-              <Text>{notice.title}</Text>
+            <Box position="absolute" bottom="120px" left="120px" color="white" textShadow="0 0 10px rgba(0,0,0,0.8)">
+              <Text
+                whiteSpace={notice.title.length >= 70 ? "normal" : "nowrap"}
+                overflow="visible"
+                maxW="800px"
+                lineHeight="1.3"
+                fontSize="4xl"
+                fontWeight="bold"
+              >
+                {notice.title}
+              </Text>
               <Box mt={4}>
                 <SliderBoxIndicator
                   total={topNotices.length}

@@ -18,7 +18,7 @@ public class ReportCommentRequest {
     private String comment;
 
     public ReportComment toEntity(ReportCommentRequest req, Report report, Member member) {
-        return new ReportComment(req.getComment(), report, member);
+        return new ReportComment(req.getComment(), report, member.getId(), member.getNickname());
     }
 
 }

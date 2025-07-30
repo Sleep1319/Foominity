@@ -59,8 +59,8 @@ public class ReportResponse {
     public static ReportResponse from(Report report) {
         return new ReportResponse(
                 report.getId(),
-                report.getMember().getId(),
-                report.getMember().getNickname(),
+                report.getMemberId(),
+                report.getNickname(),
                 report.getType(),
                 report.getTargetId(),
                 report.getTargetType(),

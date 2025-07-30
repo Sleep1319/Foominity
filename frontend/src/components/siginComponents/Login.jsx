@@ -48,7 +48,7 @@ const Login = ({ onClose }) => {
 
   return (
     <form onSubmit={handleLogin}>
-      <VStack spacing={4}>
+      <VStack spacing={4} mb="20px">
         <FormControl isRequired>
           <Input
             border="none"
@@ -116,7 +116,7 @@ const Login = ({ onClose }) => {
         >
           로그인
         </Button>
-        <SocialLoginButton mode="login" />
+        <SocialLoginButton mode="login" mb="20px"/>
       </VStack>
     </form>
   );
