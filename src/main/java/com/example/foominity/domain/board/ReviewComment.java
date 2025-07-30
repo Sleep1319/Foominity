@@ -22,19 +22,22 @@ public class ReviewComment {
     @Column(nullable = false)
     private float starPoint;
 
-    @JoinColumn(name = "member_id")
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Member member;
+    @Column(name = "member_id")
+    private Long memberId;
+
+    @Column(name = "nickname")
+    private String nickname;
     // 게시판 아이디
     @JoinColumn(name = "review_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Review review;
 
-    public ReviewComment(String content, Review review, Member member, float starPoint) {
+    public ReviewComment(String content, Review review, Long memberId, String nickname, float starPoint) {
         this.content = content;
         this.starPoint = starPoint;
         this.review = review;
-        this.member = member;
+        this.memberId = memberId;
+        this.nickname = nickname;
     }
 
     public void changeComment(String content, float starPoint) {

@@ -20,7 +20,7 @@ public class ReviewCommentRequest {
     private float starPoint;
 
     public ReviewComment toEntity(Review review, Member member) {
-        return new ReviewComment(this.comment, review, member, this.starPoint);
+        return new ReviewComment(this.comment, review, member.getId(), member.getNickname(), this.starPoint);
     }
 
 }

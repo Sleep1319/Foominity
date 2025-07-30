@@ -105,7 +105,7 @@ public class ReviewCommentService {
         ReviewComment reviewComment = reviewCommentRepository.findById(commentId)
                 .orElseThrow(NotFoundReviewCommentException::new);
 
-        if (!reviewComment.getMember().getId().equals(member.getId())) {
+        if (!reviewComment.getMemberId().equals(member.getId())) {
             throw new ForbiddenActionException();
         }
 
