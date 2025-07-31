@@ -1,6 +1,7 @@
 package com.example.foominity.service.artist;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -14,6 +15,7 @@ import com.example.foominity.domain.artist.Artist;
 import com.example.foominity.domain.board.Review;
 import com.example.foominity.domain.category.ArtistCategory;
 import com.example.foominity.domain.category.Category;
+import com.example.foominity.domain.category.ReviewCategory;
 import com.example.foominity.domain.image.ImageFile;
 import com.example.foominity.domain.member.Member;
 import com.example.foominity.dto.artist.ArtistRequest;
@@ -21,6 +23,8 @@ import com.example.foominity.dto.artist.ArtistResponse;
 import com.example.foominity.dto.artist.ArtistSimpleResponse;
 import com.example.foominity.dto.artist.ArtistUpdateRequest;
 import com.example.foominity.dto.category.ArtistCategoryResponse;
+import com.example.foominity.dto.category.ReviewCategoryResponse;
+import com.example.foominity.dto.openai.ArtistRecommendRequest;
 import com.example.foominity.exception.NotFoundArtistException;
 import com.example.foominity.exception.NotFoundMemberException;
 import com.example.foominity.exception.UnauthorizedException;
@@ -56,7 +60,7 @@ public class ArtistService {
 
     // 아티스트 전체 조회
     public Page<ArtistSimpleResponse> getArtistList(int page) {
-        PageRequest pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "id"));
+        PageRequest pageable = PageRequest.of(page, 12, Sort.by(Sort.Direction.DESC, "id"));
         Page<Artist> artists = artistRepository.findAll(pageable);
 
         List<ArtistSimpleResponse> artistSimpleResponsesList = artists.stream()
@@ -215,5 +219,83 @@ public class ArtistService {
 
         AuthUtil.validateAdmin(member);
         return member;
+    }
+
+    // 이름으로 조회
+    public Optional<ArtistSimpleResponse> findByName(String name) {
+
+        return artistRepository.findByNameIgnoreCase(name)
+                .map(artist -> {
+                    List<ArtistCategory> artistCategories = artistCategoryRepository.findByArtistId(artist.getId());
+
+                    List<ArtistCategoryResponse> categoryResponses = artistCategories.stream()
+                            .map(ac -> new ArtistCategoryResponse(
+                                    ac.getCategory().getId(),
+                                    ac.getCategory().getCategoryName()))
+                            .toList();
+
+                    ImageFile imageFile = artist.getImageFile();
+                    String imagePath = (imageFile != null) ? imageFile.getSavePath() : null;
+
+                    return new ArtistSimpleResponse(
+                            artist.getId(),
+                            artist.getName(),
+                            categoryResponses,
+                            imagePath);
+                });
+    }
+
+    public List<ArtistSimpleResponse> findByCategory(List<String> categories) {
+        List<Artist> matched = artistRepository.findByCategories(categories);
+
+        return matched.stream().map(artist -> {
+            List<ArtistCategory> artistCategories = artistCategoryRepository.findByArtistId(artist.getId());
+
+            List<ArtistCategoryResponse> categoryResponses = artistCategories.stream()
+                    .map(ac -> new ArtistCategoryResponse(
+                            ac.getCategory().getId(),
+                            ac.getCategory().getCategoryName()))
+                    .toList();
+
+            ImageFile imageFile = artist.getImageFile();
+            String imagePath = (imageFile != null) ? imageFile.getSavePath() : null;
+
+            return new ArtistSimpleResponse(
+                    artist.getId(),
+                    artist.getName(),
+                    categoryResponses,
+                    imagePath);
+        }).toList();
+    }
+
+    // 아티스트 맞춤 추천 ai
+    public ArtistRecommendRequest toArtistRecommend(ArtistResponse artist) {
+
+        List<ArtistCategory> artistCategories = artistCategoryRepository
+                .findByArtistId(artist.getId());
+
+        List<String> categories = artistCategories.stream()
+                .map(ac -> ac.getCategory().getCategoryName())
+                .toList();
+
+        String categoryText = categories.isEmpty() ? "" : String.join(", ", categories) + " 장르에 속합니다.";
+
+        String focus = String.format(
+                "이 아티스트는 %s 해당 아티스트와 서브장르가 유사하며 협업 경험이 많은 아티스트를 추천해 주세요.",
+                categoryText).trim();
+
+        return new ArtistRecommendRequest(
+                artist.getName(),
+                categories,
+                "유사도를 중점으로 정밀하게 분석",
+                focus
+
+        );
+    }
+
+    // 아티스트 맞춤 추천 ai 리팩토링
+    public ArtistRecommendRequest buildRecommendRequest(Long artistId) {
+        ArtistResponse artist = readArtist(artistId);
+        return toArtistRecommend(artist);
     }
 }

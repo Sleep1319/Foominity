@@ -73,7 +73,7 @@ public class ReviewService {
 
         // 리뷰 전체 조회
         public Page<ReviewSimpleResponse> findAll(int page) {
-                PageRequest pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "id"));
+                PageRequest pageable = PageRequest.of(page, 12, Sort.by(Sort.Direction.DESC, "id"));
                 Page<Review> reviews = reviewRepository.findAll(pageable);
 
                 List<ReviewSimpleResponse> reviewSimpleResponsesList = reviews.stream()
@@ -571,7 +571,7 @@ public class ReviewService {
                 String artistText = artists.isEmpty() ? "" : String.join(", ", artists) + "의 색깔이 잘 드러난 작품입니다.";
 
                 String focus = String.format(
-                                "이 앨범은 %s %s 리스너들에게 인상 깊은 경험을 제공할 유사한 앨범을 추천해 주세요.",
+                                "이 앨범은 %s %s 해당 앨범과 서브장르, 사운드가 최대한 유사한 앨범을 추천해 주세요.",
                                 categoryText,
                                 artistText).trim();
 
@@ -579,7 +579,7 @@ public class ReviewService {
                                 review.getTitle(),
                                 artists,
                                 categories,
-                                "정석적으로, 꼼꼼하게, 똑똑하게, 냉철하게",
+                                "유사도를 중점으로 정밀하게 분석",
                                 focus);
         }
 

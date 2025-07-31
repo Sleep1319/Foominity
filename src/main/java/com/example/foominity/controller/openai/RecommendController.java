@@ -43,4 +43,16 @@ public class RecommendController {
         }
     }
 
+    @GetMapping("/api/artists/{id}/recommend")
+    public ResponseEntity<List<ArtistSimpleResponse>> recommendByArtist(@PathVariable Long id) {
+
+        try {
+            List<ArtistSimpleResponse> results = recommendationService.getArtistRecommendationsFromOpenAI(id);
+            return ResponseEntity.ok(results);
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(List.of());
+        }
+    }
+
 }

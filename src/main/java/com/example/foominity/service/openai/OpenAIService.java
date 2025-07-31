@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.example.foominity.dto.openai.AlbumRecommendRequest;
+import com.example.foominity.dto.openai.ArtistRecommendRequest;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -30,14 +31,13 @@ public class OpenAIService {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public String askChatGPT(String prompt) throws IOException {
+    public String askChatGPT(String systemMessage, String prompt) throws IOException {
         OkHttpClient client = new OkHttpClient();
 
         Map<String, Object> requestBody = new HashMap<>();
-
         requestBody.put("model", "gpt-4o");
         requestBody.put("messages", List.of(
-                Map.of("role", "system", "content", "당신은 최고의 앨범 추천모델 입니다."),
+                Map.of("role", "system", "content", systemMessage),
                 Map.of("role", "user", "content", prompt)));
 
         Request request = new Request.Builder()
@@ -60,7 +60,19 @@ public class OpenAIService {
 
     public List<String> askAlbumRecommendations(AlbumRecommendRequest req) throws IOException {
         String prompt = buildPrompt(req);
-        String raw = askChatGPT(prompt);
+        String raw = askChatGPT(GptRole.ALBUM_RECOMMENDER.getMessage(), prompt);
+
+        System.out.println("✅ GPT 응답 원본:\n" + raw);
+
+        return List.of(raw.split("\n")).stream()
+                .map(String::trim)
+                .filter(line -> !line.isEmpty())
+                .toList();
+    }
+
+    public List<String> askArtistRecommendations(ArtistRecommendRequest req) throws IOException {
+        String prompt = artistsPrompt(req);
+        String raw = askChatGPT(GptRole.ARTIST_RECOMMENDER.getMessage(), prompt);
 
         System.out.println("✅ GPT 응답 원본:\n" + raw);
 
@@ -72,9 +84,12 @@ public class OpenAIService {
 
     private String buildPrompt(AlbumRecommendRequest req) {
         return """
-                다음 정보를 바탕으로 힙합 앨범 5개를 추천해주세요.
+                아래 정보를 기반으로, 이 앨범의 음악적 특성과 분위기를 먼저 유추한 후,
+                그와 유사한 톤과 스타일의 앨범을 5개 추천해주세요.
                 반드시 **앨범 제목만 한 줄에 하나씩** 정확하게 출력해 주세요.
-                출력 형식: 앨범명 (아티스트명) 은 생략하고 앨범명만!
+                출력 형식: 앨범명 *(아티스트명)* 은 생략하고 *앨범명*만!
+
+                참고: 프로덕션 스타일(로우파이/하이파이/샘플 기반 등), 감정적 톤, 장르적 색깔 등을 기반으로 판단해 주세요.
 
                 - 앨범명: %s
                 - 아티스트명: %s
@@ -87,5 +102,25 @@ public class OpenAIService {
                 String.join(", ", req.getCategory()),
                 req.getTone(),
                 req.getFocus());
+    }
+
+    private String artistsPrompt(ArtistRecommendRequest req) {
+        return """
+                아래 정보를 기반으로,
+                그와 유사한 스타일의 아티스트를 5명 추천해주세요.
+                반드시 **아티스트 이름만 한 줄에 하나씩** 정확하게 출력해 주세요.
+
+                참고: 프로덕션 스타일(로우파이/하이파이/샘플 기반 등), 협업하는 아티스트, 장르적 색깔 등을 기반으로 판단해 주세요.
+
+                - 아티스트명: %s
+                - 카테고리: %s
+                - 톤앤매너: %s
+                - 특징: %s
+                """.formatted(
+                req.getArtist(),
+                String.join(", ", req.getCategory()),
+                req.getTone(),
+                req.getFocus());
+
     }
 }
