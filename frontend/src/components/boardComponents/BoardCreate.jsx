@@ -27,8 +27,8 @@ const BoardCreate = () => {
   const [error, setError] = useState("");
   const toast = useToast();
   const navigate = useNavigate();
-  const CATEGORY_LIST = ["일반", "음악", "후기", "정보", "질문"];
-  const [category, setCategory] = useState(CATEGORY_LIST[0]);
+  const SUBJECT_LIST = ["일반", "음악", "후기", "정보", "질문"];
+  const [subject, setSubject] = useState(SUBJECT_LIST[0]);
 
   const editorRef = useRef();
 
@@ -46,7 +46,7 @@ const BoardCreate = () => {
         title,
         content,
         memberId: user.memberId, // memberid는 가져오기
-        category,
+        subject,
       });
       toast({
         title: "게시글이 등록되었습니다.",
@@ -87,8 +87,8 @@ const BoardCreate = () => {
         <VStack spacing={6} align="stretch">
           <FormControl>
             <FormLabel>카테고리</FormLabel>
-            <Select value={category} onChange={(e) => setCategory(e.target.value)}>
-              {CATEGORY_LIST.map((cat) => (
+            <Select value={subject} onChange={(e) => setSubject(e.target.value)}>
+              {SUBJECT_LIST.map((cat) => (
                 <option key={cat} value={cat}>
                   {cat}
                 </option>

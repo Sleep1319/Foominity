@@ -23,10 +23,10 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
 
     List<Board> findByMemberId(Long memberId);
 
-    Page<Board> findByCategory(String category, Pageable pageable);
+    Page<Board> findBySubject(String subject, Pageable pageable);
 
     Page<Board> findByTitleContainingIgnoreCase(String keyword, Pageable pageable);
 
-    Page<Board> findByCategoryAndTitleContainingIgnoreCase(String category, String keyword, Pageable pageable);
+    Page<Board> findBySubjectAndTitleContainingIgnoreCase(String subject, String keyword, Pageable pageable);
 
 }

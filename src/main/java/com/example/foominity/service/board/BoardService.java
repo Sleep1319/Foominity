@@ -3,8 +3,6 @@ package com.example.foominity.service.board;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.example.foominity.domain.board.Review;
-import com.example.foominity.dto.board.ReviewResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -49,40 +47,16 @@ public class BoardService {
                         board.getId(),
                         board.getTitle(),
                         board.getContent(),
-                        board.getMember().getId(),
-                        board.getMember().getNickname(),
+                        board.getMemberId(),
+                        board.getNickname(),
                         board.getViews(),
-                        board.getCategory(),
+                        board.getSubject(),
                         board.getCreatedDate(),
                         board.getUpdatedDate()))
                 .toList();
         return new PageImpl<>(boardResponseList, pageable,
                 boards.getTotalElements());
     }
-
-    // public List<BoardResponse> findByTitle(String keyword) {
-    // List<Board> boards;
-
-    // if (keyword == null || keyword.trim().isEmpty()) {
-    // boards = boardRepository.findAllByOrderByCreatedDateDesc();
-    // } else {
-    // boards =
-    // boardRepository.findByTitleContainingIgnoreCaseOrderByCreatedDateDesc(keyword);
-    // }
-
-    // return boards.stream()
-    // .map(board -> new BoardResponse(
-    // board.getId(),
-    // board.getTitle(),
-    // board.getContent(),
-    // board.getMember().getId(),
-    // board.getMember().getNickname(),
-    // board.getViews(),
-    // board.getCategory(),
-    // board.getCreatedDate(),
-    // board.getUpdatedDate()))
-    // .collect(Collectors.toList());
-    // }
 
     // 검색
     public Page<BoardResponse> findByKeyword(String keyword, int page) {
@@ -91,16 +65,16 @@ public class BoardService {
         return boards.map(BoardResponse::from);
     }
 
-    public Page<BoardResponse> findByCategory(String category, int page) {
+    public Page<BoardResponse> findBySubject(String subject, int page) {
         PageRequest pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
-        Page<Board> boards = boardRepository.findByCategory(category, pageable);
+        Page<Board> boards = boardRepository.findBySubject(subject, pageable);
         Page<BoardResponse> boardResponses = boards.map(BoardResponse::from);
         return boardResponses;
     }
 
-    public Page<BoardResponse> findByCategoryAndKeyword(String category, String keyword, int page) {
+    public Page<BoardResponse> findBySubjectAndKeyword(String subject, String keyword, int page) {
         PageRequest pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
-        Page<Board> boards = boardRepository.findByCategoryAndTitleContainingIgnoreCase(category, keyword, pageable);
+        Page<Board> boards = boardRepository.findBySubjectAndTitleContainingIgnoreCase(subject, keyword, pageable);
         return boards.map(BoardResponse::from);
     }
 
@@ -114,10 +88,10 @@ public class BoardService {
                 board.getId(),
                 board.getTitle(),
                 board.getContent(),
-                board.getMember().getId(),
-                board.getMember().getNickname(),
+                board.getMemberId(),
+                board.getNickname(),
                 board.getViews(),
-                board.getCategory(),
+                board.getSubject(),
                 board.getCreatedDate(),
                 board.getUpdatedDate());
     }
@@ -139,7 +113,7 @@ public class BoardService {
     @Transactional
     public void updateBoard(Long id, BoardUpdateRequest req, HttpServletRequest tokenRequest) {
         Board board = validateBoardOwnership(id, tokenRequest);
-        board.update(req.getTitle(), req.getContent(), req.getCategory());
+        board.update(req.getTitle(), req.getContent(), req.getSubject());
     }
 
     @Transactional
@@ -171,11 +145,8 @@ public class BoardService {
         if (member.getRole().getId() == 4L) {
             return board;
         }
-        if (member.getRole().getId() == 4L) {
-            return board;
-        }
 
-        if (!board.getMember().getId().equals(member.getId())) {
+        if (!board.getMemberId().equals(member.getId())) {
             throw new ForbiddenActionException();
         }
         return board;
@@ -189,7 +160,7 @@ public class BoardService {
                 .map(board -> new BoardResponse(
                         board.getId(),
                         board.getTitle(),
-                        board.getMember().getNickname(),
+                        board.getNickname(),
                         board.getViews(),
                         board.getCreatedDate(),
                         board.getUpdatedDate()))

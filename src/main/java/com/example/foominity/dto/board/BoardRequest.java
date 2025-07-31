@@ -16,15 +16,18 @@ public class BoardRequest {
     private Long memberId;
 
     @NotNull
+    private String nickname;
+
+    @NotNull
     private String title;
 
     @NotNull
     private String content;
 
     @NotNull
-    private String category;
+    private String subject;
 
     public Board toEntity(BoardRequest req, Member member) {
-        return new Board(req.getTitle(), req.getContent(), req.getCategory(), member);
+        return new Board(req.getTitle(), req.getContent(), req.getSubject(), member.getId(), member.getNickname());
     }
 }
