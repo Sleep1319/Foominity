@@ -3,6 +3,7 @@ import { useUser } from "../../context/UserContext.jsx";
 import axios from "axios";
 import LikedAlbums from "../../components/memberComponents/LikedAlbums.jsx";
 import ParticipatedAlbums from "../../components/memberComponents/ParticipatedAlbums.jsx";
+import RecommendedAlbums from "../../components/memberComponents/RecommendAlbums.jsx";
 axios.defaults.baseURL = "http://localhost:8084"; // 기본 백엔드 주소
 axios.defaults.withCredentials = true;
 
@@ -26,6 +27,7 @@ const MyMusic = () => {
 
       <ParticipatedAlbums />
       <LikedAlbums />
+      <RecommendedAlbums />
     </>
   );
 };
