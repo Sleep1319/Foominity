@@ -25,7 +25,7 @@ const PublicProfilePostsTable = () => {
   }, [id]);
 
   if (loading) return <Spinner />;
-  if (posts.length === 0) return <Box>작성한 게시물이 없습니다.</Box>;
+  if (posts.length === 0) return <Box ml="207px">작성한 게시물이 없습니다.</Box>;
 
   // 총 페이지 수
   const totalPages = Math.ceil(posts.length / postsPerPage);

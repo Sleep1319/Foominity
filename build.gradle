@@ -64,6 +64,7 @@ dependencies {
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 	implementation 'com.theokanning.openai-gpt3-java:service:0.11.1'
 
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 }
 
 def querydslDir = "build/generated/querydsl"

@@ -118,6 +118,8 @@ const ParticipatedAlbums = () => {
                     objectFit="cover"
                     borderRadius="md"
                     boxShadow="md"
+                    cursor="pointer"
+                    onClick={() => navigate(`/review/${r.id}`)}
                   />
                 </Box>
                 <Text fontSize="sm" color="gray.500">
