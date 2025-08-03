@@ -1,11 +1,20 @@
 import React, { useState } from "react";
-import { Box, VStack, HStack, Input, Button, Text, Image, Spinner, Select } from "@chakra-ui/react";
+import {
+  Box,
+  VStack,
+  HStack,
+  Input,
+  Button,
+  Text,
+  Image,
+  Spinner,
+  Select,
+} from "@chakra-ui/react";
 
-// .env.local에 정의된 RapidAPI 정보
 const RAPID_HOST = import.meta.env.VITE_RAPIDAPI_HOST;
 const RAPID_KEY = import.meta.env.VITE_RAPIDAPI_KEY;
 
-// iTunes API 검색 (최대 200개)
+// iTunes 검색
 async function searchTracks(query, searchType) {
   const attribute = searchType === "artist" ? "artistTerm" : "songTerm";
   const url = `https://itunes.apple.com/search?term=${encodeURIComponent(
@@ -17,9 +26,14 @@ async function searchTracks(query, searchType) {
   return results;
 }
 
-// 가사 조회 (기존 코드 그대로)
+// 가사 가져오기
 async function fetchLyrics(trackName, artistName) {
-  const params = new URLSearchParams({ t: trackName, a: artistName, d: "0:0", type: "json" });
+  const params = new URLSearchParams({
+    t: trackName,
+    a: artistName,
+    d: "0:0",
+    type: "json",
+  });
   const url = `https://${RAPID_HOST}/songs/lyrics?${params}`;
   const res = await fetch(url, {
     headers: {
@@ -34,15 +48,30 @@ async function fetchLyrics(trackName, artistName) {
     const lines = data.map((o) => o.text?.trim()).filter(Boolean);
     return lines.join("\n") || "가사를 찾을 수 없습니다.";
   }
-  return data.lyrics_body ?? data.message?.body?.lyrics?.lyrics_body ?? "가사를 찾을 수 없습니다.";
+  return (
+    data.lyrics_body ??
+    data.message?.body?.lyrics?.lyrics_body ??
+    "가사를 찾을 수 없습니다."
+  );
+}
+
+// 가사 정제 함수
+function prettifyLyrics(rawText) {
+  return rawText
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => line.replace(/([.!?])(\s+|$)/g, "$1\n"))
+    .join("\n")
+    .replace(/\n{2,}/g, "\n\n");
 }
 
 export default function TrackAndLyrics() {
   const [query, setQuery] = useState("");
-  const [searchType, setSearchType] = useState("track"); // 'track' or 'artist'
-  const [allTracks, setAllTracks] = useState([]); // (1) 전체 200곡
-  const [page, setPage] = useState(0); // (2) 페이지 인덱스
-  const pageSize = 10; // (3) 페이지 당 곡 수
+  const [searchType, setSearchType] = useState("track");
+  const [allTracks, setAllTracks] = useState([]);
+  const [page, setPage] = useState(0);
+  const pageSize = 10;
 
   const [lyrics, setLyrics] = useState("");
   const [error, setError] = useState("");
@@ -60,7 +89,6 @@ export default function TrackAndLyrics() {
     setLoading(true);
     try {
       let list = await searchTracks(query, searchType);
-      // **최신 발매일 내림차순** 으로 정렬
       list.sort((a, b) => new Date(b.releaseDate) - new Date(a.releaseDate));
       setAllTracks(list);
       if (list.length === 0) setError("검색 결과가 없습니다.");
@@ -76,8 +104,9 @@ export default function TrackAndLyrics() {
     setLyrics("");
     setLoading(true);
     try {
-      const text = await fetchLyrics(track.trackName, track.artistName);
-      setLyrics(text);
+      const rawText = await fetchLyrics(track.trackName, track.artistName);
+      const pretty = prettifyLyrics(rawText);
+      setLyrics(pretty);
     } catch (e) {
       setError(e.message);
     } finally {
@@ -85,7 +114,6 @@ export default function TrackAndLyrics() {
     }
   };
 
-  // 현재 페이지에 보여줄 트랙들
   const paginated = allTracks.slice(page * pageSize, (page + 1) * pageSize);
 
   return (
@@ -95,7 +123,11 @@ export default function TrackAndLyrics() {
       </Text>
 
       <HStack mb={3} spacing={2}>
-        <Select w="130px" value={searchType} onChange={(e) => setSearchType(e.target.value)}>
+        <Select
+          w="130px"
+          value={searchType}
+          onChange={(e) => setSearchType(e.target.value)}
+        >
           <option value="track">곡 제목</option>
           <option value="artist">아티스트명</option>
         </Select>
@@ -128,7 +160,12 @@ export default function TrackAndLyrics() {
             _hover={{ bg: "gray.50" }}
             onClick={() => onSelect(t)}
           >
-            <Image boxSize="60px" src={t.artworkUrl100} alt={t.trackName} borderRadius="md" />
+            <Image
+              boxSize="60px"
+              src={t.artworkUrl100}
+              alt={t.trackName}
+              borderRadius="md"
+            />
             <Box>
               <Text fontWeight="semibold">{t.trackName}</Text>
               <Text fontSize="sm" color="gray.600">
@@ -143,20 +180,35 @@ export default function TrackAndLyrics() {
 
       {allTracks.length > pageSize && (
         <HStack justify="center" mt={4} spacing={4}>
-          <Button onClick={() => setPage((p) => Math.max(p - 1, 0))} isDisabled={page === 0}>
+          <Button
+            onClick={() => setPage((p) => Math.max(p - 1, 0))}
+            isDisabled={page === 0}
+          >
             이전
           </Button>
           <Text>
             {page + 1} / {Math.ceil(allTracks.length / pageSize)}
           </Text>
-          <Button onClick={() => setPage((p) => p + 1)} isDisabled={(page + 1) * pageSize >= allTracks.length}>
+          <Button
+            onClick={() => setPage((p) => p + 1)}
+            isDisabled={(page + 1) * pageSize >= allTracks.length}
+          >
             다음
           </Button>
         </HStack>
       )}
 
       {lyrics && (
-        <Box mt={4} p={4} bg="gray.100" borderRadius="md" whiteSpace="pre-wrap">
+        <Box
+          mt={4}
+          p={4}
+          bg="gray.100"
+          borderRadius="md"
+          whiteSpace="pre-wrap"
+          fontSize="sm"
+          lineHeight="tall"
+          fontFamily="body"
+        >
           {lyrics}
         </Box>
       )}
