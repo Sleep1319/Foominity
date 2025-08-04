@@ -1,17 +1,17 @@
 import { useEffect, useRef } from "react";
 import SockJS from "sockjs-client";
-import { CompatClient, Stomp } from "@stomp/stompjs";
+import { Stomp } from "@stomp/stompjs";
 
 const ChatSocket = ({ roomId, senderId, onMessageReceive }) => {
     const stompClientRef = useRef(null);
 
     useEffect(() => {
-        const socket = new SockJS("http://localhost:8084/ws");
+        const token = localStorage.getItem("socketToken"); // 또는 쿠키에서 가져와도 됨
+        const socket = new SockJS(`http://localhost:8084/ws?token=${token}`);
         const stompClient = Stomp.over(socket);
         stompClientRef.current = stompClient;
 
         stompClient.connect({}, () => {
-            // ✅ 구독 (브로드캐스트 수신용)
             stompClient.subscribe(`/topic/chat/${roomId}`, (message) => {
                 const received = JSON.parse(message.body);
                 onMessageReceive(received);

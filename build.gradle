@@ -55,7 +55,6 @@ dependencies {
 	annotationProcessor "com.querydsl:querydsl-apt:${querydslVersion}:jakarta"
 	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
-
 	implementation 'com.fasterxml.jackson.core:jackson-databind'
 
 	// HTTP 요청을 위한 라이브러리

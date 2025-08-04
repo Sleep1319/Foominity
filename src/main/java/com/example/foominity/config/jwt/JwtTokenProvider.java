@@ -64,6 +64,22 @@ public class JwtTokenProvider {
                 .compact();
     }
 
+    public String createSocketToken(Long memberId, String nickname) {
+        Date now = new Date();
+        Date expiry = new Date(now.getTime() + accessTokenValidity);
+
+        return Jwts.builder()
+                .claims()
+                .subject(String.valueOf(memberId))
+                .add("id", memberId)
+                .add("nickname", nickname)
+                .and()
+                .issuedAt(now)
+                .expiration(expiry)
+                .signWith(key)
+                .compact();
+    }
+
     // 리프레쉬 토큰 생성
     public String createRefreshToken(Long memberId) {
         Date now = new Date();

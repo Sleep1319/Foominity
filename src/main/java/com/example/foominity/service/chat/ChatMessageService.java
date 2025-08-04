@@ -16,10 +16,10 @@ public class ChatMessageService {
 
     private final ChatMessageRepository chatMessageRepository;
 
-    public void handleIncomingMessage(ChatMessageDto dto) {
+    public void handleIncomingMessage(ChatMessageDto dto, Long memberId, String nickname) {
         ChatMessage message = new ChatMessage(
                 dto.getRoomId(),
-                dto.getSenderId(),
+                memberId,
                 dto.getMessage(),
                 dto.getCreatedAt() != null ? dto.getCreatedAt() : LocalDateTime.now()
         );
