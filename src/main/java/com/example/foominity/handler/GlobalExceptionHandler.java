@@ -103,4 +103,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                 Map.of("error", "요청 처리 중 오류 발생"));
     }
+
+    @ExceptionHandler(AlreadyLikedException.class)
+    public ResponseEntity<?> handleAlreadyLikedException(AlreadyLikedException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Map.of("error", ex.getMessage()));
+    }
 }

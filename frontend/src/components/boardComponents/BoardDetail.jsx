@@ -68,6 +68,27 @@ const BoardDetail = () => {
 
   const handleCommentSuccess = () => setCommentKey((k) => k + 1);
 
+  const handleLike = async () => {
+    try {
+      await axios.post(`/api/board/${id}/like`, {}, { withCredentials: true });
+      alert("추천되었습니다!");
+      window.location.reload();
+    } catch (error) {
+      if (error.response && error.response.status === 409) {
+        alert("이미 추천한 게시글입니다!");
+      } else if (
+        error.response &&
+        error.response.data &&
+        error.response.data.error &&
+        error.response.data.error.includes("이미 추천한 게시글입니다")
+      ) {
+        alert("이미 추천한 게시글입니다!");
+      } else {
+        alert("오류가 발생했습니다.");
+      }
+    }
+  };
+
   if (loading) {
     return (
       <Box minH="60vh" display="flex" align="center" justify="center">
@@ -128,6 +149,15 @@ const BoardDetail = () => {
         {/* 내용 */}
         <Box mt={25} mb={150} pb={4}>
           <Viewer initialValue={board.content} />
+        </Box>
+
+        <Box display="flex" alignItems="center" justifyContent="center" mb={2}>
+          <Button bg="black" color="white" size="sm" onClick={handleLike} mr={3}>
+            추천
+          </Button>
+          <Text fontSize="md" color="gray.500">
+            추천 수 : {board.likeCount || 0}
+          </Text>
         </Box>
 
         {/* 댓글 */}

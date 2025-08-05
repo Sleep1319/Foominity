@@ -46,6 +46,7 @@ const BoardCreate = () => {
         title,
         content,
         memberId: user.memberId, // memberid는 가져오기
+        nickname: user.nickname,
         subject,
       });
       toast({
@@ -116,7 +117,7 @@ const BoardCreate = () => {
                 initialEditType="wysiwyg"
                 useCommandShortcut={true}
                 hideModeSwitch={true}
-                placeholder="내용을 입력하세요"
+                // placeholder="내용을 입력하세요"
               />
               {error && <FormErrorMessage>{error}</FormErrorMessage>}
             </FormControl>

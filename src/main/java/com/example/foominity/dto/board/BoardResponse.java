@@ -20,6 +20,7 @@ public class BoardResponse {
     private String nickname;
     private int views;
     private String subject;
+    private int likeCount;
 
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
@@ -43,6 +44,7 @@ public class BoardResponse {
                 board.getNickname(),
                 board.getViews(),
                 board.getSubject(),
+                board.getLikeCount(),
                 board.getCreatedDate(),
                 board.getUpdatedDate());
     }

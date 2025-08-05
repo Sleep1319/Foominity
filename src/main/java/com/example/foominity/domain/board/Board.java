@@ -36,6 +36,13 @@ public class Board extends BaseEntity {
     @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
     private List<BoardComment> boardComments;
 
+    @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
+    private List<BoardLike> boardLikes;
+
+    public int getLikeCount() {
+        return boardLikes == null ? 0 : boardLikes.size();
+    }
+
     public void update(String title, String content, String subject) {
         this.title = title;
         this.content = content;
@@ -54,4 +61,5 @@ public class Board extends BaseEntity {
     public void increaseViews() {
         this.views++;
     }
+
 }

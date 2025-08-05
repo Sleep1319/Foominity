@@ -1,5 +1,6 @@
 package com.example.foominity.service.board;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -12,9 +13,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.foominity.config.jwt.JwtTokenProvider;
 import com.example.foominity.domain.board.Board;
+import com.example.foominity.domain.board.BoardLike;
 import com.example.foominity.domain.member.Member;
 import com.example.foominity.dto.board.BoardResponse;
 import com.example.foominity.dto.board.BoardUpdateRequest;
+import com.example.foominity.repository.board.BoardLikeRepository;
 import com.example.foominity.repository.board.BoardRepository;
 import com.example.foominity.repository.member.MemberRepository;
 
@@ -25,6 +28,7 @@ import com.example.foominity.exception.ForbiddenActionException;
 import com.example.foominity.exception.NotFoundBoardException;
 import com.example.foominity.exception.NotFoundMemberException;
 import com.example.foominity.exception.UnauthorizedException;
+import com.example.foominity.exception.AlreadyLikedException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -32,6 +36,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class BoardService {
+
+    private final BoardLikeRepository boardLikeRepository;
 
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
@@ -51,6 +57,7 @@ public class BoardService {
                         board.getNickname(),
                         board.getViews(),
                         board.getSubject(),
+                        board.getBoardLikes().size(),
                         board.getCreatedDate(),
                         board.getUpdatedDate()))
                 .toList();
@@ -92,6 +99,7 @@ public class BoardService {
                 board.getNickname(),
                 board.getViews(),
                 board.getSubject(),
+                board.getLikeCount(),
                 board.getCreatedDate(),
                 board.getUpdatedDate());
     }
@@ -127,6 +135,29 @@ public class BoardService {
                 .stream()
                 .map(BoardResponse::from)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void likeBoard(Long id, Long memberId) {
+        Board board = boardRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("해당 게시글을 찾을 수 없습니다."));
+
+        if (boardLikeRepository.existsByBoardAndMemberId(board, memberId)) {
+            throw new AlreadyLikedException("이미 추천한 게시글입니다.");
+        }
+        boardLikeRepository.save(new BoardLike(board, memberId));
+    }
+
+    public long getLikeCount(Long id) {
+        Board board = boardRepository.findById(id).orElseThrow();
+        return boardLikeRepository.countByBoard(board);
+    }
+
+    @Transactional
+    public List<BoardResponse> getPopularBoards() {
+        LocalDateTime from = LocalDateTime.now().minusDays(2); // 최신 2일
+        List<Board> boards = boardRepository.findPopularBoards(from);
+        return boards.stream().map(BoardResponse::from).collect(Collectors.toList());
     }
 
     public Board validateBoardOwnership(Long id, HttpServletRequest tokenRequest) {
