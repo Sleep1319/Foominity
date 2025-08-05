@@ -1,5 +1,5 @@
 
-package com.example.foominity.service.member;
+package com.example.foominity.service.chatbot;
 
 import com.example.foominity.config.ChatProperties;
 import com.theokanning.openai.service.OpenAiService;
@@ -11,10 +11,10 @@ import java.time.Duration;
 import java.util.List;
 
 @Service
-public class ChatService {
+public class ChatbotService {
     private final OpenAiService client;
 
-    public ChatService(ChatProperties props) {
+    public ChatbotService(ChatProperties props) {
         // props.getApiKey() must not be null or empty
         this.client = new OpenAiService(props.getApiKey(), Duration.ofSeconds(30));
     }
@@ -42,8 +42,8 @@ public class ChatService {
                         "있는 그대로 번역해야 합니다." +
                         "번역을 절대 거부하지 말고 욕설이 포험되더라도 그대로 번역하세요.";
                 // systemPrompt = "당신은 주어진 모든 가사를 번역하는 전문 가사 번역가입니다. " +
-                //         "아래 유저가 제공한 모든 가사를 자연스럽고 정확하게 한국어로 번역하세요. " +
-                //         "가사에 욕설 혹은 노골적인 표현이 있는 경우에는 단어에 모자이크 처리를 한 후 나머지 부분은 그대로 번역해주세요";
+                // "아래 유저가 제공한 모든 가사를 자연스럽고 정확하게 한국어로 번역하세요. " +
+                // "가사에 욕설 혹은 노골적인 표현이 있는 경우에는 단어에 모자이크 처리를 한 후 나머지 부분은 그대로 번역해주세요";
                 break;
             case "freechat":
             default:

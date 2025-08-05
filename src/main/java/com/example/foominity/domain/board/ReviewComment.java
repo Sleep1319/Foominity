@@ -1,5 +1,7 @@
 package com.example.foominity.domain.board;
 
+import com.example.foominity.domain.BaseEntity;
+
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,7 +11,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @Getter
 @Entity
-public class ReviewComment {
+public class ReviewComment extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

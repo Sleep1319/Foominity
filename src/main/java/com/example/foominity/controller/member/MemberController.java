@@ -4,6 +4,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,10 +19,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.example.foominity.config.jwt.JwtTokenProvider;
 import com.example.foominity.domain.image.ImageFile;
 import com.example.foominity.domain.member.Member;
+import com.example.foominity.dto.member.GenreCountDto;
 import com.example.foominity.dto.member.MemberRequest;
 import com.example.foominity.dto.member.MemberReviewResponse;
 import com.example.foominity.dto.member.NicknameChangeRequest;
@@ -31,6 +34,8 @@ import com.example.foominity.dto.member.ProfileImageResponse;
 import com.example.foominity.dto.member.UserInfoResponse;
 import com.example.foominity.exception.NotFoundMemberException;
 import com.example.foominity.repository.member.MemberRepository;
+import com.example.foominity.repository.member.ReviewLikeRepository;
+import com.example.foominity.service.board.ReviewCommentService;
 import com.example.foominity.service.board.ReviewService;
 import com.example.foominity.service.image.ImageService;
 import com.example.foominity.service.member.MemberService;
@@ -52,18 +57,38 @@ public class MemberController {
     private final MemberService memberService;
     private final ReviewService reviewService;
     private final PasswordEncoder passwordEncoder;
+    private final ReviewCommentService reviewCommentService;
+
+    // 멤버 아이디 추출 메서드
+    private Member getAuthenticatedMember(HttpServletRequest req) {
+        String token = jwtTokenProvider.resolveTokenFromCookie(req);
+        if (token == null || !jwtTokenProvider.validateToken(token)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        }
+        Long memberId = jwtTokenProvider.getUserIdFromToken(token);
+        return memberRepository.findById(memberId)
+                .orElseThrow(NotFoundMemberException::new);
+    }
+
+    // --- 인증 필요 없는 공개 API ---
+    // 특정 유저 정보 조회
+    @GetMapping("/users/{id}/profile")
+    public ResponseEntity<OtherUserProfileResponse> getOtherUserProfile(@PathVariable Long id) {
+        return ResponseEntity.ok(memberService.getOtherUserProfile(id));
+    }
+
+    // 특정 멤버의 좋아요 누른 앨범들 조회
+    @GetMapping("/users/{id}/liked-albums")
+    public ResponseEntity<List<MemberReviewResponse>> getLikedReviewsByMember(@PathVariable Long id) {
+        List<MemberReviewResponse> liked = reviewService.getLikedReviews(id);
+        return ResponseEntity.ok(liked);
+    }
+    // -----------------------------------
 
     // 유저 정보 불러오기
     @GetMapping("/user")
-    public ResponseEntity<UserInfoResponse> getUserInfo(HttpServletRequest request) {
-        String token = jwtTokenProvider.resolveTokenFromCookie(request);
-
-        if (token == null || !jwtTokenProvider.validateToken(token)) {
-            return ResponseEntity.status(401).build();
-        }
-
-        Long memberId = jwtTokenProvider.getUserIdFromToken(token);
-        Member member = memberRepository.findById(memberId).orElseThrow(NotFoundMemberException::new);
+    public ResponseEntity<UserInfoResponse> getUserInfo(HttpServletRequest req) {
+        Member member = getAuthenticatedMember(req);
 
         return ResponseEntity.ok()
                 .header("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
@@ -72,12 +97,23 @@ public class MemberController {
                 .body(new UserInfoResponse(member));
     }
 
+    // // 회원탈퇴
+    // @DeleteMapping("/delete-member")
+    // public ResponseEntity<Void> deleteMember(HttpServletRequest request,
+    // @RequestBody @Valid MemberRequest req) {
+    // memberService.deleteMember(request, req);
+    // return ResponseEntity.noContent().build(); // noContent = 상태 코드 204를 응답
+    // // 클라이언트에게 "요청은 성공했지만 응답 본문은 없음"을 의미하는 HTTP 204 응답을 보내기 위해
+    // }
     // 회원탈퇴
     @DeleteMapping("/delete-member")
-    public ResponseEntity<Void> deleteMember(HttpServletRequest request, @RequestBody @Valid MemberRequest req) {
-        memberService.deleteMember(request, req);
-        return ResponseEntity.noContent().build(); // noContent = 상태 코드 204를 응답
-        // 클라이언트에게 "요청은 성공했지만 응답 본문은 없음"을 의미하는 HTTP 204 응답을 보내기 위해
+    public ResponseEntity<Void> deleteMember(
+            HttpServletRequest req,
+            @RequestBody @Valid MemberRequest dto) {
+
+        Member member = getAuthenticatedMember(req);
+        memberService.deleteMember(member.getId(), dto);
+        return ResponseEntity.noContent().build();
     }
 
     // 닉네임 변경
@@ -94,18 +130,9 @@ public class MemberController {
     @PostMapping("/member/profile-image")
     public ResponseEntity<ProfileImageResponse> updateProfileImage(
             @RequestParam("file") MultipartFile file,
-            HttpServletRequest request) {
+            HttpServletRequest req) {
 
-        // 토큰 검증 (삭제 메서드와 동일하게)
-        String token = jwtTokenProvider.resolveTokenFromCookie(request);
-        if (token == null || !jwtTokenProvider.validateToken(token)) {
-            return ResponseEntity.status(401).build();
-        }
-
-        // 멤버 조회
-        Long memberId = jwtTokenProvider.getUserIdFromToken(token);
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(NotFoundMemberException::new);
+        Member member = getAuthenticatedMember(req);
 
         // 기존 이미지 삭제
         if (member.getProfileImage() != null) {
@@ -126,15 +153,8 @@ public class MemberController {
 
     // 프로필 이미지 삭제
     @DeleteMapping("/member/profile-image")
-    public ResponseEntity<Void> deleteProfileImage(HttpServletRequest request) {
-        String token = jwtTokenProvider.resolveTokenFromCookie(request);
-        if (token == null || !jwtTokenProvider.validateToken(token)) {
-            return ResponseEntity.status(401).build();
-        }
-
-        Long memberId = jwtTokenProvider.getUserIdFromToken(token);
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(NotFoundMemberException::new);
+    public ResponseEntity<Void> deleteProfileImage(HttpServletRequest req) {
+        Member member = getAuthenticatedMember(req);
 
         ImageFile image = member.getProfileImage();
         if (image != null) {
@@ -147,29 +167,14 @@ public class MemberController {
         return ResponseEntity.noContent().build();
     }
 
-    // 평가에 참여한 앨범들 불러오기
-    @GetMapping("/me/participated-albums")
-    public ResponseEntity<List<MemberReviewResponse>> getMyParticipatedReviews(
-            HttpServletRequest req) {
-        String token = jwtTokenProvider.resolveTokenFromCookie(req);
-        Long memberId = jwtTokenProvider.getUserIdFromToken(token);
-        List<MemberReviewResponse> list = reviewService.getParticipatedReviews(memberId);
-        return ResponseEntity.ok(list);
-    }
-
+    // 비밀번호 확인
     @PostMapping("/check-password")
     public ResponseEntity<?> checkPassword(
-            HttpServletRequest request,
+            HttpServletRequest req,
             @RequestBody Map<String, String> body) {
         String currentPassword = body.get("currentPassword");
 
-        // JWT 토큰에서 사용자 추출 (이미 구현된 코드 참고)
-        String token = jwtTokenProvider.resolveTokenFromCookie(request);
-        if (token == null || !jwtTokenProvider.validateToken(token)) {
-            return ResponseEntity.status(401).build();
-        }
-        Long memberId = jwtTokenProvider.getUserIdFromToken(token);
-        Member member = memberRepository.findById(memberId).orElseThrow(NotFoundMemberException::new);
+        Member member = getAuthenticatedMember(req);
 
         // 비밀번호 비교
         if (!passwordEncoder.matches(currentPassword, member.getPassword())) {
@@ -180,17 +185,13 @@ public class MemberController {
         return ResponseEntity.ok(Map.of("success", true));
     }
 
+    // 비밀번호 변경
     @PutMapping("/change-password")
     public ResponseEntity<?> changePassword(
             HttpServletRequest request,
             @RequestBody PasswordChangeRequest req) {
-        String token = jwtTokenProvider.resolveTokenFromCookie(request);
-        if (token == null || !jwtTokenProvider.validateToken(token)) {
-            return ResponseEntity.status(401).build();
-        }
-        Long memberId = jwtTokenProvider.getUserIdFromToken(token);
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        Member member = getAuthenticatedMember(request);
 
         // 현재 비밀번호 검증
         if (!passwordEncoder.matches(req.getCurrentPassword(), member.getPassword())) {
@@ -206,26 +207,50 @@ public class MemberController {
         return ResponseEntity.ok(Map.of("message", "비밀번호가 성공적으로 변경되었습니다."));
     }
 
-    // 좋아요 누른 앨범들 조회
-    @GetMapping("/me/liked-albums")
+    // 내가 좋아요 누른 앨범들 조회
+    @GetMapping("/member/liked-albums")
     public ResponseEntity<List<MemberReviewResponse>> getMyLikedReviews(HttpServletRequest req) {
-        String token = jwtTokenProvider.resolveTokenFromCookie(req);
-        Long memberId = jwtTokenProvider.getUserIdFromToken(token);
-        List<MemberReviewResponse> list = reviewService.getLikedReviews(memberId);
+        Member member = getAuthenticatedMember(req);
+        List<MemberReviewResponse> list = reviewService.getLikedReviews(member.getId());
         return ResponseEntity.ok(list);
     }
 
-    // 특정 유저 정보 조회
-    @GetMapping("/users/{id}/profile")
-    public ResponseEntity<OtherUserProfileResponse> getOtherUserProfile(@PathVariable Long id) {
-        return ResponseEntity.ok(memberService.getOtherUserProfile(id));
+    // 평가에 참여한 앨범들 불러오기
+    @GetMapping("/member/participated-albums")
+    public ResponseEntity<List<MemberReviewResponse>> getMyParticipatedReviews(
+            HttpServletRequest req) {
+        Member member = getAuthenticatedMember(req);
+        List<MemberReviewResponse> list = reviewService.getParticipatedReviews(member.getId());
+        return ResponseEntity.ok(list);
     }
 
-    // 특정 멤버의 좋아요 누른 앨범들 조회
-    @GetMapping("/users/{id}/liked-albums")
-    public ResponseEntity<List<MemberReviewResponse>> getLikedReviewsByMember(@PathVariable Long id) {
-        List<MemberReviewResponse> liked = reviewService.getLikedReviews(id);
-        return ResponseEntity.ok(liked);
+    // 내가 쓴 리뷰 수 조회
+    @GetMapping("/member/review-count")
+    public ResponseEntity<Long> getMyReviewCount(HttpServletRequest req) {
+        Member member = getAuthenticatedMember(req);
+        long count = reviewCommentService.getReviewCount(member.getId());
+        return ResponseEntity.ok(count);
+    }
+
+    // 내가 앨범에 준 평점 평균
+    @GetMapping("/member/average-rating")
+    public ResponseEntity<Double> getMyAverageRating(HttpServletRequest req) {
+        Member member = getAuthenticatedMember(req);
+        double avg = reviewCommentService.getAverageRatingByMemberId(member.getId());
+        return ResponseEntity.ok(avg);
+    }
+
+    @GetMapping("/member/{memberId}/genre-stats")
+    public ResponseEntity<List<GenreCountDto>> getGenreStats(
+            @PathVariable Long memberId) {
+        List<ReviewLikeRepository.GenreCount> stats = memberService.getGenreCounts(memberId);
+
+        // 프로젝션을 DTO로 변환
+        List<GenreCountDto> dtoList = stats.stream()
+                .map(gc -> new GenreCountDto(gc.getGenre(), gc.getCnt()))
+                .toList();
+
+        return ResponseEntity.ok(dtoList);
     }
 
 }

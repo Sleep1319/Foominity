@@ -20,6 +20,7 @@
     "@toast-ui/editor": "^3.2.2",
     "@toast-ui/react-editor": "^3.2.3",
     "axios": "^1.10.0",
+    "dayjs": "^1.11.13",
     "docs": "^0.3.2-canary.0",
     "framer-motion": "^12.23.12",
     "fuse.js": "^7.1.0",
@@ -31,6 +32,7 @@
     "react-icons": "^5.5.0",
     "react-router-dom": "^7.6.2",
     "react-slick": "^0.30.3",
+    "recharts": "^3.1.1",
     "slick-carousel": "^1.8.1",
     "sockjs-client": "^1.6.1",
     "stompjs": "^2.3.3"
