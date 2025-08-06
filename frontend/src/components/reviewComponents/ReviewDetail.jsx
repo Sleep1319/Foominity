@@ -7,6 +7,7 @@ import ReviewCommentForm from "@/components/commentComponents/ReviewCommentForm"
 import CommentList from "@/components/commentComponents/CommentList.jsx";
 import LoginRequiredModal from "../siginComponents/LoginRequiredModal";
 import { useUser } from "@/context/UserContext";
+import RefreshButton from "@/components/ui/RefreshButton";
 
 const ReviewDetail = () => {
   const { id } = useParams();
@@ -92,17 +93,20 @@ const ReviewDetail = () => {
     setCommentKey((prev) => prev + 1);
   };
 
+  const fetchRecommendations = async () => {
+    try {
+      const res = await axios.get(`/api/reviews/${id}/recommend`);
+      console.log("🎯 추천 앨범 리스트:", res.data);
+      setRecommendations(res.data);
+    } catch (err) {
+      console.error("추천 앨범 불러오기 실패:", err);
+    }
+  };
+
   useEffect(() => {
     fetchReview();
     fetchLikeInfo();
-
-    axios
-      .get(`/api/reviews/${id}/recommend`)
-      .then((res) => {
-        console.log("🎯 추천 앨범 리스트:", res.data);
-        setRecommendations(res.data);
-      })
-      .catch((err) => console.error("추천 앨범 불러오기 실패:", err));
+    fetchRecommendations();
   }, [id]);
 
   useEffect(() => {
@@ -224,6 +228,7 @@ const ReviewDetail = () => {
           <Box mt={10}>
             <Text fontSize="2xl" fontWeight="bold" mb={4}>
               유사한 앨범 추천
+              <RefreshButton onClick={fetchRecommendations} />
             </Text>
             {recommendations.length === 0 ? (
               <Text>추천 앨범이 없습니다.</Text>

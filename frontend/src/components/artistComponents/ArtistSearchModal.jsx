@@ -7,6 +7,7 @@ import {
   ModalCloseButton,
   ModalBody,
   Input,
+  Image,
   Select,
   Button,
   Table,
@@ -15,6 +16,7 @@ import {
   Th,
   Tbody,
   Td,
+  Text,
   IconButton,
   Flex,
 } from "@chakra-ui/react";
@@ -40,12 +42,12 @@ const ArtistSearchModal = ({ isOpen, onClose, onSelect }) => {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="6xl">
+    <Modal isOpen={isOpen} onClose={onClose} size="xl" isCentered scrollBehavior="inside">
       <ModalOverlay />
-      <ModalContent>
+      <ModalContent maxH="90vh" overflow="hidden">
         <ModalHeader>아티스트 검색</ModalHeader>
         <ModalCloseButton />
-        <ModalBody>
+        <ModalBody overflowY="auto" maxH="70vh">
           <Flex gap={2} mb={4}>
             <Select w="200px" value={searchType} onChange={(e) => setSearchType(e.target.value)}>
               <option value="name">아티스트명</option>
@@ -59,17 +61,24 @@ const ArtistSearchModal = ({ isOpen, onClose, onSelect }) => {
             <Thead>
               <Tr>
                 <Th>이름</Th>
-                <Th>출생일</Th>
-                <Th>국적</Th>
                 <Th>선택</Th>
               </Tr>
             </Thead>
             <Tbody>
               {results.map((artist) => (
                 <Tr key={artist.id}>
-                  <Td>{artist.name}</Td>
-                  <Td>{artist.born}</Td>
-                  <Td>{artist.nationality}</Td>
+                  <Td>
+                    <Flex align="center" gap={3}>
+                      <Image
+                        src={artist.imagePath ? `http://localhost:8084/${artist.imagePath}` : "/default-avatar.png"}
+                        alt={artist.name}
+                        boxSize="40px"
+                        objectFit="cover"
+                        borderRadius="full"
+                      />
+                      <Text>{artist.name}</Text>
+                    </Flex>
+                  </Td>
                   <Td>
                     <Button
                       size="sm"

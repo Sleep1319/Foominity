@@ -16,6 +16,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useUser } from "@/context/UserContext";
+import RefreshButton from "@/components/ui/RefreshButton";
 
 const ArtistDetail = () => {
   const { id } = useParams();
@@ -34,11 +35,10 @@ const ArtistDetail = () => {
         const [artistRes, reviewsRes, recommendRes] = await Promise.all([
           axios.get(`/api/artists/${id}`),
           axios.get(`/api/artists/${id}/reviews`),
-          axios.get(`/api/artists/${id}/recommend`),
         ]);
         setArtist(artistRes.data);
         setReviews(reviewsRes.data);
-        setRecommendations(recommendRes.data);
+        await fetchRecommendations();
       } catch (err) {
         console.error("아티스트 조회 실패:", err);
       } finally {
@@ -48,6 +48,15 @@ const ArtistDetail = () => {
 
     fetchData();
   }, [id]);
+
+  const fetchRecommendations = async () => {
+    try {
+      const res = await axios.get(`/api/artists/${id}/recommend`);
+      setRecommendations(res.data);
+    } catch (err) {
+      console.error("추천 아티스트 불러오기 실패:", err);
+    }
+  };
 
   const handleDelete = () => {
     if (window.confirm("정말 삭제하시겠습니까?")) {
@@ -157,8 +166,8 @@ const ArtistDetail = () => {
       <Box mt={16}>
         <Text fontSize="2xl" fontWeight="bold" mb={4}>
           유사한 아티스트
+          <RefreshButton onClick={fetchRecommendations} />
         </Text>
-
         {recommendations.length === 0 ? (
           <Text>추천 아티스트가 없습니다.</Text>
         ) : (
@@ -206,6 +215,20 @@ const ArtistDetail = () => {
             <Button colorScheme="blue" onClick={() => navigate(`/artist/update/${id}`)}>
               수정
             </Button>
+          </Box>
+        )}
+        {/* ✅ 삭제 버튼: 관리자만 */}
+        {state?.roleName === "ADMIN" && (
+          <Box display="flex" justifyContent="flex-end" mb={2}>
+            <Text
+              fontSize="sm"
+              color="red.500"
+              cursor="pointer"
+              onClick={handleDelete}
+              _hover={{ textDecoration: "underline" }}
+            >
+              삭제하기
+            </Text>
           </Box>
         )}
       </Box>
