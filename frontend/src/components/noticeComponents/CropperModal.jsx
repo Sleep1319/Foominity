@@ -23,6 +23,7 @@ const CropperModal = ({ imageSrc, isOpen, onClose, onComplete }) => {
   const getCroppedImg = (imageSrc, croppedAreaPixels) => {
     return new Promise((resolve) => {
       const image = new Image();
+      image.crossOrigin = "anonymous";
       image.src = imageSrc;
       image.onload = () => {
         const canvas = document.createElement("canvas");

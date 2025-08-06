@@ -4,6 +4,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.foominity.dto.magazine.MagazineRequest;
 import com.example.foominity.dto.magazine.MagazineResponse;
+import com.example.foominity.dto.magazine.PendingMagazine;
+import com.example.foominity.exception.NoPendingNewsException;
 import com.example.foominity.service.magazine.MagazineService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -65,6 +67,34 @@ public class NoticeController {
     @PostMapping("/api/notices/main/{id}")
     public ResponseEntity<String> changeMainNotice(@PathVariable Long id, HttpServletRequest request) {
         magazineService.changeMainNotice(id, request);
+        return ResponseEntity.ok().build();
+    }
+
+    // @PostMapping("/api/notices/sync")
+    // public ResponseEntity<Void> syncPitchforkToMagazine(HttpServletRequest
+    // request) {
+    // magazineService.syncPitchforkArticles(request);
+    // return ResponseEntity.ok().build();
+    // }
+
+    // ✅ Pitchfork 기사 하나 가져오기 (검수용)
+    @GetMapping("/api/notices/pending")
+    public ResponseEntity<PendingMagazine> getNextPending() {
+        try {
+            PendingMagazine pending = magazineService.getNextPending();
+            return ResponseEntity.ok(pending);
+        } catch (NoPendingNewsException e) {
+            return ResponseEntity.noContent().build(); // 204 No Content
+        }
+    }
+
+    // ✅ Pitchfork 기사 최종 등록 (관리자 검수 후 저장)
+    @PostMapping(value = "/api/notices/publish", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Void> publishPending(
+            @ModelAttribute @Valid MagazineRequest req,
+            HttpServletRequest request) {
+
+        magazineService.publishPending(req, request);
         return ResponseEntity.ok().build();
     }
 
