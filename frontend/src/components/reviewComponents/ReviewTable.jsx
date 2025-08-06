@@ -26,7 +26,7 @@ import {
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import { BsChevronLeft, BsChevronRight } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
-import { useUser } from "../../context/UserContext";
+import { useUser} from "@/redux/useUser.js";
 import Slider from "react-slick";
 import { useLocation } from "react-router-dom";
 

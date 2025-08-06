@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import {Routes, Route} from "react-router-dom";
 import Home from "../view/home/Home.jsx";
 
 import Register from "../view/Sign/Register.jsx";
@@ -8,9 +8,9 @@ import ProtectedRoute from "./ProtectedRoute";
 import MyPage from "../view/member/MyPage.jsx";
 import ReportDetails from "../view/report/ReportDetails.jsx";
 import NoticeDetails from "../view/notice/NoticeDetails.jsx";
-import SocialRegister from "@/view/Sign/SocialRegister.jsx";
-import Review from "@/view/review/Review.jsx";
-import ReviewDetails from "@/view/review/ReviewDetails.jsx";
+import SocialRegister from "../view/Sign/SocialRegister.jsx";
+import Review from "../view/review/Review.jsx";
+import ReviewDetails from "../view/review/ReviewDetails.jsx";
 import CreateReview from "../view/review/CreateReviews.jsx";
 
 import BoardLists from "./../view/board/BoardLists";
@@ -34,49 +34,53 @@ import ArtistDetails from "../view/artist/ArtistDetails.jsx";
 
 import ArtistEdits from "../view/artist/ArtistEdits.jsx";
 import PublicProfile from "../view/member/PublicProfile.jsx";
+import ChatLayout from "../layouts/ChatLayout.jsx";
 
 function AppRoutes() {
-  return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/users/:id/profile" element={<PublicProfile />} />
-      <Route path="/changepassword" element={<ChangePassword />} />
-      <Route path="/findpassword" element={<FindPassword />} />
-      <Route path="/report" element={<ReportLists />} />
-      <Route path="/report/:id" element={<ReportDetails />} />
-      <Route path="/notice" element={<NoticeLists />} />
-      <Route path="/notice/:id" element={<NoticeDetails />} />
-      <Route path="/review" element={<Review />} />
-      <Route path="/review/:id" element={<ReviewDetails />} />
-      <Route path="/deletecomplete" element={<DeleteComplete />} />
-      <Route path="/artist/:id" element={<ArtistDetails />} />
-      <Route element={<ProtectedRoute requireAuth={false} />}>
-        <Route path="/loginpage" element={<LoginPage />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/social-sign-up" element={<SocialRegister />} />
-      </Route>
-      <Route element={<ProtectedRoute requireAuth={true} />}>
-        {/* 로그인 필수 페이지 */}
-        <Route path="/mypage/*" element={<MyPage />} />
-        <Route path="/mymusic/" element={<MyMusic />} />
-        <Route path="/review/create" element={<CreateReview />} />
-        <Route path="/artist/update/:id" element={<ArtistEdits />} />
-      </Route>
-      <Route path="/mymusic/participatedalbumslist" element={<ParticipatedAlbumsList />} />
+    return (
+        <Routes>
+            <Route element={<ChatLayout/>}>
+                <Route path="/" element={<Home/>}/>
+                <Route path="/users/:id/profile" element={<PublicProfile/>}/>
+                <Route path="/changepassword" element={<ChangePassword/>}/>
+                <Route path="/findpassword" element={<FindPassword/>}/>
+                <Route path="/report" element={<ReportLists/>}/>
+                <Route path="/report/:id" element={<ReportDetails/>}/>
+                <Route path="/notice" element={<NoticeLists/>}/>
+                <Route path="/notice/:id" element={<NoticeDetails/>}/>
+                <Route path="/review" element={<Review/>}/>
+                <Route path="/review/:id" element={<ReviewDetails/>}/>
+                <Route path="/deletecomplete" element={<DeleteComplete/>}/>
+                <Route path="/artist/:id" element={<ArtistDetails/>}/>
+                <Route element={<ProtectedRoute requireAuth={true}/>}>
+                    {/* 로그인 필수 페이지 */}
+                    <Route path="/mypage/*" element={<MyPage/>}/>
+                    <Route path="/mymusic/" element={<MyMusic/>}/>
+                    <Route path="/review/create" element={<CreateReview/>}/>
+                    <Route path="/artist/update/:id" element={<ArtistEdits/>}/>
+                </Route>
+                <Route path="/mymusic/participatedalbumslist" element={<ParticipatedAlbumsList/>}/>
 
-      {/* 자유게시판 */}
-      <Route path="/board" element={<BoardLists />} />
-      <Route path="/board/create" element={<BoardCreateRun />} />
-      <Route path="/board/:id" element={<BoardDetails />} />
-      <Route path="/board/update/:id" element={<BoardUpdateRun />} />
+                {/* 자유게시판 */}
+                <Route path="/board" element={<BoardLists/>}/>
+                <Route path="/board/create" element={<BoardCreateRun/>}/>
+                <Route path="/board/:id" element={<BoardDetails/>}/>
+                <Route path="/board/update/:id" element={<BoardUpdateRun/>}/>
 
-      {/* Notice */}
-      <Route path="/notice/create" element={<NoticeCreateRun />} />
+                {/* Notice */}
+                <Route path="/notice/create" element={<NoticeCreateRun/>}/>
 
-      {/* Report */}
-      <Route path="/report/create" element={<ReportCreateRun />} />
-    </Routes>
-  );
+                {/* Report */}
+                <Route path="/report/create" element={<ReportCreateRun/>}/>
+
+            </Route>
+                <Route element={<ProtectedRoute requireAuth={false}/>}>
+                    <Route path="/loginpage" element={<LoginPage/>}/>
+                    <Route path="/register" element={<Register/>}/>
+                    <Route path="/social-sign-up" element={<SocialRegister/>}/>
+                </Route>
+        </Routes>
+    );
 }
 
 export default AppRoutes;

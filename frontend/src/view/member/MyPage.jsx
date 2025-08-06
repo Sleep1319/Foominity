@@ -2,7 +2,7 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import Profile from "./Profile";
 import EditProfile from "./EditProfile";
-import { useUser } from "../../context/UserContext";
+import { useUser} from "@/redux/useUser.js";
 
 const MyPage = () => {
   const { state, updateUser, isLoading } = useUser();

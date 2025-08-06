@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button, Input, FormControl, VStack, Text, Link, Divider, HStack } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-import { useUser } from "@/context/UserContext.jsx";
+import { useUser} from "@/redux/useUser.js";
 import axios from "axios";
 import SocialLoginButton from "@/components/siginComponents/SocialLoginButton.jsx";
 

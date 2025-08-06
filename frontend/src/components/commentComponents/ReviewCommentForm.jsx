@@ -2,7 +2,7 @@
 import React from "react";
 import CommentForm from "./CommentForm.jsx";
 import axios from "axios";
-import { useUser } from "@/context/UserContext.jsx";
+import { useUser} from "@/redux/useUser.js";
 
 const ReviewCommentForm = ({ reviewId, commentCount = 0, onSuccess }) => {
   const { state } = useUser()

@@ -292,7 +292,7 @@ import {
 import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useUser } from "../../context/UserContext";
+import { useUser} from "@/redux/useUser.js";
 import MyPostsTable from "../../components/memberComponents/MyPostsTable";
 import { FiEdit, FiTrash } from "react-icons/fi";
 

@@ -19,7 +19,7 @@ import {
 import { useParams, useNavigate, Link as RouterLink } from "react-router-dom";
 import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
-import { useUser } from "../../context/UserContext";
+import { useUser} from "@/redux/useUser.js";
 
 const NoticeDetail = () => {
   const { id } = useParams();

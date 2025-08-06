@@ -1,7 +1,7 @@
 // src/components/report/ReportCommentForm.jsx
 
 import axios from "axios";
-import { useUser } from "@/context/UserContext";
+import { useUser} from "@/redux/useUser.js";
 import CommentForm from "./CommentForm";
 
 const ReportCommentForm = ({ reportId, onSuccess }) => {

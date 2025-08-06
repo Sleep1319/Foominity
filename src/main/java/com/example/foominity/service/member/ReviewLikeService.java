@@ -47,13 +47,13 @@ public class ReviewLikeService {
                 .orElseThrow(NotFoundReviewException::new);
 
         // 이미 눌렀던 좋아요면 삭제
-        return reviewLikeRepository.findByMemberAndReview(member, review)
+        return reviewLikeRepository.findByMemberAndReviewId(member, review.getId())
                 .map(existing -> {
                     reviewLikeRepository.delete(existing);
                     return false;
                 })
                 .orElseGet(() -> {
-                    reviewLikeRepository.save(new ReviewLike(member, review));
+                    reviewLikeRepository.save(new ReviewLike(member, review.getId()));
                     return true;
                 });
     }
@@ -66,7 +66,7 @@ public class ReviewLikeService {
         return reviewLikeRepository.findByMemberId(memberId)
                 .stream()
                 .map(rl -> {
-                    Review r = rl.getReview();
+                    Review r = reviewRepository.findById(rl.getReviewId()).orElseThrow();
                     return new ReviewSimpleResponse(
                             r.getId(),
                             r.getTitle(),

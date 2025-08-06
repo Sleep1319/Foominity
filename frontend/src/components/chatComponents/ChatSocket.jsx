@@ -1,46 +1,50 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import SockJS from "sockjs-client";
-import { Stomp } from "@stomp/stompjs";
+import { Client } from "@stomp/stompjs";
+
+let stompClient = null;
+let sendMessage = () => {};
 
 const ChatSocket = ({ roomId, senderId, onMessageReceive }) => {
-    const stompClientRef = useRef(null);
-
     useEffect(() => {
-        const token = localStorage.getItem("socketToken"); // 또는 쿠키에서 가져와도 됨
-        const socket = new SockJS(`http://localhost:8084/ws?token=${token}`);
-        const stompClient = Stomp.over(socket);
-        stompClientRef.current = stompClient;
+        if (!roomId || !senderId) return;
 
-        stompClient.connect({}, () => {
-            stompClient.subscribe(`/topic/chat/${roomId}`, (message) => {
-                const received = JSON.parse(message.body);
-                onMessageReceive(received);
-            });
+        const socket = new SockJS("http://localhost:8084/ws");
+        stompClient = new Client({
+            webSocketFactory: () => socket,
+            reconnectDelay: 5000,
+            onConnect: () => {
+                console.log("WebSocket 연결됨");
+
+                stompClient.subscribe(`/topic/chat/${roomId}`, (message) => {
+                    const body = JSON.parse(message.body);
+                    console.log("받은 메시지:", body);
+                    onMessageReceive?.(body);
+                });
+            },
         });
 
+        stompClient.activate();
+
         return () => {
-            if (stompClientRef.current?.connected) {
-                stompClientRef.current.disconnect();
+            if (stompClient) {
+                stompClient.deactivate();
+                console.log("WebSocket 연결 해제됨");
             }
         };
-    }, [roomId, onMessageReceive]);
+    }, [roomId, senderId]);
 
-    const sendMessage = (text) => {
-        if (stompClientRef.current && stompClientRef.current.connected) {
-            stompClientRef.current.send(
-                "/app/chat.sendMessage",
-                {},
-                JSON.stringify({
-                    roomId,
-                    senderId,
-                    message: text,
-                    createdAt: new Date().toISOString(),
-                })
-            );
+    sendMessage = (message) => {
+        if (stompClient && stompClient.connected) {
+            stompClient.publish({
+                destination: "/app/chat/send",
+                body: JSON.stringify({ roomId, senderId, message }),
+            });
         }
     };
 
-    return { sendMessage };
+    return null;
 };
 
 export default ChatSocket;
+export { sendMessage };

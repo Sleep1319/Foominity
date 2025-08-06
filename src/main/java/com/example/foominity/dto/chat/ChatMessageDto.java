@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class ChatMessageDto {
     private Long roomId;
-    private Long senderId;
+    private String nickname;
     private String message;
     private LocalDateTime createdAt;
 }

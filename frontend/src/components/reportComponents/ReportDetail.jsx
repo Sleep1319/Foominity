@@ -25,7 +25,7 @@ import {
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useUser } from "../../context/UserContext";
+import { useUser} from "@/redux/useUser.js";
 import ReportCommentForm from "../commentComponents/ReportCommentForm";
 import CommentList from "../commentComponents/CommentList";
 

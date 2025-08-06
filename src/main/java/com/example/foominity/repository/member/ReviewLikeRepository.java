@@ -12,7 +12,7 @@ import com.example.foominity.domain.member.Member;
 
 @Repository
 public interface ReviewLikeRepository extends JpaRepository<ReviewLike, Long> {
-    Optional<ReviewLike> findByMemberAndReview(Member member, Review review);
+    Optional<ReviewLike> findByMemberAndReviewId(Member member, Long reviewId);
 
     Optional<ReviewLike> findByMemberIdAndReviewId(Long memberId, Long reviewId);
 

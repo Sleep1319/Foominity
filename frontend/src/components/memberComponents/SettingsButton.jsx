@@ -12,7 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { HiCog } from "react-icons/hi";
 import DeleteModal from "../../view/Member/DeleteModal";
-import { useUser } from "../../context/UserContext";
+import { useUser} from "@/redux/useUser.js";
 
 const SettingsButton = ({ items: customItems }) => {
   // 모달 오픈 상태 관리

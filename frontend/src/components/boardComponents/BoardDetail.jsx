@@ -16,7 +16,7 @@ import {
 } from "@chakra-ui/react";
 import { useParams, useNavigate } from "react-router-dom";
 import { FaRegEye, FaRegComment } from "react-icons/fa";
-import { useUser } from "../../context/UserContext";
+import { useUser} from "@/redux/useUser.js";
 import axios from "axios";
 import BoardCommentForm from "@/components/commentComponents/BoardCommentForm.jsx";
 // import CommentList from "@/components/commentComponents/CommenList.jsx";

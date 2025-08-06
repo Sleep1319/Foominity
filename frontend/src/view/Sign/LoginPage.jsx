@@ -4,8 +4,6 @@ import { Box, Heading, Text } from "@chakra-ui/react";
 import { useLocation } from "react-router-dom";
 import Login from "../../components/siginComponents/Login";
 
-
-
 const LoginPage = () => {
     const location = useLocation();
     const [errorMessage, setErrorMessage] = useState("");

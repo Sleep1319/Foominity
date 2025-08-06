@@ -4,7 +4,7 @@ import { Link as RouterLink } from "react-router-dom";
 import { SearchIcon } from "@chakra-ui/icons";
 
 import logoImage from "@/assets/images/doremiSOL_lp.png";
-import { useUser } from "@/context/UserContext";
+import {useUser} from "../redux/useUser.js";
 import AuthButtons from "@/components/navComponents/AuthButtons.jsx";
 import UserSection from "@/components/navComponents/UserSection.jsx";
 import SearchNavbar from "@/components/navComponents/SearchNavbar.jsx";

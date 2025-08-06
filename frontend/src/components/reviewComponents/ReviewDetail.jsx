@@ -6,7 +6,7 @@ import { FaHeart, FaRegHeart } from "react-icons/fa";
 import ReviewCommentForm from "@/components/commentComponents/ReviewCommentForm";
 import CommentList from "@/components/commentComponents/CommentList.jsx";
 import LoginRequiredModal from "../siginComponents/LoginRequiredModal";
-import { useUser } from "@/context/UserContext";
+import { useUser} from "@/redux/useUser.js";
 
 const ReviewDetail = () => {
   const { id } = useParams();

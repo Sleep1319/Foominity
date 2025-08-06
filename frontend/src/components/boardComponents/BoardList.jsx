@@ -20,7 +20,7 @@ import {
 } from "@chakra-ui/react";
 import { FaRegEye } from "react-icons/fa";
 import { SearchIcon } from "@chakra-ui/icons";
-import { useUser } from "../../context/UserContext";
+import { useUser} from "@/redux/useUser.js";
 
 const BOARDS_PER_PAGE = 7;
 const SUBJECT_LIST = ["전체", "일반", "음악", "후기", "정보", "질문"];

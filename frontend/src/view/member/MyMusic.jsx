@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Text, Box } from "@chakra-ui/react";
-import { useUser } from "../../context/UserContext.jsx";
+import { useUser} from "@/redux/useUser.js";
 import LikedAlbums from "../../components/memberComponents/LikedAlbums.jsx";
 import ParticipatedAlbums from "../../components/memberComponents/ParticipatedAlbums.jsx";
 import TrackSearchWithLyrics from "../../components/chatbotComponents/TrackSearchWithLyrics.jsx";

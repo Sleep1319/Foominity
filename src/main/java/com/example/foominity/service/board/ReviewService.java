@@ -383,7 +383,7 @@ public class ReviewService {
                 List<ReviewLike> likes = reviewLikeRepository.findByMemberId(memberId);
 
                 return likes.stream().map(rl -> {
-                        Review review = rl.getReview();
+                        Review review = reviewRepository.findById(rl.getReviewId()).orElseThrow();
 
                         // 아티스트 목록
                         var artistResp = albumArtistRepository.findByReviewId(review.getId())
