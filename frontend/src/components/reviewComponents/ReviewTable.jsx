@@ -46,11 +46,36 @@ const ReviewGrid = () => {
   const initialTabIndex = queryParams.get("tab") === "artist" ? 1 : 0;
   const [tabIndex, setTabIndex] = useState(initialTabIndex);
 
+  // 페이지 정보 추가
+  const [albumPage, setAlbumPage] = useState(0);
+  const [artistPage, setArtistPage] = useState(0);
+  const [albumTotalPages, setAlbumTotalPages] = useState(1);
+  const [artistTotalPages, setArtistTotalPages] = useState(1);
+
   useEffect(() => {
     axios.get("/api/categories").then((res) => setCategories(res.data));
-    axios.get("/api/reviews?page=0").then((res) => setReviews(res.data.content));
-    axios.get("/api/artists").then((res) => setArtists(res.data.content || res.data));
   }, []);
+
+  // 앨범
+  useEffect(() => {
+    axios.get(`/api/reviews?page=${albumPage}`).then((res) => {
+      setReviews(res.data.content);
+      setAlbumTotalPages(res.data.totalPages);
+    });
+  }, [albumPage]);
+
+  // 아티스트
+  useEffect(() => {
+    axios.get(`/api/artists?page=${artistPage}`).then((res) => {
+      setArtists(res.data.content || res.data);
+      setArtistTotalPages(res.data.totalPages || 1);
+    });
+  }, [artistPage]);
+
+  useEffect(() => {
+    setSearchTerm("");
+    setSelectedCategories([]);
+  }, [tabIndex]);
 
   const handleCategoryToggle = (categoryName) => {
     setSelectedCategories((prev) =>
@@ -157,6 +182,15 @@ const ReviewGrid = () => {
                       />
                     </AspectRatio>
                     <VStack align="start" spacing={1} p={3}>
+                      <Text
+                        fontSize="xl"
+                        fontWeight="bold"
+                        color="gray.600"
+                        cursor="pointer"
+                        onClick={() => navigate(`/review/${r.id}`)}
+                      >
+                        {r.title}
+                      </Text>
                       <Box>
                         {r.artists?.map((a) => (
                           <Text
@@ -180,6 +214,29 @@ const ReviewGrid = () => {
                   </Box>
                 ))}
               </SimpleGrid>
+            )}
+            {tabIndex === 0 && filteredReviews.length > 0 && (
+              <Box textAlign="center" mt={8}>
+                <HStack justify="center" spacing={4}>
+                  <Button
+                    onClick={() => setAlbumPage((prev) => Math.max(prev - 1, 0))}
+                    isDisabled={albumPage === 0}
+                    leftIcon={<BsChevronLeft />}
+                  >
+                    이전
+                  </Button>
+                  <Text fontWeight="bold">
+                    {albumPage + 1} / {albumTotalPages}
+                  </Text>
+                  <Button
+                    onClick={() => setAlbumPage((prev) => Math.min(prev + 1, albumTotalPages - 1))}
+                    isDisabled={albumPage >= albumTotalPages - 1}
+                    rightIcon={<BsChevronRight />}
+                  >
+                    다음
+                  </Button>
+                </HStack>
+              </Box>
             )}
           </TabPanel>
 
@@ -238,6 +295,29 @@ const ReviewGrid = () => {
                 </Box>
               ))}
             </SimpleGrid>
+            {tabIndex === 1 && filteredArtists.length > 0 && (
+              <Box textAlign="center" mt={8}>
+                <HStack justify="center" spacing={4}>
+                  <Button
+                    onClick={() => setArtistPage((prev) => Math.max(prev - 1, 0))}
+                    isDisabled={artistPage === 0}
+                    leftIcon={<BsChevronLeft />}
+                  >
+                    이전
+                  </Button>
+                  <Text fontWeight="bold">
+                    {artistPage + 1} / {artistTotalPages}
+                  </Text>
+                  <Button
+                    onClick={() => setArtistPage((prev) => Math.min(prev + 1, artistTotalPages - 1))}
+                    isDisabled={artistPage >= artistTotalPages - 1}
+                    rightIcon={<BsChevronRight />}
+                  >
+                    다음
+                  </Button>
+                </HStack>
+              </Box>
+            )}
           </TabPanel>
         </TabPanels>
       </Tabs>
@@ -316,7 +396,7 @@ const TopRankedAlbums = () => {
 
         <Slider ref={sliderRef} {...settings}>
           {albums.map((a, i) => (
-            <Box key={a.id} mr={i === albums.length - 1 ? 0 : 4}>
+            <Box key={a.id || `album-${i}`} mr={i === albums.length - 1 ? 0 : 4}>
               <VStack spacing={2} align="start" w={`${boxSize}px`}>
                 <Box w={`${boxSize}px`} h={`${boxSize}px`}>
                   <Image

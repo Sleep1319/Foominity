@@ -230,6 +230,7 @@ import {
   ModalBody,
   useDisclosure,
   SimpleGrid,
+  Spinner,
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 import axios from "axios";
@@ -238,10 +239,10 @@ import { useNavigate, useParams } from "react-router-dom";
 const PublicProfileLikedAlbums = () => {
   const [albums, setAlbums] = useState([]);
   const { id } = useParams();
-  const navigate = useNavigate();
-
+  const [loading, setLoading] = useState(true);
   // 모달 컨트롤
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const navigate = useNavigate();
 
   // 미리보기 개수
   const previewCount = 4;
@@ -261,8 +262,12 @@ const PublicProfileLikedAlbums = () => {
       })
       .catch((err) => {
         console.error("다른 유저 좋아요 앨범 불러오기 실패:", err);
-      });
+      })
+      .finally(() => setLoading(false));
   }, [id]);
+
+  if (loading) return <Spinner />;
+  if (albums.length === 0) return <Box ml="190px">좋아요 표시한 앨범이 없습니다.</Box>;
 
   return (
     <Box maxW="650px" mx="auto" px={4} py={8}>

@@ -7,6 +7,7 @@ import DeleteModal from "../../view/Member/DeleteModal.jsx";
 import MyPostsTable from "../../components/memberComponents/MyPostsTable.jsx";
 import SettingsButton from "../../components/memberComponents/SettingsButton.jsx";
 import MyRequests from "../../components/memberComponents/MyRequests.jsx";
+import ChatBox from "../../components/chatbotComponents/FreeChat.jsx.jsx";
 
 const Profile = () => {
   const navigate = useNavigate();

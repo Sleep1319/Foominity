@@ -9,8 +9,12 @@ import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
+import com.example.foominity.dto.artist.ArtistSimpleResponse;
 import com.example.foominity.dto.board.ReviewSimpleResponse;
 import com.example.foominity.dto.openai.AlbumRecommendRequest;
+import com.example.foominity.dto.openai.ArtistRecommendRequest;
+import com.example.foominity.repository.artist.ArtistRepository;
+import com.example.foominity.service.artist.ArtistService;
 import com.example.foominity.service.board.ReviewService;
 
 import lombok.RequiredArgsConstructor;
@@ -23,6 +27,8 @@ public class RecommendationService {
 
     private final ReviewService reviewService;
     private final OpenAIService openAIService;
+    private final ArtistService artistService;
+    private final ArtistRepository artistRepository;
 
     public List<ReviewSimpleResponse> getRecommendationsFromOpenAI(Long reviewId) throws IOException {
         AlbumRecommendRequest req = reviewService.buildRecommendRequest(reviewId);
@@ -63,6 +69,48 @@ public class RecommendationService {
 
         return results;
 
+    }
+
+    public List<ArtistSimpleResponse> getArtistRecommendationsFromOpenAI(Long artistId) throws IOException {
+        ArtistRecommendRequest req = artistService.buildRecommendRequest(artistId);
+
+        List<String> gptArtistNames = openAIService.askArtistRecommendations(req);
+
+        List<ArtistSimpleResponse> results = new ArrayList<>();
+        Set<Long> alreadyAddedIds = new HashSet<>();
+        alreadyAddedIds.add(artistId);
+
+        // AI - DB 매칭
+        for (String name : gptArtistNames) {
+            artistService.findByName(name).ifPresent(res -> {
+                if (!alreadyAddedIds.contains(res.getId())) {
+                    results.add(res);
+                    alreadyAddedIds.add(res.getId());
+                }
+            });
+            if (results.size() == 5) {
+                break;
+            }
+        }
+
+        // 추가된 아티스트가 부족할 경우 유사 카테고리 아티스트로 추가
+        if (results.size() < 5) {
+            List<ArtistSimpleResponse> fallback = artistService.findByCategory(req.getCategory());
+            for (ArtistSimpleResponse artist : fallback) {
+                if (!alreadyAddedIds.contains(artist.getId())) {
+                    results.add(artist);
+                    alreadyAddedIds.add(artist.getId());
+                    if (results.size() == 5) {
+                        break;
+                    }
+                }
+            }
+        }
+
+        log.info("🎯 GPT 추천 아티스트 리스트:");
+        results.forEach(a -> log.info("▶ {}", a.getName()));
+
+        return results;
     }
 
 }

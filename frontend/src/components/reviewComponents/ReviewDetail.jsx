@@ -273,16 +273,14 @@ const ReviewDetail = () => {
 
           <ReviewCommentForm reviewId={id} commentCount={review.commentCount || 0} onSuccess={handleCommentSuccess} />
           <CommentList key={commentKey} type="reviews" id={id} />
+
           <Text
             fontSize="md"
-            textAlign="left"
-            mt={6}
-            mb={6}
-            display="inline-block"
             cursor="pointer"
-            onClick={() => navigate("/review")}
+            onClick={() => navigate("/review?tab=review")}
+            _hover={{ textDecoration: "underline" }}
           >
-            목록
+            ← 목록으로
           </Text>
         </Box>
       </Box>
