@@ -9,7 +9,15 @@ import {
   Image,
   Spinner,
   Select,
+  useDisclosure,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
 } from "@chakra-ui/react";
+import { FiMusic } from "react-icons/fi";
 
 const RAPID_HOST = import.meta.env.VITE_RAPIDAPI_HOST;
 const RAPID_KEY = import.meta.env.VITE_RAPIDAPI_KEY;
@@ -28,12 +36,7 @@ async function searchTracks(query, searchType) {
 
 // 가사 가져오기
 async function fetchLyrics(trackName, artistName) {
-  const params = new URLSearchParams({
-    t: trackName,
-    a: artistName,
-    d: "0:0",
-    type: "json",
-  });
+  const params = new URLSearchParams({ t: trackName, a: artistName, d: "0:0", type: "json" });
   const url = `https://${RAPID_HOST}/songs/lyrics?${params}`;
   const res = await fetch(url, {
     headers: {
@@ -48,14 +51,10 @@ async function fetchLyrics(trackName, artistName) {
     const lines = data.map((o) => o.text?.trim()).filter(Boolean);
     return lines.join("\n") || "가사를 찾을 수 없습니다.";
   }
-  return (
-    data.lyrics_body ??
-    data.message?.body?.lyrics?.lyrics_body ??
-    "가사를 찾을 수 없습니다."
-  );
+  return data.lyrics_body ?? data.message?.body?.lyrics?.lyrics_body ?? "가사를 찾을 수 없습니다.";
 }
 
-// 가사 정제 함수
+// 가사 정제
 function prettifyLyrics(rawText) {
   return rawText
     .split(/\r?\n/)
@@ -77,6 +76,8 @@ export default function TrackAndLyrics() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
   const onSearch = async () => {
     setError("");
     setLyrics("");
@@ -88,7 +89,7 @@ export default function TrackAndLyrics() {
     }
     setLoading(true);
     try {
-      let list = await searchTracks(query, searchType);
+      const list = await searchTracks(query, searchType);
       list.sort((a, b) => new Date(b.releaseDate) - new Date(a.releaseDate));
       setAllTracks(list);
       if (list.length === 0) setError("검색 결과가 없습니다.");
@@ -107,6 +108,7 @@ export default function TrackAndLyrics() {
       const rawText = await fetchLyrics(track.trackName, track.artistName);
       const pretty = prettifyLyrics(rawText);
       setLyrics(pretty);
+      onOpen(); // 모달 열기
     } catch (e) {
       setError(e.message);
     } finally {
@@ -118,16 +120,13 @@ export default function TrackAndLyrics() {
 
   return (
     <Box maxW="600px" mx="auto" p={4}>
-      <Text fontSize="2xl" mb={4}>
-        🎵 트랙 검색 & 가사 보기
-      </Text>
+      <HStack spacing={2} mb={4}>
+        <FiMusic size="24px" />
+        <Text fontSize="2xl">트랙 검색 & 가사 보기</Text>
+      </HStack>
 
       <HStack mb={3} spacing={2}>
-        <Select
-          w="130px"
-          value={searchType}
-          onChange={(e) => setSearchType(e.target.value)}
-        >
+        <Select w="130px" value={searchType} onChange={(e) => setSearchType(e.target.value)}>
           <option value="track">곡 제목</option>
           <option value="artist">아티스트명</option>
         </Select>
@@ -160,12 +159,7 @@ export default function TrackAndLyrics() {
             _hover={{ bg: "gray.50" }}
             onClick={() => onSelect(t)}
           >
-            <Image
-              boxSize="60px"
-              src={t.artworkUrl100}
-              alt={t.trackName}
-              borderRadius="md"
-            />
+            <Image boxSize="60px" src={t.artworkUrl100} alt={t.trackName} borderRadius="md" />
             <Box>
               <Text fontWeight="semibold">{t.trackName}</Text>
               <Text fontSize="sm" color="gray.600">
@@ -180,38 +174,31 @@ export default function TrackAndLyrics() {
 
       {allTracks.length > pageSize && (
         <HStack justify="center" mt={4} spacing={4}>
-          <Button
-            onClick={() => setPage((p) => Math.max(p - 1, 0))}
-            isDisabled={page === 0}
-          >
+          <Button onClick={() => setPage((p) => Math.max(p - 1, 0))} isDisabled={page === 0}>
             이전
           </Button>
           <Text>
             {page + 1} / {Math.ceil(allTracks.length / pageSize)}
           </Text>
-          <Button
-            onClick={() => setPage((p) => p + 1)}
-            isDisabled={(page + 1) * pageSize >= allTracks.length}
-          >
+          <Button onClick={() => setPage((p) => p + 1)} isDisabled={(page + 1) * pageSize >= allTracks.length}>
             다음
           </Button>
         </HStack>
       )}
 
-      {lyrics && (
-        <Box
-          mt={4}
-          p={4}
-          bg="gray.100"
-          borderRadius="md"
-          whiteSpace="pre-wrap"
-          fontSize="sm"
-          lineHeight="tall"
-          fontFamily="body"
-        >
-          {lyrics}
-        </Box>
-      )}
+      {/* 가사 모달 */}
+      <Modal isOpen={isOpen} onClose={onClose} size="xl" isCentered scrollBehavior="inside">
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>가사 보기</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Box whiteSpace="pre-wrap" fontSize="sm" lineHeight="tall">
+              {lyrics}
+            </Box>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </Box>
   );
 }

@@ -1,4 +1,3 @@
-// ReviewTrendChart.jsx
 import React from "react";
 import dayjs from "dayjs";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
@@ -26,10 +25,22 @@ function groupReviewsByDate(reviews, days = 7) {
 const ReviewTrendChart = ({ reviews }) => {
   const data = groupReviewsByDate(reviews);
 
+  const hasAnyReview = data.some((d) => d.count > 0);
+
+  if (!hasAnyReview) {
+    return (
+      <Box p={4}>
+        <Text textAlign="center" color="gray.500">
+          아직 평가에 참여한 앨범이 없습니다.
+        </Text>
+      </Box>
+    );
+  }
+
   return (
-    <Box w="100%" mt={8}>
-      <Text fontSize="xl" fontWeight="bold" mb={2}>
-        최근 7일 리뷰 참여 트렌드
+    <Box w="100%" h="300px" mt={8}>
+      <Text fontSize="xl" fontWeight="bold" mb={2} ml={10}>
+        최근 7일 리뷰 작성 현황
       </Text>
       <ResponsiveContainer width="100%" height={250}>
         <BarChart data={data} margin={{ top: 10, right: 20, left: 0, bottom: 5 }}>

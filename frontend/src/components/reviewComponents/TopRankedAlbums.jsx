@@ -9,6 +9,8 @@ const TopRankedAlbums = () => {
   const [albums, setAlbums] = useState([]);
   const sliderRef = useRef(null);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const isDragging = useRef(false);
+  const dragStartX = useRef(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,6 +22,7 @@ const TopRankedAlbums = () => {
 
   const slidesToShow = 6.5;
   const slidesToScroll = 3.5;
+
   const settings = {
     dots: false,
     infinite: false,
@@ -32,8 +35,24 @@ const TopRankedAlbums = () => {
 
   const isFirst = currentIndex === 0;
   const isLast = currentIndex + slidesToShow >= albums.length;
-  // const boxSize = 210;
   const boxSize = 160;
+
+  const handleMouseDown = (e) => {
+    dragStartX.current = e.clientX;
+    isDragging.current = false;
+  };
+
+  const handleMouseMove = (e) => {
+    if (Math.abs(e.clientX - dragStartX.current) > 5) {
+      isDragging.current = true;
+    }
+  };
+
+  const handleMouseUp = () => {
+    setTimeout(() => {
+      isDragging.current = false;
+    }, 0);
+  };
 
   return (
     <Box maxW="1500px" mx="auto" px={4} py={8}>
@@ -87,7 +106,21 @@ const TopRankedAlbums = () => {
         <Slider ref={sliderRef} {...settings}>
           {albums.map((a, i) => (
             <Box key={a.id} mr={i === albums.length - 1 ? 0 : 4}>
-              <VStack spacing={2} align="start" w={`${boxSize}px`}>
+              <VStack
+                spacing={2}
+                align="start"
+                w={`${boxSize}px`}
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                onClick={(e) => {
+                  if (isDragging.current) {
+                    e.preventDefault();
+                    return;
+                  }
+                  navigate(`/review/${a.id}`);
+                }}
+              >
                 <Box w={`${boxSize}px`} h={`${boxSize}px`}>
                   <Image
                     src={a.imagePath ? `http://localhost:8084/${a.imagePath}` : ""}
@@ -97,20 +130,13 @@ const TopRankedAlbums = () => {
                     objectFit="cover"
                     borderRadius="md"
                     boxShadow="md"
-                    cursor="pointer"
-                    onClick={() => navigate(`/review/${a.id}`)}
+                    pointerEvents="none"
                   />
                 </Box>
                 <Text fontSize="2xl" color="gray.600" fontWeight="bold">
                   #{i + 1}
                 </Text>
-                <Text
-                  fontSize="lg"
-                  fontWeight="semibold"
-                  whiteSpace="normal"
-                  cursor="pointer"
-                  onClick={() => navigate(`/review/${a.id}`)}
-                >
+                <Text fontSize="lg" fontWeight="semibold" whiteSpace="normal">
                   {a.title}
                 </Text>
                 <Text fontSize="md" color="gray.600" whiteSpace="normal">

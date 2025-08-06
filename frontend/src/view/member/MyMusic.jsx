@@ -118,9 +118,141 @@
 // };
 
 // export default MyMusic;
+//=============================================위에 멘토링 용
+
+// import React, { useState, useEffect } from "react";
+// import { Box, Text, Flex, Spinner, Grid, VStack, HStack } from "@chakra-ui/react";
+// import { useUser } from "../../context/UserContext.jsx";
+// import LikedAlbums from "../../components/memberComponents/LikedAlbums.jsx";
+// import ParticipatedAlbums from "../../components/memberComponents/ParticipatedAlbums.jsx";
+// import TrackSearchWithLyrics from "../../components/chatbotComponents/TrackSearchWithLyrics.jsx";
+// import GuidedChat from "../../components/chatbotComponents/GuidedChat.jsx";
+// import GenreChart from "../../components/memberComponents/GenreChart.jsx";
+// import ReviewTrendChart from "../../components/memberComponents/ReviewTrendChart.jsx";
+
+// const MyMusic = () => {
+//   const { state } = useUser();
+//   const memberId = state.memberId;
+
+//   const [reviewCount, setReviewCount] = useState(null);
+//   const [averageRating, setAverageRating] = useState(null);
+//   const [reviews, setReviews] = useState([]);
+//   const [genreStats, setGenreStats] = useState([]);
+//   const [chatMode, setChatMode] = useState(null);
+
+//   useEffect(() => {
+//     const fetchStats = async () => {
+//       try {
+//         const countRes = await fetch("/api/member/review-count", {
+//           credentials: "include",
+//         });
+//         if (countRes.ok) {
+//           const count = await countRes.json();
+//           setReviewCount(count);
+//         }
+
+//         const avgRes = await fetch("/api/member/average-rating", {
+//           credentials: "include",
+//         });
+//         if (avgRes.ok) {
+//           const avg = await avgRes.json();
+//           setAverageRating(avg);
+//         }
+
+//         const reviewRes = await fetch("/api/member/participated-albums", {
+//           credentials: "include",
+//         });
+//         if (reviewRes.ok) {
+//           const list = await reviewRes.json();
+//           setReviews(list);
+//         }
+
+//         const genreRes = await fetch(`/api/member/${memberId}/genre-stats`, {
+//           credentials: "include",
+//         });
+//         if (genreRes.ok) {
+//           const json = await genreRes.json();
+//           setGenreStats(json.map(({ genre, count }) => ({ genre, count })));
+//         }
+//       } catch (err) {
+//         console.error("통계 조회 중 에러:", err);
+//       }
+//     };
+
+//     fetchStats();
+//   }, [memberId]);
+
+//   return (
+//     <Box px={4} pt="100px" pb={10}>
+//       <Text
+//         lineHeight="2.5"
+//         textAlign="center"
+//         fontSize="3xl"
+//         fontWeight="medium"
+//         borderBottom="2px solid gray"
+//         pb={2}
+//         mb={6}
+//       >
+//         {state.nickname} 님의 음악
+//       </Text>
+
+//       {/* 상단 통계 */}
+//       <Flex justify="center" align="center" mb={8} direction="column">
+//         <VStack>
+//           <Text>상단에 활동내역 만들 예정임</Text>
+//           {reviewCount !== null ? <Text>리뷰 수: {reviewCount}개</Text> : <Spinner size="sm" />}
+//           {averageRating !== null ? <Text>평균 평점: {averageRating.toFixed(1)}</Text> : <Spinner size="sm" />}
+//         </VStack>
+
+//         <HStack w="1500px" h="300px">
+//           <Box mt={6} w={{ base: "100%", md: "50%" }} maxW="600px" mx="auto">
+//             <GenreChart data={genreStats} />
+//           </Box>
+//           {/* {reviews.length > 0 && ( */}
+//           <Box mt={8} w="100%" maxW="700px">
+//             <ReviewTrendChart reviews={reviews} />
+//           </Box>
+//           {/* )} */}
+//         </HStack>
+//       </Flex>
+
+//       {/* 참여한 앨범 & 좋아요 앨범 옆에 챗봇 */}
+//       <Flex mb={12} align="flex-start" gap={8}>
+//         <Grid templateColumns={["1fr", "1fr 1fr"]} gap={4} flex="2">
+//           <ParticipatedAlbums />
+//           <LikedAlbums />
+//         </Grid>
+
+//         <Box flex="1" minW="300px">
+//           <GuidedChat onModeChange={setChatMode} />
+//           {chatMode === "translate" && (
+//             <Box mt={4}>
+//               <TrackSearchWithLyrics />
+//             </Box>
+//           )}
+//         </Box>
+//       </Flex>
+//     </Box>
+//   );
+// };
+
+// export default MyMusic;
 
 import React, { useState, useEffect } from "react";
-import { Box, Text, Flex, Spinner, Grid, VStack, HStack } from "@chakra-ui/react";
+import {
+  Box,
+  Text,
+  Spinner,
+  VStack,
+  HStack,
+  SimpleGrid,
+  Tabs,
+  TabList,
+  TabPanels,
+  Tab,
+  TabPanel,
+  Flex,
+} from "@chakra-ui/react";
 import { useUser } from "../../context/UserContext.jsx";
 import LikedAlbums from "../../components/memberComponents/LikedAlbums.jsx";
 import ParticipatedAlbums from "../../components/memberComponents/ParticipatedAlbums.jsx";
@@ -132,9 +264,11 @@ import ReviewTrendChart from "../../components/memberComponents/ReviewTrendChart
 const MyMusic = () => {
   const { state } = useUser();
   const memberId = state.memberId;
+
   const [reviewCount, setReviewCount] = useState(null);
   const [averageRating, setAverageRating] = useState(null);
   const [reviews, setReviews] = useState([]);
+  const [genreStats, setGenreStats] = useState([]);
   const [chatMode, setChatMode] = useState(null);
 
   useEffect(() => {
@@ -163,161 +297,88 @@ const MyMusic = () => {
           const list = await reviewRes.json();
           setReviews(list);
         }
+
+        const genreRes = await fetch(`/api/member/${memberId}/genre-stats`, {
+          credentials: "include",
+        });
+        if (genreRes.ok) {
+          const json = await genreRes.json();
+          setGenreStats(json.map(({ genre, count }) => ({ genre, count })));
+        }
       } catch (err) {
         console.error("통계 조회 중 에러:", err);
       }
     };
 
     fetchStats();
-  }, []);
+  }, [memberId]);
 
   return (
-    <Box px={4} pt="100px" pb={10}>
-      <Text
-        lineHeight="2.5"
-        textAlign="center"
-        fontSize="3xl"
-        fontWeight="medium"
-        borderBottom="2px solid gray"
-        pb={2}
-        mb={6}
-      >
-        {state.nickname} 님의 음악
-      </Text>
-
-      {/* 상단 통계 */}
-      <Flex justify="center" align="center" mb={8} direction="column">
-        <VStack>
-          <Text>상단에 활동내역 만들 예정임</Text>
-          {reviewCount !== null ? <Text>리뷰 수: {reviewCount}개</Text> : <Spinner size="sm" />}
-          {averageRating !== null ? <Text>평균 평점: {averageRating.toFixed(1)}</Text> : <Spinner size="sm" />}
-        </VStack>
-
-        <HStack w="1500px" h="300px">
-          <Box mt={6} w={{ base: "100%", md: "50%" }} maxW="600px" mx="auto">
-            <GenreChart memberId={memberId} />
-          </Box>
-          {reviews.length > 0 && (
-            <Box mt={8} w="100%" maxW="700px">
-              <ReviewTrendChart reviews={reviews} />
-            </Box>
+    <Box px={4} pt="100px" pb={16} maxW="1300px" mx="auto">
+      {/* 상단 프로필 */}
+      <VStack spacing={2} textAlign="center" mb={10}>
+        <Text fontSize="3xl" fontWeight="bold">
+          {state.nickname} 님의 음악 프로필
+        </Text>
+        <HStack spacing={6} mt={2}>
+          {reviewCount !== null ? (
+            <Text fontSize="md" color="gray.700">
+              작성한 리뷰: {reviewCount}개
+            </Text>
+          ) : (
+            <Spinner size="sm" />
+          )}
+          {averageRating !== null ? (
+            <Text fontSize="md" color="gray.700">
+              평균 별점: {averageRating.toFixed(1)}
+            </Text>
+          ) : (
+            <Spinner size="sm" />
           )}
         </HStack>
-      </Flex>
+      </VStack>
 
-      {/* 참여한 앨범 & 좋아요 앨범 옆에 챗봇 */}
-      <Flex mb={12} align="flex-start" gap={8}>
-        <Grid templateColumns={["1fr", "1fr 1fr"]} gap={4} flex="2">
-          <ParticipatedAlbums />
-          <LikedAlbums />
-        </Grid>
+      {/* 탭 구성 */}
+      <Tabs variant="unstyled" isFitted>
+        <TabList mb={6} borderBottom="1px solid #ccc">
+          <Tab _selected={{ borderBottom: "2px solid black", fontWeight: "bold" }}>나의 활동</Tab>
+          <Tab _selected={{ borderBottom: "2px solid black", fontWeight: "bold" }}>챗봇</Tab>
+        </TabList>
 
-        <Box flex="1" minW="300px">
-          <GuidedChat onModeChange={setChatMode} />
-          {chatMode === "translate" && (
-            <Box mt={4}>
-              <TrackSearchWithLyrics />
-            </Box>
-          )}
-        </Box>
-      </Flex>
+        <TabPanels>
+          {/* 나의 활동 탭 */}
+          <TabPanel>
+            <SimpleGrid columns={[1, 2]} spacing={8} mb={14}>
+              <GenreChart data={genreStats} />
+              <ReviewTrendChart reviews={reviews} />
+            </SimpleGrid>
+
+            <SimpleGrid columns={[1, 2]} spacing={8} mb={12}>
+              <LikedAlbums />
+              <ParticipatedAlbums />
+            </SimpleGrid>
+          </TabPanel>
+
+          {/* 챗봇 탭 */}
+          <Box maxW="1300px">
+            <TabPanel>
+              <Flex gap={4}>
+                <Box flex="1">
+                  <GuidedChat onModeChange={setChatMode} />
+                </Box>
+
+                {chatMode === "translate" && (
+                  <Box flex="1">
+                    <TrackSearchWithLyrics />
+                  </Box>
+                )}
+              </Flex>
+            </TabPanel>
+          </Box>
+        </TabPanels>
+      </Tabs>
     </Box>
   );
 };
 
 export default MyMusic;
-
-//=========================================================================================================
-
-// import React, { useState, useEffect } from "react";
-// import { Text, Box, Flex, Spinner, VStack } from "@chakra-ui/react";
-// import { useUser } from "../../context/UserContext.jsx";
-// import LikedAlbums from "../../components/memberComponents/LikedAlbums.jsx";
-// import ParticipatedAlbums from "../../components/memberComponents/ParticipatedAlbums.jsx";
-// import TrackSearchWithLyrics from "../../components/chatbotComponents/TrackSearchWithLyrics.jsx";
-// import GuidedChat from "../../components/chatbotComponents/GuidedChat.jsx";
-
-// const MyMusic = () => {
-//   const { state } = useUser();
-
-//   // 리뷰 수와 평균 평점 상태
-//   const [reviewCount, setReviewCount] = useState(null);
-//   const [averageRating, setAverageRating] = useState(null);
-
-//   useEffect(() => {
-//     const fetchStats = async () => {
-//       try {
-//         // 리뷰 수 조회
-//         const countRes = await fetch("/api/member/review-count", {
-//           credentials: "include",
-//         });
-//         if (countRes.ok) {
-//           const count = await countRes.json();
-//           setReviewCount(count);
-//         }
-
-//         // 평균 평점 조회
-//         const avgRes = await fetch("/api/member/average-rating", {
-//           credentials: "include",
-//         });
-//         if (avgRes.ok) {
-//           const avg = await avgRes.json();
-//           setAverageRating(avg);
-//         }
-//       } catch (err) {
-//         console.error("통계 조회 중 에러:", err);
-//       }
-//     };
-
-//     fetchStats();
-//   }, []);
-
-//   // 채팅 모드 상태
-//   const [chatMode, setChatMode] = useState(null);
-
-//   return (
-//     <>
-//       {/* 제목 */}
-//       <Text
-//         lineHeight="2.5"
-//         textAlign="center"
-//         fontSize="3xl"
-//         fontWeight="medium"
-//         borderBottom="2px solid gray"
-//         pb={2}
-//         // mt={4}
-//         mt="100px"
-//         ml={5}
-//         h="85px"
-//       >
-//         {state.nickname} 님의 음악
-//       </Text>
-//       <VStack>
-//         <Text mb="-25px" mt={5}>
-//           일단 정보만 띄워둔거임
-//         </Text>
-//         {/* 상단 통계 표시 영역 */}
-//         <Box px={5} mt={4}>
-//           <Flex justify="center" align="center">
-//             {reviewCount !== null ? <Text mr={6}>리뷰 수: {reviewCount}개</Text> : <Spinner mr={6} size="sm" />}
-//             {averageRating !== null ? <Text>평균 평점: {averageRating.toFixed(1)}</Text> : <Spinner size="sm" />}
-//           </Flex>
-//         </Box>
-//       </VStack>
-
-//       {/* 참여한 앨범 & 좋아요 앨범 */}
-//       <ParticipatedAlbums />
-//       <LikedAlbums />
-
-//       {/* Guided Chat 영역 */}
-//       <Box maxW="450px" mx="auto" px={4} mt={8} mb={20}>
-//         <GuidedChat onModeChange={setChatMode} />
-//       </Box>
-
-//       {/* translate 모드일 때만 화면에 표시 */}
-//       {chatMode === "translate" && <TrackSearchWithLyrics />}
-//     </>
-//   );
-// };
-
-// export default MyMusic;
