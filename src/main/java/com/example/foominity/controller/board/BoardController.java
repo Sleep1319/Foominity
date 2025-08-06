@@ -48,15 +48,7 @@ public class BoardController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(required = false) String subject,
             @RequestParam(required = false) String keyword) {
-        if ((subject == null || subject.equals("전체")) && (keyword == null || keyword.isBlank())) {
-            return ResponseEntity.ok(boardService.findAll(page));
-        } else if (subject != null && !subject.equals("전체") && (keyword == null || keyword.isBlank())) {
-            return ResponseEntity.ok(boardService.findBySubject(subject, page));
-        } else if ((subject == null || subject.equals("전체")) && keyword != null && !keyword.isBlank()) {
-            return ResponseEntity.ok(boardService.findByKeyword(keyword, page));
-        } else {
-            return ResponseEntity.ok(boardService.findBySubjectAndKeyword(subject, keyword, page));
-        }
+        return ResponseEntity.ok(boardService.getBoards(page, subject, keyword));
     }
 
     @GetMapping("/api/board/{id}")

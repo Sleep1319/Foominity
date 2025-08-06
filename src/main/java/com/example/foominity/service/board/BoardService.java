@@ -43,6 +43,18 @@ public class BoardService {
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
 
+    public Page<BoardResponse> getBoards(int page, String subject, String keyword) {
+        if ((subject == null || subject.equals("전체")) && (keyword == null || keyword.isBlank())) {
+            return findAll(page);
+        } else if (subject != null && !subject.equals("전체") && (keyword == null || keyword.isBlank())) {
+            return findBySubject(subject, page);
+        } else if ((subject == null || subject.equals("전체")) && keyword != null && !keyword.isBlank()) {
+            return findByKeyword(keyword, page);
+        } else {
+            return findBySubjectAndKeyword(subject, keyword, page);
+        }
+    }
+
     public Page<BoardResponse> findAll(int page) {
         PageRequest pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC,
                 "createdDate"));
@@ -66,17 +78,17 @@ public class BoardService {
     }
 
     // 검색
-    public Page<BoardResponse> findByKeyword(String keyword, int page) {
-        PageRequest pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
-        Page<Board> boards = boardRepository.findByTitleContainingIgnoreCase(keyword, pageable);
-        return boards.map(BoardResponse::from);
-    }
-
     public Page<BoardResponse> findBySubject(String subject, int page) {
         PageRequest pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
         Page<Board> boards = boardRepository.findBySubject(subject, pageable);
         Page<BoardResponse> boardResponses = boards.map(BoardResponse::from);
         return boardResponses;
+    }
+
+    public Page<BoardResponse> findByKeyword(String keyword, int page) {
+        PageRequest pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
+        Page<Board> boards = boardRepository.findByTitleContainingIgnoreCase(keyword, pageable);
+        return boards.map(BoardResponse::from);
     }
 
     public Page<BoardResponse> findBySubjectAndKeyword(String subject, String keyword, int page) {
