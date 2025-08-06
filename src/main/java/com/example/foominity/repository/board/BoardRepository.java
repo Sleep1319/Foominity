@@ -41,7 +41,7 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
               GROUP BY b.id
               HAVING ((b.views / 50.0) + COUNT(bl.id)) >= 5
               ORDER BY ((b.views / 50.0) + COUNT(bl.id)) DESC, b.created_date DESC
-              LIMIT 10
+              LIMIT 3
             """, nativeQuery = true)
     List<Board> findPopularBoards(@Param("from") LocalDateTime from);
 
