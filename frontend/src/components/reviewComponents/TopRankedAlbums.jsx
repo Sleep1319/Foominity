@@ -109,6 +109,7 @@ const TopRankedAlbums = () => {
               <VStack
                 spacing={2}
                 align="start"
+                cursor="pointer"
                 w={`${boxSize}px`}
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}

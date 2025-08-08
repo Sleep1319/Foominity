@@ -1,250 +1,9 @@
-// import React, { useState, useEffect } from "react";
-// import { Box, Text, Grid, Flex, Spinner, Button, useColorModeValue } from "@chakra-ui/react";
-// import { useUser } from "../../context/UserContext.jsx";
-// import LikedAlbums from "../../components/memberComponents/LikedAlbums.jsx";
-// import ParticipatedAlbums from "../../components/memberComponents/ParticipatedAlbums.jsx";
-// import TrackSearchWithLyrics from "../../components/chatbotComponents/TrackSearchWithLyrics.jsx";
-// import GuidedChat from "../../components/chatbotComponents/GuidedChat.jsx";
-// import GenreChart from "../../components/memberComponents/GenreChart.jsx";
-
-// const MyMusic = () => {
-//   const { state } = useUser();
-//   const memberId = state.memberId;
-
-//   const [reviewCount, setReviewCount] = useState(null);
-//   const [averageRating, setAverageRating] = useState(null);
-//   const [chatMode, setChatMode] = useState(null);
-
-//   useEffect(() => {
-//     (async () => {
-//       try {
-//         const [countRes, avgRes] = await Promise.all([
-//           fetch("/api/member/review-count", { credentials: "include" }),
-//           fetch("/api/member/average-rating", { credentials: "include" }),
-//         ]);
-//         if (countRes.ok) setReviewCount(await countRes.json());
-//         if (avgRes.ok) setAverageRating(await avgRes.json());
-//       } catch (err) {
-//         console.error("통계 조회 중 에러:", err);
-//       }
-//     })();
-//   }, []);
-
-//   const cardBg = useColorModeValue("white", "gray.700");
-//   const borderColor = useColorModeValue("gray.200", "gray.600");
-
-//   return (
-//     // 전체 폭을 100%로 변경했습니다.
-//     <Box px={{ base: 4, md: 8 }} py={10} w="100%">
-//       {/* 페이지 제목 */}
-//       <Text textAlign="center" fontSize={{ base: "2xl", md: "3xl" }} fontWeight="bold" mb={8}>
-//         {state.nickname} 님의 음악 공간
-//       </Text>
-
-//       {/* 상단: 통계 + 차트 */}
-//       <Grid templateColumns={{ base: "1fr", md: "1fr 1fr" }} gap={6} mb={10}>
-//         <Box bg={cardBg} border="1px" borderColor={borderColor} borderRadius="md" p={6} textAlign="center">
-//           {reviewCount !== null && averageRating !== null ? (
-//             <>
-//               <Text fontSize="lg">
-//                 리뷰 수:{" "}
-//                 <Text as="span" fontWeight="bold">
-//                   {reviewCount}개
-//                 </Text>
-//               </Text>
-//               <Text fontSize="lg" mt={2}>
-//                 평균 평점:{" "}
-//                 <Text as="span" fontWeight="bold">
-//                   {averageRating.toFixed(1)}
-//                 </Text>
-//               </Text>
-//             </>
-//           ) : (
-//             <Spinner size="lg" />
-//           )}
-//         </Box>
-
-//         <Box bg={cardBg} border="1px" borderColor={borderColor} borderRadius="md" p={6}>
-//           <GenreChart memberId={memberId} />
-//         </Box>
-//       </Grid>
-
-//       {/* 하단: 앨범 섹션(두 카드 가로 배치) + 챗봇 */}
-//       <Grid templateColumns={{ base: "1fr", lg: "3fr 1fr" }} gap={6}>
-//         {/* 앨범 섹션 */}
-//         <Flex w="100%" gap={6}>
-//           {/* 참여한 앨범 */}
-//           <Box bg={cardBg} border="1px" borderColor={borderColor} borderRadius="md" p={4} flex="1">
-//             <Flex justify="space-between" align="center" mb={4}>
-//               <Text fontSize="lg" fontWeight="medium">
-//                 내가 평가한 앨범
-//               </Text>
-//               <Button size="sm" variant="outline">
-//                 전체보기
-//               </Button>
-//             </Flex>
-//             <ParticipatedAlbums />
-//           </Box>
-
-//           {/* 좋아하는 앨범 */}
-//           <Box bg={cardBg} border="1px" borderColor={borderColor} borderRadius="md" p={4} flex="1">
-//             <Flex justify="space-between" align="center" mb={4}>
-//               <Text fontSize="lg" fontWeight="medium">
-//                 내가 좋아하는 앨범
-//               </Text>
-//               <Button size="sm" variant="outline">
-//                 전체보기
-//               </Button>
-//             </Flex>
-//             <LikedAlbums />
-//           </Box>
-//         </Flex>
-
-//         {/* 챗봇 섹션 */}
-//         <Box bg={cardBg} border="1px" borderColor={borderColor} borderRadius="md" p={4}>
-//           <Text fontSize="lg" fontWeight="medium" mb={4}>
-//             챗봇 지원
-//           </Text>
-//           <GuidedChat onModeChange={setChatMode} />
-//           {chatMode === "translate" && (
-//             <Box mt={4}>
-//               <TrackSearchWithLyrics />
-//             </Box>
-//           )}
-//         </Box>
-//       </Grid>
-//     </Box>
-//   );
-// };
-
-// export default MyMusic;
-//=============================================위에 멘토링 용
-
-// import React, { useState, useEffect } from "react";
-// import { Box, Text, Flex, Spinner, Grid, VStack, HStack } from "@chakra-ui/react";
-// import { useUser } from "../../context/UserContext.jsx";
-// import LikedAlbums from "../../components/memberComponents/LikedAlbums.jsx";
-// import ParticipatedAlbums from "../../components/memberComponents/ParticipatedAlbums.jsx";
-// import TrackSearchWithLyrics from "../../components/chatbotComponents/TrackSearchWithLyrics.jsx";
-// import GuidedChat from "../../components/chatbotComponents/GuidedChat.jsx";
-// import GenreChart from "../../components/memberComponents/GenreChart.jsx";
-// import ReviewTrendChart from "../../components/memberComponents/ReviewTrendChart.jsx";
-
-// const MyMusic = () => {
-//   const { state } = useUser();
-//   const memberId = state.memberId;
-
-//   const [reviewCount, setReviewCount] = useState(null);
-//   const [averageRating, setAverageRating] = useState(null);
-//   const [reviews, setReviews] = useState([]);
-//   const [genreStats, setGenreStats] = useState([]);
-//   const [chatMode, setChatMode] = useState(null);
-
-//   useEffect(() => {
-//     const fetchStats = async () => {
-//       try {
-//         const countRes = await fetch("/api/member/review-count", {
-//           credentials: "include",
-//         });
-//         if (countRes.ok) {
-//           const count = await countRes.json();
-//           setReviewCount(count);
-//         }
-
-//         const avgRes = await fetch("/api/member/average-rating", {
-//           credentials: "include",
-//         });
-//         if (avgRes.ok) {
-//           const avg = await avgRes.json();
-//           setAverageRating(avg);
-//         }
-
-//         const reviewRes = await fetch("/api/member/participated-albums", {
-//           credentials: "include",
-//         });
-//         if (reviewRes.ok) {
-//           const list = await reviewRes.json();
-//           setReviews(list);
-//         }
-
-//         const genreRes = await fetch(`/api/member/${memberId}/genre-stats`, {
-//           credentials: "include",
-//         });
-//         if (genreRes.ok) {
-//           const json = await genreRes.json();
-//           setGenreStats(json.map(({ genre, count }) => ({ genre, count })));
-//         }
-//       } catch (err) {
-//         console.error("통계 조회 중 에러:", err);
-//       }
-//     };
-
-//     fetchStats();
-//   }, [memberId]);
-
-//   return (
-//     <Box px={4} pt="100px" pb={10}>
-//       <Text
-//         lineHeight="2.5"
-//         textAlign="center"
-//         fontSize="3xl"
-//         fontWeight="medium"
-//         borderBottom="2px solid gray"
-//         pb={2}
-//         mb={6}
-//       >
-//         {state.nickname} 님의 음악
-//       </Text>
-
-//       {/* 상단 통계 */}
-//       <Flex justify="center" align="center" mb={8} direction="column">
-//         <VStack>
-//           <Text>상단에 활동내역 만들 예정임</Text>
-//           {reviewCount !== null ? <Text>리뷰 수: {reviewCount}개</Text> : <Spinner size="sm" />}
-//           {averageRating !== null ? <Text>평균 평점: {averageRating.toFixed(1)}</Text> : <Spinner size="sm" />}
-//         </VStack>
-
-//         <HStack w="1500px" h="300px">
-//           <Box mt={6} w={{ base: "100%", md: "50%" }} maxW="600px" mx="auto">
-//             <GenreChart data={genreStats} />
-//           </Box>
-//           {/* {reviews.length > 0 && ( */}
-//           <Box mt={8} w="100%" maxW="700px">
-//             <ReviewTrendChart reviews={reviews} />
-//           </Box>
-//           {/* )} */}
-//         </HStack>
-//       </Flex>
-
-//       {/* 참여한 앨범 & 좋아요 앨범 옆에 챗봇 */}
-//       <Flex mb={12} align="flex-start" gap={8}>
-//         <Grid templateColumns={["1fr", "1fr 1fr"]} gap={4} flex="2">
-//           <ParticipatedAlbums />
-//           <LikedAlbums />
-//         </Grid>
-
-//         <Box flex="1" minW="300px">
-//           <GuidedChat onModeChange={setChatMode} />
-//           {chatMode === "translate" && (
-//             <Box mt={4}>
-//               <TrackSearchWithLyrics />
-//             </Box>
-//           )}
-//         </Box>
-//       </Flex>
-//     </Box>
-//   );
-// };
-
-// export default MyMusic;
-
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Box,
   Text,
   Spinner,
   VStack,
-  HStack,
   SimpleGrid,
   Tabs,
   TabList,
@@ -258,6 +17,7 @@ import LikedAlbums from "../../components/memberComponents/LikedAlbums.jsx";
 import ParticipatedAlbums from "../../components/memberComponents/ParticipatedAlbums.jsx";
 import TrackSearchWithLyrics from "../../components/chatbotComponents/TrackSearchWithLyrics.jsx";
 import GuidedChat from "../../components/chatbotComponents/GuidedChat.jsx";
+import RecommendPanel from "../../components/chatbotComponents/RecommendPanel.jsx";
 import GenreChart from "../../components/memberComponents/GenreChart.jsx";
 import ReviewTrendChart from "../../components/memberComponents/ReviewTrendChart.jsx";
 
@@ -269,7 +29,9 @@ const MyMusic = () => {
   const [averageRating, setAverageRating] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [genreStats, setGenreStats] = useState([]);
+  const [favoriteGenre, setFavoriteGenre] = useState("");
   const [chatMode, setChatMode] = useState(null);
+  const chatRef = useRef();
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -277,82 +39,114 @@ const MyMusic = () => {
         const countRes = await fetch("/api/member/review-count", {
           credentials: "include",
         });
-        if (countRes.ok) {
-          const count = await countRes.json();
-          setReviewCount(count);
-        }
+        if (countRes.ok) setReviewCount(await countRes.json());
 
         const avgRes = await fetch("/api/member/average-rating", {
           credentials: "include",
         });
-        if (avgRes.ok) {
-          const avg = await avgRes.json();
-          setAverageRating(avg);
-        }
+        if (avgRes.ok) setAverageRating(await avgRes.json());
 
         const reviewRes = await fetch("/api/member/participated-albums", {
           credentials: "include",
         });
-        if (reviewRes.ok) {
-          const list = await reviewRes.json();
-          setReviews(list);
-        }
+        if (reviewRes.ok) setReviews(await reviewRes.json());
 
         const genreRes = await fetch(`/api/member/${memberId}/genre-stats`, {
           credentials: "include",
         });
         if (genreRes.ok) {
           const json = await genreRes.json();
-          setGenreStats(json.map(({ genre, count }) => ({ genre, count })));
+          const stats = json.map(({ genre, count }) => ({ genre, count }));
+          setGenreStats(stats);
+          const top = stats.reduce((p, c) => (c.count > p.count ? c : p), stats[0]);
+          setFavoriteGenre(top.genre);
         }
       } catch (err) {
         console.error("통계 조회 중 에러:", err);
       }
     };
-
     fetchStats();
   }, [memberId]);
 
   return (
     <Box px={4} pt="100px" pb={16} maxW="1300px" mx="auto">
-      {/* 상단 프로필 */}
       <VStack spacing={2} textAlign="center" mb={10}>
         <Text fontSize="3xl" fontWeight="bold">
           {state.nickname} 님의 음악 프로필
         </Text>
-        <HStack spacing={6} mt={2}>
-          {reviewCount !== null ? (
-            <Text fontSize="md" color="gray.700">
-              작성한 리뷰: {reviewCount}개
-            </Text>
-          ) : (
-            <Spinner size="sm" />
-          )}
-          {averageRating !== null ? (
-            <Text fontSize="md" color="gray.700">
-              평균 별점: {averageRating.toFixed(1)}
-            </Text>
-          ) : (
-            <Spinner size="sm" />
-          )}
-        </HStack>
       </VStack>
 
-      {/* 탭 구성 */}
       <Tabs variant="unstyled" isFitted>
-        <TabList mb={6} borderBottom="1px solid #ccc">
+        <TabList mb={8} borderBottom="1px solid #ccc">
           <Tab _selected={{ borderBottom: "2px solid black", fontWeight: "bold" }}>나의 활동</Tab>
-          <Tab _selected={{ borderBottom: "2px solid black", fontWeight: "bold" }}>챗봇</Tab>
+          <Tab _selected={{ borderBottom: "2px solid black", fontWeight: "bold" }}>AI 음악 비서</Tab>
         </TabList>
 
         <TabPanels>
           {/* 나의 활동 탭 */}
           <TabPanel>
+            {/* 1단계: 텍스트 세로 배치 + 차트 탭으로 전환 */}
             <SimpleGrid columns={[1, 2]} spacing={8} mb={14}>
-              <GenreChart data={genreStats} />
-              <ReviewTrendChart reviews={reviews} />
+              {/* 우측: 두 차트를 탭으로 */}
+              <Tabs variant="enclosed" w="100%">
+                <TabList border="none">
+                  <Tab
+                    color="gray.600"
+                    _selected={{ color: "black", fontWeight: "bold", borderBottom: "1px solid black" }}
+                    fontWeight="medium"
+                    _hover={{ color: "black", fontWeight: "bold" }}
+                    // border="1px solid black"
+                    // borderRadius="0px"
+                  >
+                    장르별 좋아요 분포
+                  </Tab>
+                  <Tab
+                    color="gray.600"
+                    _selected={{ color: "black", fontWeight: "bold", borderBottom: "1px solid black" }}
+                    fontWeight="medium"
+                    _hover={{ color: "black", fontWeight: "bold" }}
+                    // border="1px solid black"
+                    // borderRadius="0px"
+                  >
+                    최근 7일 리뷰 작성 현황
+                  </Tab>
+                </TabList>
+                <TabPanels>
+                  <TabPanel p={0}>
+                    <GenreChart data={genreStats} />
+                  </TabPanel>
+                  <TabPanel p={0}>
+                    <ReviewTrendChart reviews={reviews} />
+                  </TabPanel>
+                </TabPanels>
+              </Tabs>
+              {/* 좌측: 세로로 */}
+              <VStack align="start" spacing={4}>
+                {favoriteGenre !== null ? (
+                  <Text fontSize="md" color="gray.700">
+                    가장 선호하는 장르: {favoriteGenre}
+                  </Text>
+                ) : (
+                  <Spinner size="sm" />
+                )}
+                {reviewCount !== null ? (
+                  <Text fontSize="md" color="gray.700">
+                    작성한 리뷰: {reviewCount}개
+                  </Text>
+                ) : (
+                  <Spinner size="sm" />
+                )}
+                {averageRating !== null ? (
+                  <Text fontSize="md" color="gray.700">
+                    평균 별점: {averageRating.toFixed(1)}
+                  </Text>
+                ) : (
+                  <Spinner size="sm" />
+                )}
+              </VStack>
             </SimpleGrid>
 
+            {/* 2단계: 즐겨찾기/참여 앨범 */}
             <SimpleGrid columns={[1, 2]} spacing={8} mb={12}>
               <LikedAlbums />
               <ParticipatedAlbums />
@@ -360,21 +154,24 @@ const MyMusic = () => {
           </TabPanel>
 
           {/* 챗봇 탭 */}
-          <Box maxW="1300px">
-            <TabPanel>
-              <Flex gap={4}>
-                <Box flex="1">
-                  <GuidedChat onModeChange={setChatMode} />
-                </Box>
-
-                {chatMode === "translate" && (
-                  <Box flex="1">
-                    <TrackSearchWithLyrics />
+          <TabPanel>
+            <Flex gap={6} w="100%">
+              <Box flex="1" maxW="615px" h="600px">
+                <GuidedChat ref={chatRef} onModeChange={setChatMode} />
+              </Box>
+              <Box flex="1" h="600px" overflowY={chatMode === "recommend" ? "auto" : "visible"}>
+                {chatMode === "translate" && <TrackSearchWithLyrics />}
+                {chatMode === "recommend" && (
+                  <RecommendPanel onResult={(reply) => chatRef.current?.push({ sender: "BOT", content: reply })} />
+                )}
+                {chatMode === "diagnosis" && (
+                  <Box p={4}>
+                    <Text>진단할 노래 제목과 아티스트를 알려주세요.</Text>
                   </Box>
                 )}
-              </Flex>
-            </TabPanel>
-          </Box>
+              </Box>
+            </Flex>
+          </TabPanel>
         </TabPanels>
       </Tabs>
     </Box>
@@ -382,3 +179,158 @@ const MyMusic = () => {
 };
 
 export default MyMusic;
+
+//============================================================
+
+// import React, { useState, useEffect, useRef } from "react";
+// import {
+//   Box,
+//   Text,
+//   Spinner,
+//   VStack,
+//   HStack,
+//   SimpleGrid,
+//   Tabs,
+//   TabList,
+//   TabPanels,
+//   Tab,
+//   TabPanel,
+//   Flex,
+// } from "@chakra-ui/react";
+// import { useUser } from "../../context/UserContext.jsx";
+// import LikedAlbums from "../../components/memberComponents/LikedAlbums.jsx";
+// import ParticipatedAlbums from "../../components/memberComponents/ParticipatedAlbums.jsx";
+// import TrackSearchWithLyrics from "../../components/chatbotComponents/TrackSearchWithLyrics.jsx";
+// import GuidedChat from "../../components/chatbotComponents/GuidedChat.jsx";
+// import RecommendPanel from "../../components/chatbotComponents/RecommendPanel.jsx";
+// import GenreChart from "../../components/memberComponents/GenreChart.jsx";
+// import ReviewTrendChart from "../../components/memberComponents/ReviewTrendChart.jsx";
+
+// const MyMusic = () => {
+//   const { state } = useUser();
+//   const memberId = state.memberId;
+
+//   const [reviewCount, setReviewCount] = useState(null);
+//   const [averageRating, setAverageRating] = useState(null);
+//   const [reviews, setReviews] = useState([]);
+//   const [genreStats, setGenreStats] = useState([]);
+//   const [favoriteGenre, setFavoriteGenre] = useState("");
+//   const [chatMode, setChatMode] = useState(null);
+//   const chatRef = useRef();
+
+//   useEffect(() => {
+//     const fetchStats = async () => {
+//       try {
+//         const countRes = await fetch("/api/member/review-count", {
+//           credentials: "include",
+//         });
+//         if (countRes.ok) setReviewCount(await countRes.json());
+
+//         const avgRes = await fetch("/api/member/average-rating", {
+//           credentials: "include",
+//         });
+//         if (avgRes.ok) setAverageRating(await avgRes.json());
+
+//         const reviewRes = await fetch("/api/member/participated-albums", {
+//           credentials: "include",
+//         });
+//         if (reviewRes.ok) setReviews(await reviewRes.json());
+
+//         const genreRes = await fetch(`/api/member/${memberId}/genre-stats`, {
+//           credentials: "include",
+//         });
+//         if (genreRes.ok) {
+//           const json = await genreRes.json();
+//           const stats = json.map(({ genre, count }) => ({ genre, count }));
+//           setGenreStats(stats);
+//           const top = stats.reduce((p, c) => (c.count > p.count ? c : p), stats[0]);
+//           setFavoriteGenre(top.genre);
+//         }
+//       } catch (err) {
+//         console.error("통계 조회 중 에러:", err);
+//       }
+//     };
+//     fetchStats();
+//   }, [memberId]);
+
+//   return (
+//     <Box px={4} pt="100px" pb={16} maxW="1300px" mx="auto">
+//       <VStack spacing={2} textAlign="center" mb={10}>
+//         <Text fontSize="3xl" fontWeight="bold">
+//           {state.nickname} 님의 음악 프로필
+//         </Text>
+//       </VStack>
+
+//       <Tabs variant="unstyled" isFitted>
+//         <TabList mb={8} borderBottom="1px solid #ccc">
+//           <Tab _selected={{ borderBottom: "2px solid black", fontWeight: "bold" }}>나의 활동</Tab>
+//           <Tab _selected={{ borderBottom: "2px solid black", fontWeight: "bold" }}>AI 음악 비서</Tab>
+//         </TabList>
+
+//         <TabPanels>
+//           {/* 나의 활동 탭 */}
+//           <TabPanel>
+//             <HStack spacing={6} mt={2}>
+//               {favoriteGenre ? (
+//                 <Text fontSize="md" color="gray.700">
+//                   제일 좋아하는 장르: {favoriteGenre}
+//                 </Text>
+//               ) : (
+//                 <Spinner size="sm" />
+//               )}
+//               {reviewCount !== null ? (
+//                 <Text fontSize="md" color="gray.700">
+//                   작성한 리뷰: {reviewCount}개
+//                 </Text>
+//               ) : (
+//                 <Spinner size="sm" />
+//               )}
+//               {averageRating !== null ? (
+//                 <Text fontSize="md" color="gray.700">
+//                   평균 별점: {averageRating.toFixed(1)}
+//                 </Text>
+//               ) : (
+//                 <Spinner size="sm" />
+//               )}
+//             </HStack>
+
+//             <SimpleGrid columns={[1, 2]} spacing={8} mb={14}>
+//               <GenreChart data={genreStats} />
+//               <ReviewTrendChart reviews={reviews} />
+//             </SimpleGrid>
+
+//             <SimpleGrid columns={[1, 2]} spacing={8} mb={12}>
+//               <LikedAlbums />
+//               <ParticipatedAlbums />
+//             </SimpleGrid>
+//           </TabPanel>
+
+//           {/* 챗봇 탭 */}
+//           <TabPanel>
+//             <Flex gap={6} w="100%">
+//               {/* 왼쪽: GuidedChat */}
+//               <Box flex="1" maxW="615px" h="600px">
+//                 <GuidedChat ref={chatRef} onModeChange={setChatMode} />
+//               </Box>
+
+//               {/* 오른쪽: mode별 패널 */}
+//               <Box flex="1" h="600px" overflowY={chatMode === "recommend" ? "auto" : "visible"}>
+//                 {chatMode === "translate" && <TrackSearchWithLyrics />}
+//                 {chatMode === "recommend" && (
+//                   <RecommendPanel onResult={(reply) => chatRef.current?.push({ sender: "BOT", content: reply })} />
+//                 )}
+//                 {chatMode === "diagnosis" && (
+//                   <Box p={4}>
+//                     <Text>진단할 노래 제목과 아티스트를 알려주세요.</Text>
+//                   </Box>
+//                 )}
+//               </Box>
+//             </Flex>
+//           </TabPanel>
+//         </TabPanels>
+//       </Tabs>
+//     </Box>
+//   );
+// };
+
+// export default MyMusic;

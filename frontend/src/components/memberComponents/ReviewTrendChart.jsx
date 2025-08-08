@@ -2,6 +2,7 @@ import React from "react";
 import dayjs from "dayjs";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 import { Box, Text } from "@chakra-ui/react";
+import { Link } from "react-router-dom";
 
 function groupReviewsByDate(reviews, days = 7) {
   const today = dayjs().startOf("day");
@@ -32,6 +33,7 @@ const ReviewTrendChart = ({ reviews }) => {
       <Box p={4}>
         <Text textAlign="center" color="gray.500">
           아직 평가에 참여한 앨범이 없습니다.
+          <Link to="/review"> 앨범게시판 이동</Link>
         </Text>
       </Box>
     );
@@ -39,16 +41,16 @@ const ReviewTrendChart = ({ reviews }) => {
 
   return (
     <Box w="100%" h="300px" mt={8}>
-      <Text fontSize="xl" fontWeight="bold" mb={2} ml={10}>
+      {/* <Text fontSize="lg" fontWeight="medium" mb={2} ml={10}>
         최근 7일 리뷰 작성 현황
-      </Text>
+      </Text> */}
       <ResponsiveContainer width="100%" height={250}>
         <BarChart data={data} margin={{ top: 10, right: 20, left: 0, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="date" fontSize={12} />
           <YAxis allowDecimals={false} fontSize={12} />
           <Tooltip formatter={(value) => `${value}개 작성`} />
-          <Bar dataKey="count" fill="#4299E1" radius={[4, 4, 0, 0]} />
+          <Bar dataKey="count" fill="black" radius={[4, 4, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </Box>
