@@ -28,7 +28,7 @@ public class MagazineAIService {
 
         try {
             // OpenAIService를 통해 GPT 호출
-            String aiResponse = openAIService.askChatGPT("temp", prompt).trim();
+            String aiResponse = openAIService.askChatGPT(prompt).trim();
 
             // 줄 단위로 분리하여 리스트로 반환
             return aiResponse.lines()
