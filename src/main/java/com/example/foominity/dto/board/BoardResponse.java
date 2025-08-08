@@ -1,9 +1,13 @@
 package com.example.foominity.dto.board;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import com.example.foominity.domain.BaseEntity;
 import com.example.foominity.domain.board.Board;
+import com.example.foominity.domain.board.BoardImage;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,6 +25,7 @@ public class BoardResponse {
     private int views;
     private String subject;
     private int likeCount;
+    private List<String> imageUrls;
 
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
@@ -36,6 +41,10 @@ public class BoardResponse {
     }
 
     public static BoardResponse from(Board board) {
+        List<String> imageUrls = board.getImages() != null ? board.getImages().stream()
+                .map(BoardImage::getImageUrl)
+                .collect(Collectors.toList())
+                : new ArrayList<>();
         return new BoardResponse(
                 board.getId(),
                 board.getTitle(),
@@ -45,6 +54,7 @@ public class BoardResponse {
                 board.getViews(),
                 board.getSubject(),
                 board.getLikeCount(),
+                imageUrls,
                 board.getCreatedDate(),
                 board.getUpdatedDate());
     }

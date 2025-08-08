@@ -1,6 +1,7 @@
 package com.example.foominity.controller.board;
 
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.foominity.domain.member.Member;
 import com.example.foominity.dto.board.BoardRequest;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -56,17 +58,23 @@ public class BoardController {
         return ResponseEntity.ok(boardService.findByid(id));
     }
 
-    @PostMapping("/api/board/create")
-    public ResponseEntity<String> createBoard(@Valid @RequestBody BoardRequest req,
+    @PostMapping(value = "/api/board/create", consumes = "multipart/form-data")
+    public ResponseEntity<?> createBoard(
+            @Valid @RequestPart("data") BoardRequest req,
+            @RequestPart(value = "images", required = false) List<MultipartFile> images,
             HttpServletRequest tokenRequest) {
-        boardService.createBoard(req, tokenRequest);
+        boardService.createBoard(req, images, tokenRequest);
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/api/board/update/{id}")
-    public ResponseEntity<String> updateBoard(@PathVariable Long id, @Valid @RequestBody BoardUpdateRequest req,
+    @PutMapping(value = "/api/board/update/{id}", consumes = "multipart/form-data")
+    public ResponseEntity<?> updateBoard(
+            @PathVariable Long id,
+            @Valid @RequestPart("data") BoardUpdateRequest req,
+            @RequestPart(value = "deleteImageIds", required = false) List<Long> deleteImageIds,
+            @RequestPart(value = "newImages", required = false) List<MultipartFile> newImages,
             HttpServletRequest tokenRequest) {
-        boardService.updateBoard(id, req, tokenRequest);
+        boardService.updateBoard(id, req, deleteImageIds, newImages, tokenRequest);
         return ResponseEntity.ok().build();
     }
 

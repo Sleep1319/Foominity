@@ -3,11 +3,9 @@ import {
   Box,
   Heading,
   Input,
-  Textarea,
   Button,
   FormControl,
   FormLabel,
-  FormErrorMessage,
   VStack,
   useToast,
   Flex,
@@ -20,84 +18,79 @@ import { Editor } from "@toast-ui/react-editor";
 import "@toast-ui/editor/dist/toastui-editor.css";
 
 const BoardUpdate = () => {
-  const { id } = useParams(); // 게시글 id
+  const { id } = useParams();
   const [title, setTitle] = useState("");
-  // const [content, setContent] = useState("");
+  const [subject, setSubject] = useState("일반");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const toast = useToast();
   const navigate = useNavigate();
   const editorRef = useRef();
 
   const SUBJECT_LIST = ["일반", "음악", "후기", "정보", "질문"];
-  const [subject, setSubject] = useState(SUBJECT_LIST[0]);
 
-  // 1. 기존 게시글 데이터 받아오기
+  // 기존 글 로드
   useEffect(() => {
     const fetchBoard = async () => {
       try {
-        const res = await axios.get(`/api/board/${id}`);
+        const res = await axios.get(`/api/board/${id}`, { withCredentials: true });
         setTitle(res.data.title);
         setSubject(res.data.subject);
+        // 에디터가 렌더된 다음 콘텐츠 주입
         setTimeout(() => {
-          if (editorRef.current) {
-            editorRef.current.getInstance().setMarkdown(res.data.content || "");
-          }
+          editorRef.current?.getInstance?.().setMarkdown(res.data.content || "");
         }, 0);
       } catch (err) {
-        console.log(err);
-        setError("게시글 정보를 불러올 수 없습니다.");
+        console.error(err);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
     fetchBoard();
   }, [id]);
 
-  // 수정
+  // 수정 저장 (multipart/form-data 로 전송)
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-    const content = editorRef.current?.getInstance().getMarkdown();
-    if (!title.trim() || !content.trim()) {
-      setError("제목과 내용을 모두 입력하세요.");
-      return;
-    }
     setIsSubmitting(true);
     try {
-      await axios.put(`/api/board/update/${id}`, { title, content, subject });
-      toast({
-        title: "게시글이 수정되었습니다.",
-        status: "success",
-        duration: 1500,
-        isClosable: true,
+      const currentContent = editorRef.current?.getInstance?.().getMarkdown?.() || "";
+
+      const form = new FormData();
+      const payload = { title, content: currentContent, subject };
+      form.append("data", new Blob([JSON.stringify(payload)], { type: "application/json" }));
+
+      // (옵션) 이미지 추가/삭제를 지원하려면 여기에 추가:
+      // newImages.forEach((f) => form.append("newImages", f));
+      // deleteImageIds.forEach((id) => form.append("deleteImageIds", id));
+
+      await axios.put(`/api/board/update/${id}`, form, {
+        withCredentials: true,
+        headers: { "Content-Type": "multipart/form-data" },
       });
+
+      toast({ title: "게시글이 수정되었습니다.", status: "success", duration: 1500, isClosable: true });
       navigate(`/board/${id}`);
     } catch (err) {
-      console.log(err);
-      setError("수정에 실패했습니다. 다시 시도해주세요.");
+      console.error(err);
+    } finally {
+      setIsSubmitting(false);
     }
-    setIsSubmitting(false);
   };
 
-  // 3. 삭제
+  // 삭제
   const handleDelete = async () => {
     if (!window.confirm("정말 삭제하시겠습니까?")) return;
     setIsSubmitting(true);
     try {
       await axios.delete(`/api/board/delete/${id}`, { withCredentials: true });
-      toast({
-        title: "게시글이 삭제되었습니다.",
-        status: "info",
-        duration: 1500,
-        isClosable: true,
-      });
+      toast({ title: "게시글이 삭제되었습니다.", status: "info", duration: 1500, isClosable: true });
       navigate("/board");
     } catch (err) {
-      console.log(err);
-      setError("삭제에 실패했습니다. 다시 시도해주세요.");
+      console.error(err);
+    } finally {
+      setIsSubmitting(false);
     }
-    setIsSubmitting(false);
   };
 
   if (loading) {
@@ -126,29 +119,34 @@ const BoardUpdate = () => {
             </Select>
           </FormControl>
 
-          <FormControl isInvalid={!!error && !title.trim()}>
+          <FormControl>
             <FormLabel>제목</FormLabel>
             <Input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="제목을 입력하세요"
               maxLength={100}
+              required
             />
           </FormControl>
 
-          <FormControl isInvalid={!!error && !editorRef.current?.getInstance().getMarkdown().trim()}>
+          <FormControl>
             <FormLabel>내용</FormLabel>
+            <Box fontSize="sm" color="gray.500" mb={2}>
+              이미지를 삽입하려면 에디터 툴바의 이미지 기능을 사용하세요.
+              <br />
+              업로드된 이미지는 선택 후 <b>Backspace</b> 또는 <b>Delete</b> 키로 삭제할 수 있습니다.
+            </Box>
             <Editor
               ref={editorRef}
               initialValue=""
               previewStyle="vertical"
               height="400px"
               initialEditType="wysiwyg"
-              useCommandShortcut={true}
-              hideModeSwitch={true}
+              useCommandShortcut
+              hideModeSwitch
               placeholder="내용을 입력하세요"
             />
-            {error && <FormErrorMessage>{error}</FormErrorMessage>}
           </FormControl>
 
           <Flex gap={3}>

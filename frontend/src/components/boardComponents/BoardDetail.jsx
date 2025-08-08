@@ -1,19 +1,5 @@
-// src/view/board/BoardDetail.jsx
-
 import React, { useEffect, useState } from "react";
-import {
-  Box,
-  Text,
-  Heading,
-  Flex,
-  Spacer,
-  Spinner,
-  Button,
-  useToast,
-  HStack,
-  Icon,
-  useColorModeValue,
-} from "@chakra-ui/react";
+import { Box, Text, Heading, Flex, Spacer, Spinner, Button, useToast, HStack, Icon } from "@chakra-ui/react";
 import { useParams, useNavigate } from "react-router-dom";
 import { FaRegEye, FaRegComment } from "react-icons/fa";
 import { useUser } from "../../context/UserContext";
@@ -35,12 +21,8 @@ const BoardDetail = () => {
   const [loading, setLoading] = useState(true);
   const [commentKey, setCommentKey] = useState(0);
 
-  const grayText = useColorModeValue("gray.700", "white");
-  const blueText = useColorModeValue("blue.400", "blue.200");
-
   const fetchBoard = async () => {
     try {
-      // 백엔드에서 해당 id의 게시글 정보를 GET으로 가져옵니다
       const res = await axios.get(`/api/board/${id}`);
       setBoard(res.data);
     } catch (err) {
@@ -148,7 +130,7 @@ const BoardDetail = () => {
 
         {/* 내용 */}
         <Box mt={25} mb={150} pb={4}>
-          <Viewer initialValue={board.content} />
+          <Viewer key={id} initialValue={board.content || ""} />
         </Box>
 
         <Box display="flex" alignItems="center" justifyContent="center" mb={2}>
@@ -164,12 +146,10 @@ const BoardDetail = () => {
         <CommentList key={commentKey} type="boards" id={id} borderTop="1px solid gray" />
         <BoardCommentForm boardId={id} commentCount={board.commentCount || 0} onSuccess={handleCommentSuccess} />
 
-        {/* 버튼들 */}
         <HStack mt={5}>
           <Button bg="black" color="white" size="sm" onClick={() => navigate("/board")}>
             목록
           </Button>
-          {/* ★ 신고하기: 별도 페이지로 이동 ★ */}
           <Button
             colorScheme="red"
             size="sm"

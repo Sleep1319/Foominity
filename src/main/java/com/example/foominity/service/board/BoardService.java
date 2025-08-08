@@ -1,7 +1,13 @@
 package com.example.foominity.service.board;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -10,13 +16,16 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.foominity.config.jwt.JwtTokenProvider;
 import com.example.foominity.domain.board.Board;
+import com.example.foominity.domain.board.BoardImage;
 import com.example.foominity.domain.board.BoardLike;
 import com.example.foominity.domain.member.Member;
 import com.example.foominity.dto.board.BoardResponse;
 import com.example.foominity.dto.board.BoardUpdateRequest;
+import com.example.foominity.repository.board.BoardImageRepository;
 import com.example.foominity.repository.board.BoardLikeRepository;
 import com.example.foominity.repository.board.BoardRepository;
 import com.example.foominity.repository.member.MemberRepository;
@@ -36,12 +45,17 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class BoardService {
+    private final BoardRepository boardRepository;
+
+    private final MemberRepository memberRepository;
+
+    private final BoardImageRepository boardImageRepository;
 
     private final BoardLikeRepository boardLikeRepository;
 
-    private final BoardRepository boardRepository;
-    private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
+
+    private final String uploadDir = "uploads/board_images"; // 이미지 업로드 경로 설정
 
     public Page<BoardResponse> getBoards(int page, String subject, String keyword) {
         if ((subject == null || subject.equals("전체")) && (keyword == null || keyword.isBlank())) {
@@ -61,17 +75,7 @@ public class BoardService {
         Page<Board> boards = boardRepository.findAll(pageable);
 
         List<BoardResponse> boardResponseList = boards.stream()
-                .map(board -> new BoardResponse(
-                        board.getId(),
-                        board.getTitle(),
-                        board.getContent(),
-                        board.getMemberId(),
-                        board.getNickname(),
-                        board.getViews(),
-                        board.getSubject(),
-                        board.getBoardLikes().size(),
-                        board.getCreatedDate(),
-                        board.getUpdatedDate()))
+                .map(BoardResponse::from)
                 .toList();
         return new PageImpl<>(boardResponseList, pageable,
                 boards.getTotalElements());
@@ -103,21 +107,11 @@ public class BoardService {
         // 조회수 증가 : 지금 2씩 증가하는데 main.jsx에서 StrictMode 를 제거하거나 실전으로 가면 1씩 증가한다고 함.
         // 지금은 임시로 {view / 2} 로 처리함
         board.increaseViews();
-        return new BoardResponse(
-                board.getId(),
-                board.getTitle(),
-                board.getContent(),
-                board.getMemberId(),
-                board.getNickname(),
-                board.getViews(),
-                board.getSubject(),
-                board.getLikeCount(),
-                board.getCreatedDate(),
-                board.getUpdatedDate());
+        return BoardResponse.from(board);
     }
 
     @Transactional
-    public void createBoard(BoardRequest req, HttpServletRequest tokenRequest) {
+    public void createBoard(BoardRequest req, List<MultipartFile> images, HttpServletRequest tokenRequest) {
         String token = jwtTokenProvider.resolveTokenFromCookie(tokenRequest);
 
         if (!jwtTokenProvider.validateToken(token)) {
@@ -127,18 +121,46 @@ public class BoardService {
         Long memberId = jwtTokenProvider.getUserIdFromToken(token);
         Member member = memberRepository.findById(memberId).orElseThrow(NotFoundMemberException::new);
 
-        boardRepository.save(req.toEntity(req, member));
+        Board board = req.toEntity(req, member);
+        boardRepository.save(board);
+
+        // 이미지 저장
+        if (images != null) {
+            for (MultipartFile imageFile : images) {
+                saveImage(imageFile, board);
+            }
+        }
     }
 
     @Transactional
-    public void updateBoard(Long id, BoardUpdateRequest req, HttpServletRequest tokenRequest) {
+    public void updateBoard(Long id, BoardUpdateRequest req, List<Long> deleteImageIds, List<MultipartFile> newImages,
+            HttpServletRequest tokenRequest) {
         Board board = validateBoardOwnership(id, tokenRequest);
         board.update(req.getTitle(), req.getContent(), req.getSubject());
+
+        // 1. 삭제 요청 이미지 삭제
+        if (deleteImageIds != null) {
+            for (Long imgId : deleteImageIds) {
+                deleteImage(imgId);
+            }
+        }
+        // 2. 새 이미지 추가
+        if (newImages != null) {
+            for (MultipartFile file : newImages) {
+                saveImage(file, board);
+            }
+        }
     }
 
     @Transactional
     public void deleteBoard(Long id, HttpServletRequest tokenRequest) {
         Board board = validateBoardOwnership(id, tokenRequest);
+        // 연관된 이미지 모두 삭제
+        if (board.getImages() != null) {
+            for (BoardImage image : board.getImages()) {
+                deleteImage(image.getId());
+            }
+        }
         boardRepository.delete(board);
     }
 
@@ -172,6 +194,41 @@ public class BoardService {
         return boards.stream().map(BoardResponse::from).collect(Collectors.toList());
     }
 
+    @Transactional
+    public BoardImage saveImage(MultipartFile imageFile, Board board) {
+        if (imageFile == null || imageFile.isEmpty())
+            return null;
+        try {
+            String originalName = imageFile.getOriginalFilename();
+            String ext = originalName.substring(originalName.lastIndexOf("."));
+            String uuid = UUID.randomUUID().toString();
+            String fileName = uuid + ext;
+            Path filePath = Paths.get(uploadDir, fileName);
+            Files.createDirectories(filePath.getParent());
+            Files.copy(imageFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            BoardImage boardImage = new BoardImage("/uploads/" + fileName, board); // 경로는 상황에 맞게
+            return boardImageRepository.save(boardImage);
+        } catch (Exception e) {
+            throw new RuntimeException("이미지 저장 실패", e);
+        }
+    }
+
+    @Transactional
+    public void deleteImage(Long imageId) {
+        BoardImage image = boardImageRepository.findById(imageId)
+                .orElseThrow(() -> new RuntimeException("이미지 없음"));
+        // 실제 파일 삭제
+        String filePath = "uploads/" + Paths.get(image.getImageUrl()).getFileName();
+        try {
+            Files.deleteIfExists(Paths.get(filePath));
+        } catch (IOException e) {
+            // log, ignore, etc.
+        }
+        boardImageRepository.delete(image);
+    }
+
+    // 토큰 검증
     public Board validateBoardOwnership(Long id, HttpServletRequest tokenRequest) {
         String token = jwtTokenProvider.resolveTokenFromCookie(tokenRequest);
 
