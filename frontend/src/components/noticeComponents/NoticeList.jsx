@@ -11,11 +11,6 @@ const NoticeList = () => {
   const navigate = useNavigate();
   const { state: user } = useUser();
 
-  const extractSummary = (text) => {
-    if (!text) return "";
-    return text.split(/(?<=[.?!])\s+/)[0]; // 마침표, 물음표, 느낌표 기준 첫 문장 추출
-  };
-
   useEffect(() => {
     const savedPage = sessionStorage.getItem("noticeListPage");
     if (savedPage !== null) {
@@ -110,11 +105,13 @@ const NoticeList = () => {
             >
               {main.title}
             </Text>
-            <Text fontSize="md" color="gray.600" mb={4}>
-              {extractSummary(main.content)}
-            </Text>
+            {main.summary && (
+              <Text fontSize="md" color="gray.600" mb={4}>
+                {main.summary}
+              </Text>
+            )}
             <Text fontSize="sm" color="gray.600">
-              {formatDate(main.createdDate)}
+              {formatDate(main.publishedDate || main.createdDate)}
             </Text>
           </Box>
         )}
@@ -147,11 +144,13 @@ const NoticeList = () => {
               >
                 {notice.title}
               </Text>
-              <Text fontSize="sm" color="gray.500" noOfLines={2} mb={1}>
-                {extractSummary(notice.content)}
-              </Text>
+              {notice.summary && (
+                <Text fontSize="sm" color="gray.500" noOfLines={2} mb={1}>
+                  {notice.summary}
+                </Text>
+              )}
               <Text fontSize="sm" color="gray.600">
-                {formatDate(notice.createdDate)}
+                {formatDate(notice.publishedDate || notice.createdDate)}
               </Text>
             </Box>
           ))}
@@ -196,11 +195,13 @@ const NoticeList = () => {
               >
                 {notice.title}
               </Text>
-              <Text fontSize="sm" color="gray.500" noOfLines={2} mb={1}>
-                {extractSummary(notice.content)}
-              </Text>
+              {notice.summary && (
+                <Text fontSize="sm" color="gray.500" noOfLines={2} mb={1}>
+                  {notice.summary}
+                </Text>
+              )}
               <Text fontSize="sm" color="gray.600" mt="auto">
-                {formatDate(notice.createdDate)}
+                {formatDate(notice.publishedDate || notice.createdDate)}
               </Text>
             </Box>
           ))}
@@ -212,10 +213,6 @@ const NoticeList = () => {
             bg="white"
             color="black"
             border="1px solid black"
-            cursor="pointer"
-            _hover={{}}
-            _active={{}}
-            _disabled={{ opacity: 0.5 }}
             onClick={() => setPage((prev) => Math.max(prev - 1, 0))}
             isDisabled={page === 0}
           >
@@ -228,9 +225,6 @@ const NoticeList = () => {
               bg={i === page ? "black" : "white"}
               color={i === page ? "white" : "black"}
               border="1px solid black"
-              cursor="pointer"
-              _hover={{}}
-              _active={{}}
               onClick={() => setPage(i)}
             >
               {i + 1}
@@ -241,10 +235,6 @@ const NoticeList = () => {
             bg="white"
             color="black"
             border="1px solid black"
-            cursor="pointer"
-            _hover={{}}
-            _active={{}}
-            _disabled={{ opacity: 0.5 }}
             onClick={() => setPage((prev) => Math.min(prev + 1, totalPages - 1))}
             isDisabled={page >= totalPages - 1}
           >

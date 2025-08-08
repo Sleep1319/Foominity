@@ -20,4 +20,6 @@ public interface MagazineRepository extends JpaRepository<Magazine, Long> {
     Optional<List<Magazine>> findTop4ByOrderByIdDesc();
 
     Optional<Magazine> findByMainNoticeTrue();
+
+    boolean existsByOriginalUrl(String originalUrl);
 }

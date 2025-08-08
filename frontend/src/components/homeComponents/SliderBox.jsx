@@ -10,6 +10,8 @@ import SliderBoxIndicator from "./SliderBoxIndicator";
 
 const SliderBox = ({ notices = [] }) => {
   const sliderRef = useRef(null);
+  const isDragging = useRef(false);
+  const dragStartX = useRef(0);
   const [currentIndex, setCurrentIndex] = useState(0);
   const navigate = useNavigate();
 
@@ -31,6 +33,23 @@ const SliderBox = ({ notices = [] }) => {
 
   const handleDotClick = (index) => {
     sliderRef.current?.slickGoTo(index);
+  };
+
+  const handleMouseDown = (e) => {
+    dragStartX.current = e.clientX;
+    isDragging.current = false;
+  };
+
+  const handleMouseMove = (e) => {
+    if (Math.abs(e.clientX - dragStartX.current) > 5) {
+      isDragging.current = true;
+    }
+  };
+
+  const handleClick = (noticeId) => {
+    if (!isDragging.current) {
+      navigate(`/notice/${noticeId}`);
+    }
   };
 
   return (
@@ -82,7 +101,9 @@ const SliderBox = ({ notices = [] }) => {
             h="100%"
             position="relative"
             cursor="pointer"
-            onClick={() => navigate(`/notice/${notice.id}`)}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={() => handleClick(notice.id)}
           >
             <Image
               src={`http://localhost:8084/${notice.imagePath}`}
