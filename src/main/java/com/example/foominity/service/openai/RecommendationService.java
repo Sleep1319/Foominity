@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import com.example.foominity.domain.member.ReviewLike;
 import org.springframework.stereotype.Service;
 
 import com.example.foominity.dto.artist.ArtistSimpleResponse;
@@ -133,7 +134,7 @@ public class RecommendationService {
                 .forEach(excludedIds::add);
 
         reviewLikeRepository.findByMemberId(memberId).stream()
-                .map(rl -> rl.getReview().getId())
+                .map(ReviewLike::getReviewId)
                 .forEach(excludedIds::add);
 
         // ✅ [2] GPT 앨범명 중 DB에 존재하는 것만 + 제외 대상 걸러서 추가

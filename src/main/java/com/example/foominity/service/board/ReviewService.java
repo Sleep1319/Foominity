@@ -615,7 +615,9 @@ public class ReviewService {
                                 .toList();
 
                 List<String> likeAlbum = reviewLikeRepository.findByMemberId(memberId).stream()
-                                .map(rl -> rl.getReview().getTitle())
+                                .map(rl ->reviewRepository.findById(rl.getReviewId())
+                                        .map(Review::getTitle)
+                                        .orElse("제목 없음"))
                                 .distinct()
                                 .toList();
 

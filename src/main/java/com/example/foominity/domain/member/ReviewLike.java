@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.swing.*;
+
 @Getter
 @NoArgsConstructor
 @Entity
@@ -28,4 +30,5 @@ public class ReviewLike {
         this.member = member;
         this.reviewId = reviewId;
     }
+
 }

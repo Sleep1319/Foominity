@@ -1,5 +1,5 @@
 import { Avatar, Box, HStack, Text, VStack, Flex, Button, Input } from "@chakra-ui/react";
-import { useUser } from "../../context/UserContext.jsx";
+import { useUser} from "@/redux/useUser.js";
 import axios from "axios";
 import LikedAlbums from "../../components/memberComponents/LikedAlbums.jsx";
 import ParticipatedAlbums from "../../components/memberComponents/ParticipatedAlbums.jsx";
