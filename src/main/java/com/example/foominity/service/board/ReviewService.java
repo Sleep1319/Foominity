@@ -29,6 +29,7 @@ import com.example.foominity.dto.artist.ArtistSimpleResponse;
 import com.example.foominity.dto.category.ReviewCategoryResponse;
 import com.example.foominity.dto.member.MemberReviewResponse;
 import com.example.foominity.dto.openai.AlbumRecommendRequest;
+import com.example.foominity.dto.openai.LikeRecommendRequest;
 import com.example.foominity.exception.ForbiddenActionException;
 import com.example.foominity.exception.NotFoundMemberException;
 import com.example.foominity.exception.NotFoundReviewException;
@@ -553,6 +554,21 @@ public class ReviewService {
                 }).toList();
         }
 
+        public List<String> getCategoriesByMemberId(Long memberId) {
+                // 1. 사용자가 평가한 리뷰 ID 리스트 가져오기
+                List<Long> reviewIds = reviewCommentRepository.findByMemberId(memberId).stream()
+                                .map(rc -> rc.getReview().getId())
+                                .distinct()
+                                .toList();
+
+                // 2. 리뷰 ID 별로 ReviewCategory 찾아서 category 이름만 뽑기
+                return reviewIds.stream()
+                                .flatMap(reviewId -> reviewCategoryRepository.findByReviewId(reviewId).stream()
+                                                .map(rc -> rc.getCategory().getCategoryName()))
+                                .distinct()
+                                .toList();
+        }
+
         // 앨범 맞춤 추천 ai
         public AlbumRecommendRequest toAlbumRecommend(ReviewResponse review) {
 
@@ -588,6 +604,50 @@ public class ReviewService {
                 ReviewResponse review = readReview(reviewId);
                 return toAlbumRecommend(review);
 
+        }
+
+        // 사용자 정보 기반 앨범 맞춤 추천 ai
+        public LikeRecommendRequest LikeAlbumRecommend(Long memberId) {
+
+                List<String> reviewAlbum = reviewCommentRepository.findByMemberId(memberId).stream()
+                                .map(rc -> rc.getReview().getTitle())
+                                .distinct()
+                                .toList();
+
+                List<String> likeAlbum = reviewLikeRepository.findByMemberId(memberId).stream()
+                                .map(rl -> rl.getReview().getTitle())
+                                .distinct()
+                                .toList();
+
+                List<Long> reviewIds = reviewCommentRepository.findByMemberId(memberId).stream()
+                                .map(rc -> rc.getReview().getId())
+                                .distinct()
+                                .toList();
+
+                List<String> categories = reviewIds.stream()
+                                .flatMap(id -> reviewCategoryRepository.findByReviewId(id).stream()
+                                                .map(c -> c.getCategory().getCategoryName()))
+                                .distinct()
+                                .toList();
+
+                String focus = String.format("""
+                                사용자가 평가한 앨범은 %s 이며,
+                                사용자가 좋아요 한 앨범은 %s 입니다.
+                                사용자가 좋게 평가한 앨범, 좋아요한 앨범들과 서브장르, 사운드가 유사한 앨범을 추천해주세요.
+                                """, String.join(", ", reviewAlbum),
+                                String.join(", ", likeAlbum));
+
+                return new LikeRecommendRequest(
+                                reviewAlbum,
+                                likeAlbum,
+                                "유사도를 중점으로 정밀하게 분석",
+                                focus,
+                                categories);
+        }
+
+        public LikeRecommendRequest buildLikeRecommendRequest(Long memberId) {
+                Member member = memberRepository.findById(memberId).orElseThrow();
+                return LikeAlbumRecommend(member.getId());
         }
 
 }

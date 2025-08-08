@@ -13,7 +13,10 @@ import com.example.foominity.dto.artist.ArtistSimpleResponse;
 import com.example.foominity.dto.board.ReviewSimpleResponse;
 import com.example.foominity.dto.openai.AlbumRecommendRequest;
 import com.example.foominity.dto.openai.ArtistRecommendRequest;
+import com.example.foominity.dto.openai.LikeRecommendRequest;
 import com.example.foominity.repository.artist.ArtistRepository;
+import com.example.foominity.repository.board.ReviewCommentRepository;
+import com.example.foominity.repository.member.ReviewLikeRepository;
 import com.example.foominity.service.artist.ArtistService;
 import com.example.foominity.service.board.ReviewService;
 
@@ -29,6 +32,8 @@ public class RecommendationService {
     private final OpenAIService openAIService;
     private final ArtistService artistService;
     private final ArtistRepository artistRepository;
+    private final ReviewCommentRepository reviewCommentRepository;
+    private final ReviewLikeRepository reviewLikeRepository;
 
     public List<ReviewSimpleResponse> getRecommendationsFromOpenAI(Long reviewId) throws IOException {
         AlbumRecommendRequest req = reviewService.buildRecommendRequest(reviewId);
@@ -109,6 +114,56 @@ public class RecommendationService {
 
         log.info("🎯 GPT 추천 아티스트 리스트:");
         results.forEach(a -> log.info("▶ {}", a.getName()));
+
+        return results;
+    }
+
+    public List<ReviewSimpleResponse> getLikeRecommendationsFromOpenAI(Long memberId) throws IOException {
+        LikeRecommendRequest req = reviewService.buildLikeRecommendRequest(memberId);
+        List<String> gptAlbumTitles = openAIService.askLikeRecommendations(req);
+
+        List<ReviewSimpleResponse> results = new ArrayList<>();
+        Set<Long> alreadyAddedIds = new HashSet<>();
+
+        // ✅ [1] 평가한 앨범 + 좋아요 누른 앨범 ID 수집
+        Set<Long> excludedIds = new HashSet<>();
+
+        reviewCommentRepository.findByMemberId(memberId).stream()
+                .map(rc -> rc.getReview().getId())
+                .forEach(excludedIds::add);
+
+        reviewLikeRepository.findByMemberId(memberId).stream()
+                .map(rl -> rl.getReview().getId())
+                .forEach(excludedIds::add);
+
+        // ✅ [2] GPT 앨범명 중 DB에 존재하는 것만 + 제외 대상 걸러서 추가
+        for (String title : gptAlbumTitles) {
+            reviewService.findByTitle(title).ifPresent(res -> {
+                if (!excludedIds.contains(res.getId()) && !alreadyAddedIds.contains(res.getId())) {
+                    results.add(res);
+                    alreadyAddedIds.add(res.getId());
+                }
+            });
+            if (results.size() == 5)
+                break;
+        }
+
+        // ✅ 부족할 경우 카테고리 기반 fallback으로 채우기
+        if (results.size() < 5) {
+            List<String> categories = reviewService.getCategoriesByMemberId(memberId); // 사용자 선호 카테고리 추출
+            List<ReviewSimpleResponse> fallback = reviewService.findByCategory(categories);
+            for (ReviewSimpleResponse review : fallback) {
+                if (!excludedIds.contains(review.getId()) && !alreadyAddedIds.contains(review.getId())) {
+                    results.add(review);
+                    alreadyAddedIds.add(review.getId());
+                    if (results.size() == 5)
+                        break;
+                }
+            }
+        }
+
+        log.info("🎯 GPT 추천 앨범명 리스트 (최종 필터링 후):");
+        results.forEach(r -> log.info("▶ {}", r.getTitle()));
 
         return results;
     }
