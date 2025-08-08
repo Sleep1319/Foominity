@@ -240,6 +240,7 @@ public class MemberController {
         return ResponseEntity.ok(avg);
     }
 
+    // 장르별 좋아요 수 추출
     @GetMapping("/member/{memberId}/genre-stats")
     public ResponseEntity<List<GenreCountDto>> getGenreStats(
             @PathVariable Long memberId) {
