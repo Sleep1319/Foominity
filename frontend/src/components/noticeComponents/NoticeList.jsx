@@ -7,7 +7,9 @@ import { useUser } from "../../context/UserContext";
 const NoticeList = () => {
   const [notices, setNotices] = useState([]);
   const [page, setPage] = useState(0);
-  const NOTICES_PER_PAGE = 20;
+  const ROWS_PER_PAGE = 7;
+  const ITEMS_PER_ROW = 3;
+  const NOTICES_PER_PAGE = ROWS_PER_PAGE * ITEMS_PER_ROW;
   const navigate = useNavigate();
   const { state: user } = useUser();
 
@@ -54,9 +56,13 @@ const NoticeList = () => {
     return `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`;
   };
 
-  const [main, ...rest] = notices;
-  const sideNotices = rest.slice(0, 2);
-  const gridNotices = rest.slice(2);
+  // 게시글 분리
+  const validNotices = notices.filter((n) => n);
+  const main = validNotices[0];
+  const sideNotices = validNotices.slice(1, 3);
+  const gridNotices = validNotices.slice(3);
+
+  // 페이징 (줄 단위)
   const totalPages = Math.ceil(gridNotices.length / NOTICES_PER_PAGE);
   const currentGridNotices = gridNotices.slice(page * NOTICES_PER_PAGE, (page + 1) * NOTICES_PER_PAGE);
 
@@ -159,6 +165,7 @@ const NoticeList = () => {
 
       <Box mt={20}>
         <Box w="100%" h="1px" bg="gray.400" my={16} />
+
         <SimpleGrid columns={[1, null, 3]} spacing={10}>
           {currentGridNotices.map((notice) => (
             <Box
