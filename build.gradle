@@ -59,7 +59,7 @@ dependencies {
 
 	// HTTP 요청을 위한 라이브러리
 	implementation 'com.squareup.okhttp3:okhttp:4.12.0'
-`
+
 	// 구글 번역
 	implementation 'com.google.cloud:google-cloud-translate:2.0.2'
 
