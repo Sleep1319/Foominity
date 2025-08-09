@@ -155,8 +155,8 @@ export default function RecommendPanel({ onResult }) {
       ) : (
         // 완료 후: 유튜브 링크만 표시
         <VStack align="stretch" spacing={4} flexGrow={1} overflowY="auto">
-          <Text mt="3px" mb="10px">
-            지금 바로 유튜브에서 추천받은 곡들을 들어보세요!
+          <Text mt="3px" mb="10px" fontWeight="bold">
+            지금 바로 추천받은 곡들을 들어보세요!
           </Text>
           {loading ? (
             <Spinner size="lg" />
