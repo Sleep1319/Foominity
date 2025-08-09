@@ -97,3 +97,6 @@ node_modules
 /frontend.zip
 /my.cnf
 /mysqlDockerfile
+/src/main/resources/application-local.yml
+/src/main/resources/application-prod.yml
+/frontend/env.prod
