@@ -22,14 +22,9 @@ import { FaRegEye } from "react-icons/fa";
 import { SearchIcon } from "@chakra-ui/icons";
 import { useUser} from "@/redux/useUser.js";
 
-const BOARDS_PER_PAGE = 7;
-const SUBJECT_LIST = ["전체", "일반", "음악", "후기", "정보", "질문"];
-
 const BoardList = ({ currentId }) => {
-  //  "말머리+검색" 동시 필터를 위한 state 통합
-  const [boardList, setBoardList] = useState([]); // 게시글 목록 (카테고리/검색 결과)
-  const [currentPage, setCurrentPage] = useState(1);
-
+  const BOARDS_PER_PAGE = 7;
+  const SUBJECT_LIST = ["전체", "일반", "음악", "후기", "정보", "질문"];
   const [selectedSubject, setSelectedSubject] = useState("전체");
   const [searchKeyword, setSearchKeyword] = useState(""); // 입력중
   const [submittedKeyword, setSubmittedKeyword] = useState(""); // 실제 검색 실행(Submit) 시
@@ -37,27 +32,29 @@ const BoardList = ({ currentId }) => {
   const navigate = useNavigate();
   const { state: user } = useUser();
 
-  //  탭/검색어 중 하나라도 바뀌면 게시글 목록 새로 불러옴
+  //  "말머리+검색" 동시 필터를 위한 state 통합
+  const [boardList, setBoardList] = useState([]); // 게시글 목록 (카테고리/검색 결과)
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
   useEffect(() => {
     const fetchBoards = async () => {
       let params = {};
-      if (selectedSubject !== "전체") params.subject = selectedSubject; // 선택된 카테고리(전체 제외)
-      if (submittedKeyword.trim() !== "") params.keyword = submittedKeyword; // 검색어
-      // → 둘 다 없으면 전체, 하나만 있으면 단독, 둘 다 있으면 동시 필터
+      if (selectedSubject !== "전체") params.subject = selectedSubject;
+      if (submittedKeyword.trim() !== "") params.keyword = submittedKeyword;
+      params.page = currentPage - 1; // 백엔드에 현재 페이지 전달!
+      params.size = BOARDS_PER_PAGE; // 한 페이지당 개수 전달!
       const res = await axios.get("/api/board/page", { params });
       setBoardList(res.data.content || []);
-      setCurrentPage(1); // 필터 바뀌면 항상 1페이지로 이동
+      setTotalPages(res.data.totalPages || 1);
     };
     fetchBoards();
-  }, [selectedSubject, submittedKeyword]);
+  }, [selectedSubject, submittedKeyword, currentPage]);
 
-  // 페이지네이션 계산 (항상 boardList 기준!)
-  const totalPages = Math.ceil(boardList.length / BOARDS_PER_PAGE);
-  const startIndex = (currentPage - 1) * BOARDS_PER_PAGE;
-  const currentBoards = boardList.slice(startIndex, startIndex + BOARDS_PER_PAGE);
+  const currentBoards = boardList;
 
   // 페이지 블록 계산
-  const PAGE_BLOCK = 10;
+  const PAGE_BLOCK = 100;
   const currentBlock = Math.floor((currentPage - 1) / PAGE_BLOCK);
   const blockStart = currentBlock * PAGE_BLOCK + 1;
   const blockEnd = Math.min(blockStart + PAGE_BLOCK - 1, totalPages);
@@ -83,8 +80,44 @@ const BoardList = ({ currentId }) => {
     }
   }
 
+  const [popularBoards, setPopularBoards] = useState([]);
+
+  useEffect(() => {
+    axios.get("/api/board/popular").then((res) => {
+      setPopularBoards(res.data);
+    });
+  }, []);
+
   return (
     <Box p={6} maxW="1200px" mx="auto">
+      {popularBoards.length > 0 && (
+        <Box mb={6} p={4} bg="gray.50" borderRadius="lg" border="1px solid #eee">
+          <Text fontWeight="bold" fontSize="lg" mb={2}>
+            인기글
+          </Text>
+          <Flex as="ul" direction="column" gap={1}>
+            {popularBoards.slice(0, 3).map((b) => (
+              <Flex
+                as="li"
+                key={b.id}
+                align="center"
+                fontSize="md"
+                cursor="pointer"
+                _hover={{ textDecoration: "underline", color: "gray.500" }}
+                onClick={() => navigate(`/board/${b.id}`)}
+              >
+                <Text as="span" fontWeight="semibold" mr={2} color="blue.700" noOfLines={1}>
+                  {b.title}
+                </Text>
+                <Text as="span" color="gray.500" fontSize="sm" ml={2}>
+                  추천 {b.likeCount} | 조회 {(b.views / 2).toFixed(0)}
+                </Text>
+              </Flex>
+            ))}
+          </Flex>
+        </Box>
+      )}
+
       {/* 탭 선택 시 selectedSubject 변경 */}
       <Tabs variant="unstyled" onChange={(idx) => setSelectedSubject(SUBJECT_LIST[idx])}>
         <TabList>
@@ -148,7 +181,7 @@ const BoardList = ({ currentId }) => {
           >
             <CardBody p={0}>
               <Flex align="center" minH="64px" px={4}>
-                <Text ml={5}>{board.subejct}</Text>
+                <Text ml={5}>{board.subject}</Text>
                 <Text w="80px" color="gray.400" fontSize="sm" textAlign="center">
                   {board.id}
                 </Text>

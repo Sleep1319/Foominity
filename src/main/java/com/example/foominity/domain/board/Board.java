@@ -20,7 +20,7 @@ public class Board extends BaseEntity {
     @Column(nullable = false)
     private String title;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "MEDIUMTEXT")
     private String content;
 
     private Long memberId; // 그냥 숫자
@@ -35,6 +35,16 @@ public class Board extends BaseEntity {
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
     private List<BoardComment> boardComments;
+
+    @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
+    private List<BoardLike> boardLikes;
+
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BoardImage> images; // 이미지 여러 장 추가 하기 위해 OneToMany로 설정해서 가져오기
+
+    public int getLikeCount() {
+        return boardLikes == null ? 0 : boardLikes.size();
+    }
 
     public void update(String title, String content, String subject) {
         this.title = title;
@@ -54,4 +64,5 @@ public class Board extends BaseEntity {
     public void increaseViews() {
         this.views++;
     }
+
 }
