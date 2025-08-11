@@ -9,6 +9,7 @@ export function useUser() {
     // 예전 UserContext와 동일한 형태로 맞춰서 반환
     const state = {
         id: u.id,
+        memberId: u.id,
         email: u.email,
         username: u.username,
         nickname: u.nickname,
