@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle, us
 import { Box, VStack, HStack, Input, IconButton, Avatar, Text, Spinner, Button } from "@chakra-ui/react";
 import { ArrowRightIcon } from "@chakra-ui/icons";
 import axios from "axios";
-import { useUser } from "../../context/UserContext";
+import { useUser } from "@/redux/useUser.js";
 
 const menuItems = [
   { label: "1. 플레이리스트 추천", key: "recommend" },
