@@ -8,11 +8,14 @@ import {useUser} from "../redux/useUser.js";
 import AuthButtons from "@/components/navComponents/AuthButtons.jsx";
 import UserSection from "@/components/navComponents/UserSection.jsx";
 import SearchNavbar from "@/components/navComponents/SearchNavbar.jsx";
+import {useSelector} from "react-redux";
 
 const AppNavbar = () => {
   const { state } = useUser();
   const [isSearchVisible, setSearchVisible] = useState(false);
   const toggleSearch = () => setSearchVisible((prev) => !prev);
+  const u = useSelector((s) => s.user);
+  console.log("[NavBar user]", u);
 
   return (
     <Box as="header" px={6} py={1} position="fixed" top="0" left="0" w="100%" bg="black" zIndex="1000">

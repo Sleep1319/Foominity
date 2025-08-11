@@ -1,37 +1,43 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-// 🔁 유저 정보 비동기 요청 (기존 useEffect 역할)
-export const fetchUser = createAsyncThunk("user/fetchUser", async (_, { rejectWithValue }) => {
-    try {
-        const response = await axios.get("/api/user", { withCredentials: true });
-        return response.data;
-    } catch (error) {
-        return rejectWithValue(error.response?.data || "유저 정보 로딩 실패");
+export const fetchUser = createAsyncThunk(
+    "user/fetchUser",
+    async (_, { rejectWithValue }) => {
+        try {
+            console.log("[fetchUser] GET /api/user");
+            const res = await axios.get("/api/user", { withCredentials: true });
+            console.log("[fetchUser] success:", res.data);
+            return res.data; // UserInfoResponse
+        } catch (err) {
+            const msg = err?.response?.data || err?.message || "유저 정보 로딩 실패";
+            console.warn("[fetchUser] fail:", msg);
+            return rejectWithValue(msg);
+        }
     }
-});
+);
 
-// 🔁 로그아웃 처리
 export const logout = createAsyncThunk("user/logout", async (_, { dispatch }) => {
     dispatch(setIsLoggingOut(true));
     try {
-        await axios.post("/api/logout", { withCredentials: true });
+        await axios.post("/api/logout", null, { withCredentials: true });
         dispatch(clearUser());
-        window.location.href = "/";
-    } catch (error) {
-        alert("로그아웃 실패");
     } finally {
         dispatch(setIsLoggingOut(false));
     }
 });
 
 const initialState = {
-    id: null,
-    nickname: "",
+    id: null,             // ← memberId 매핑
     email: "",
-    role: "",
-    createdAt: null,
+    username: "",
+    nickname: "",
+    role: "",             // ← roleName 매핑
+    avatar: null,
+    socialType: "",
+
     isLoading: true,
+    hydrated: false,
     isLoggingOut: false,
 };
 
@@ -40,11 +46,12 @@ const userSlice = createSlice({
     initialState,
     reducers: {
         updateUser: (state, action) => {
-            return { ...state, ...action.payload };
+            Object.assign(state, action.payload || {});
         },
         clearUser: () => ({
             ...initialState,
             isLoading: false,
+            hydrated: true,
         }),
         setIsLoading: (state, action) => {
             state.isLoading = action.payload;
@@ -59,19 +66,40 @@ const userSlice = createSlice({
                 state.isLoading = true;
             })
             .addCase(fetchUser.fulfilled, (state, action) => {
-                return { ...state, ...action.payload, isLoading: false };
+                const u = action.payload || {};
+
+                // ✅ 백엔드 DTO(UserInfoResponse) 정확 매핑
+                state.id        = u.memberId ?? null;
+                state.email     = u.email ?? "";
+                state.username  = u.username ?? "";
+                state.nickname  = u.nickname ?? "";
+                state.role      = u.roleName ?? "";     // ADMIN, ROLE_ADMIN 등
+                state.avatar    = u.avatar ?? null;
+                state.socialType= u.socialType ?? "";
+
+                state.isLoading = false;
+                state.hydrated  = true;
+
+                console.log("[userSlice fulfilled] mapped:", {
+                    id: state.id, role: state.role, nickname: state.nickname
+                });
             })
             .addCase(fetchUser.rejected, (state) => {
-                return { ...initialState, isLoading: false };
+                state.id = null;
+                state.email = "";
+                state.username = "";
+                state.nickname = "";
+                state.role = "";
+                state.avatar = null;
+                state.socialType = "";
+
+                state.isLoading = false;
+                state.hydrated = true;
             });
     },
 });
 
-export const {
-    updateUser,
-    clearUser,
-    setIsLoading,
-    setIsLoggingOut,
-} = userSlice.actions;
+export const { updateUser, clearUser, setIsLoading, setIsLoggingOut } =
+    userSlice.actions;
 
 export default userSlice.reducer;
