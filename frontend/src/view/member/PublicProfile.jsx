@@ -3,8 +3,6 @@ import { Box, Avatar, Text, VStack, HStack, Flex, Spinner, Center, Icon } from "
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { FaUser, FaUserTag, FaGlobe, FaMusic } from "react-icons/fa";
-import OtherUserLikedAlbums from "../../components/memberComponents/PublicProfileLikedAlbums";
-import MyPostsTable from "../../components/memberComponents/MyPostsTable";
 import PublicProfilePostsTable from "../../components/memberComponents/PublicProfilePostsTable";
 import PublicProfileLikedAlbums from "../../components/memberComponents/PublicProfileLikedAlbums";
 

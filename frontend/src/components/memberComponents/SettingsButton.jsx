@@ -12,7 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { HiCog } from "react-icons/hi";
 import DeleteModal from "../../view/Member/DeleteModal";
-import { useUser} from "@/redux/useUser.js";
+import { useUser } from "@/redux/useUser.js";
 
 const SettingsButton = ({ items: customItems }) => {
   // 모달 오픈 상태 관리
@@ -26,7 +26,7 @@ const SettingsButton = ({ items: customItems }) => {
   // 기본 메뉴 아이템 정의
   const defaultItems = [
     { title: "내 프로필 편집", href: "/mypage/editprofile" },
-    // { title: "비밀번호 변경", href: "/changepassword" },
+    { title: "비밀번호 변경", href: "/changepassword" },
     ...(user?.socialType == null ? [{ title: "비밀번호 변경", href: "/changepassword" }] : []),
     {
       title: "회원 탈퇴",

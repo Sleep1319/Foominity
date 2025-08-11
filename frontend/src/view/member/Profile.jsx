@@ -2,7 +2,7 @@ import { Avatar, Box, HStack, Text, VStack, Flex, Button, Icon } from "@chakra-u
 import React, { useState } from "react";
 import { FaUser, FaEnvelope, FaUserTag, FaIdBadge, FaEye } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { useUser} from "@/redux/useUser.js";
+import { useUser } from "@/redux/useUser.js";
 import DeleteModal from "../../view/Member/DeleteModal.jsx";
 import MyPostsTable from "../../components/memberComponents/MyPostsTable.jsx";
 import SettingsButton from "../../components/memberComponents/SettingsButton.jsx";
@@ -15,7 +15,7 @@ const Profile = () => {
   const [isDeleteOpen, setDeleteOpen] = useState(false);
 
   const handlePreview = () => {
-    navigate(`/users/${state.memberId}/profile`);
+    navigate(`/users/${state.id}/profile`);
   };
 
   return (

@@ -1,12 +1,12 @@
 import { Table, Thead, Tbody, Tr, Th, Td, Spinner, Box, Text, Button, Flex } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
-import { useUser} from "@/redux/useUser.js";
+import { useUser } from "@/redux/useUser.js";
 import axios from "axios";
 
 const MemberPostsTable = () => {
   const { state } = useUser();
-  const userId = state.memberId;
+  const userId = state.id;
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
 
