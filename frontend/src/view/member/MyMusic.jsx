@@ -12,7 +12,7 @@ import {
   TabPanel,
   Flex,
 } from "@chakra-ui/react";
-import { useUser} from "@/redux/useUser.js";
+import { useUser } from "@/redux/useUser.js";
 import LikedAlbums from "../../components/memberComponents/LikedAlbums.jsx";
 import ParticipatedAlbums from "../../components/memberComponents/ParticipatedAlbums.jsx";
 import TrackSearchWithLyrics from "../../components/chatbotComponents/TrackSearchWithLyrics.jsx";
@@ -23,7 +23,9 @@ import ReviewTrendChart from "../../components/memberComponents/ReviewTrendChart
 
 const MyMusic = () => {
   const { state } = useUser();
-  const memberId = state.memberId;
+  const memberId = state.id;
+
+  console.log("아이디: ", memberId);
 
   const [reviewCount, setReviewCount] = useState(null);
   const [averageRating, setAverageRating] = useState(null);

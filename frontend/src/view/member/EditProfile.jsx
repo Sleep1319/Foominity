@@ -14,7 +14,7 @@ import {
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useUser} from "@/redux/useUser.js";
+import { useUser } from "@/redux/useUser.js";
 import MyPostsTable from "../../components/memberComponents/MyPostsTable";
 import { FiEdit, FiTrash } from "react-icons/fi";
 import { FaMusic, FaUser, FaUserTag } from "react-icons/fa";
@@ -33,8 +33,10 @@ const EditProfile = ({ nickname: initialNickname, avatar, onNicknameChange }) =>
 
   const fileInputRef = useRef();
   const { state } = useUser();
-  const id = state.memberId;
+  const id = state.id;
   const { updateUser } = useUser();
+
+  console.log("아이디임 : ", id);
 
   // 장르 통계 로드 → 가장 선호 장르 추출
   useEffect(() => {
