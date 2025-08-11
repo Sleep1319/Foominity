@@ -29,6 +29,7 @@ import { useNavigate } from "react-router-dom";
 import { useUser} from "@/redux/useUser.js";
 import Slider from "react-slick";
 import { useLocation } from "react-router-dom";
+import Pagination from "../ui/Pagination";
 
 const ReviewGrid = () => {
   const { state, isLoading } = useUser();
@@ -58,19 +59,53 @@ const ReviewGrid = () => {
 
   // 앨범
   useEffect(() => {
-    axios.get(`/api/reviews?page=${albumPage}`).then((res) => {
-      setReviews(res.data.content);
-      setAlbumTotalPages(res.data.totalPages);
-    });
-  }, [albumPage]);
+    const params = new URLSearchParams();
+    params.append("page", albumPage);
+
+    if (searchTerm.trim() !== "") {
+      params.append("search", searchTerm.trim());
+    }
+
+    selectedCategories.forEach((c) => params.append("categories", c));
+
+    axios
+      .get(`/api/reviews?${params.toString()}`)
+      .then((res) => {
+        setReviews(res.data.content);
+        setAlbumTotalPages(res.data.totalPages);
+      })
+      .catch((err) => {
+        console.error("리뷰 요청 에러:", err);
+      });
+  }, [albumPage, searchTerm, selectedCategories]);
 
   // 아티스트
   useEffect(() => {
-    axios.get(`/api/artists?page=${artistPage}`).then((res) => {
-      setArtists(res.data.content || res.data);
-      setArtistTotalPages(res.data.totalPages || 1);
-    });
-  }, [artistPage]);
+    const params = new URLSearchParams();
+    params.append("page", artistPage);
+
+    if (searchTerm.trim() !== "") {
+      params.append("search", searchTerm.trim());
+    }
+
+    selectedCategories.forEach((c) => params.append("categories", c));
+
+    axios
+      .get(`/api/artists?${params.toString()}`)
+      .then((res) => {
+        setArtists(res.data.content);
+        setArtistTotalPages(res.data.totalPages);
+      })
+      .catch((err) => {
+        console.error("아티스트 요청 에러:", err);
+      });
+  }, [artistPage, searchTerm, selectedCategories]);
+
+  // 카테고리 변경 시 페이지 초기화
+  useEffect(() => {
+    setAlbumPage(0);
+    setArtistPage(0);
+  }, [searchTerm, selectedCategories]);
 
   useEffect(() => {
     setSearchTerm("");
@@ -83,21 +118,24 @@ const ReviewGrid = () => {
     );
   };
 
-  const filteredReviews = reviews.filter((r) => {
-    const matchTitle = r.title.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchCategory =
-      selectedCategories.length === 0 ||
-      selectedCategories.every((selected) => r.categories?.some((c) => c.categoryName === selected));
-    return matchTitle && matchCategory;
-  });
+  // 이미지 효과
+  const [imageLoaded, setImageLoaded] = useState({});
 
-  const filteredArtists = artists.filter((a) => {
-    const matchName = a.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchCategory =
-      selectedCategories.length === 0 ||
-      selectedCategories.every((selected) => a.categories?.some((c) => c.categoryName === selected));
-    return matchName && matchCategory;
-  });
+  // const filteredReviews = reviews.filter((r) => {
+  //   const matchTitle = r.title.toLowerCase().includes(searchTerm.toLowerCase());
+  //   const matchCategory =
+  //     selectedCategories.length === 0 ||
+  //     selectedCategories.every((selected) => r.categories?.some((c) => c.categoryName === selected));
+  //   return matchTitle && matchCategory;
+  // });
+
+  // const filteredArtists = artists.filter((a) => {
+  //   const matchName = a.name.toLowerCase().includes(searchTerm.toLowerCase());
+  //   const matchCategory =
+  //     selectedCategories.length === 0 ||
+  //     selectedCategories.every((selected) => a.categories?.some((c) => c.categoryName === selected));
+  //   return matchName && matchCategory;
+  // });
 
   // const filteredArtists = artists.filter((a) => a.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
@@ -159,11 +197,11 @@ const ReviewGrid = () => {
 
             <Divider my={6} borderColor="black" />
 
-            {filteredReviews.length === 0 ? (
+            {reviews.length === 0 ? (
               <Text>검색된 결과가 없습니다.</Text>
             ) : (
               <SimpleGrid columns={{ base: 1, sm: 2, md: 4 }} spacing={6}>
-                {filteredReviews.map((r) => (
+                {reviews.map((r) => (
                   <Box
                     key={r.id}
                     borderWidth="1px"
@@ -179,6 +217,14 @@ const ReviewGrid = () => {
                         src={r.imagePath ? `http://localhost:8084/${r.imagePath}` : ""}
                         alt={r.title}
                         objectFit="cover"
+                        transition="opacity 0.6s ease"
+                        opacity={imageLoaded[r.id] ? 1 : 0}
+                        onLoad={() =>
+                          setImageLoaded((prev) => ({
+                            ...prev,
+                            [r.id]: true,
+                          }))
+                        }
                       />
                     </AspectRatio>
                     <VStack align="start" spacing={1} p={3}>
@@ -215,29 +261,11 @@ const ReviewGrid = () => {
                 ))}
               </SimpleGrid>
             )}
-            {tabIndex === 0 && filteredReviews.length > 0 && (
-              <Box textAlign="center" mt={8}>
-                <HStack justify="center" spacing={4}>
-                  <Button
-                    onClick={() => setAlbumPage((prev) => Math.max(prev - 1, 0))}
-                    isDisabled={albumPage === 0}
-                    leftIcon={<BsChevronLeft />}
-                  >
-                    이전
-                  </Button>
-                  <Text fontWeight="bold">
-                    {albumPage + 1} / {albumTotalPages}
-                  </Text>
-                  <Button
-                    onClick={() => setAlbumPage((prev) => Math.min(prev + 1, albumTotalPages - 1))}
-                    isDisabled={albumPage >= albumTotalPages - 1}
-                    rightIcon={<BsChevronRight />}
-                  >
-                    다음
-                  </Button>
-                </HStack>
-              </Box>
-            )}
+            <Pagination
+              currentPage={albumPage}
+              totalPages={albumTotalPages}
+              onPageChange={(page) => setAlbumPage(page)}
+            />
           </TabPanel>
 
           {/* 아티스트 탭 */}
@@ -271,7 +299,7 @@ const ReviewGrid = () => {
             <Divider my={6} borderColor="black" />
 
             <SimpleGrid columns={{ base: 2, sm: 3, md: 4 }} spacing={6}>
-              {filteredArtists.map((artist) => (
+              {artists.map((artist) => (
                 <Box
                   key={artist.id}
                   borderWidth="1px"
@@ -287,6 +315,14 @@ const ReviewGrid = () => {
                       src={artist.imagePath ? `http://localhost:8084/${artist.imagePath}` : ""}
                       alt={artist.name}
                       objectFit="cover"
+                      transition="opacity 0.4s ease"
+                      opacity={imageLoaded[artist.id] ? 1 : 0}
+                      onLoad={() =>
+                        setImageLoaded((prev) => ({
+                          ...prev,
+                          [artist.id]: true,
+                        }))
+                      }
                     />
                   </AspectRatio>
                   <Box p={3}>
@@ -295,7 +331,7 @@ const ReviewGrid = () => {
                 </Box>
               ))}
             </SimpleGrid>
-            {tabIndex === 1 && filteredArtists.length > 0 && (
+            {tabIndex === 1 && artists.length > 0 && (
               <Box textAlign="center" mt={8}>
                 <HStack justify="center" spacing={4}>
                   <Button

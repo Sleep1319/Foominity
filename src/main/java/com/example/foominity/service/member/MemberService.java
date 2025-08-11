@@ -1,5 +1,7 @@
 package com.example.foominity.service.member;
 
+import java.util.List;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +14,8 @@ import com.example.foominity.dto.member.OtherUserProfileResponse;
 import com.example.foominity.exception.NotFoundMemberException;
 import com.example.foominity.exception.UnauthorizedException;
 import com.example.foominity.repository.member.MemberRepository;
+import com.example.foominity.repository.member.ReviewLikeRepository;
+import com.example.foominity.service.image.ImageService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -24,25 +28,26 @@ public class MemberService {
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ImageService imageService;
+    private final ReviewLikeRepository reviewLikeRepository;
 
-    // 회원 탈퇴
-    @Transactional
-    public void deleteMember(HttpServletRequest tokenRequest, MemberRequest req) {
-        String token = jwtTokenProvider.resolveTokenFromCookie(tokenRequest);
+    public void deleteMember(Long memberId, MemberRequest req) {
+        // 1) 회원 조회
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(NotFoundMemberException::new);
 
-        // 유효성검증
-        if (!jwtTokenProvider.validateToken(token)) {
-            throw new UnauthorizedException();
-        }
-        Long memberId = jwtTokenProvider.getUserIdFromToken(token);
-        Member member = memberRepository.findById(memberId).orElseThrow(NotFoundMemberException::new);
-
-        // 비밀번호 일치 확인
+        // 2) 비밀번호 일치 확인
         if (!passwordEncoder.matches(req.getPassword(), member.getPassword())) {
             throw new IllegalStateException("비밀번호가 일치하지 않습니다.");
-        } else {
-            memberRepository.delete(member);
         }
+
+        // 3) 프로필 이미지가 있으면 물리 파일 + DB 레코드 삭제
+        if (member.getProfileImage() != null) {
+            imageService.deleteImageFile(member.getProfileImage());
+        }
+
+        // 4) 회원 엔티티 삭제
+        memberRepository.delete(member);
     }
 
     // 닉네임 변경
@@ -70,6 +75,11 @@ public class MemberService {
         Member member = memberRepository.findById(id).orElseThrow(NotFoundMemberException::new);
 
         return new OtherUserProfileResponse(member);
+    }
+
+    // 장르 좋아요 수 리스트로 추출
+    public List<ReviewLikeRepository.GenreCount> getGenreCounts(Long memberId) {
+        return reviewLikeRepository.countGenresByMember(memberId);
     }
 
 }

@@ -121,4 +121,14 @@ public class ReviewCommentService {
         return Math.round(avg * 100) / 100.0f; // 소수점 둘째 자리까지 반올림
     }
 
+    // 내가 평가한 앨범 수 조회
+    public long getReviewCount(Long memberId) {
+        return reviewCommentRepository.countByMemberId(memberId);
+    }
+
+    // 내가 준 별점 평균 조회
+    public double getAverageRatingByMemberId(Long memberId) {
+        return reviewCommentRepository.findAverageRatingByMemberId(memberId);
+    }
+
 }

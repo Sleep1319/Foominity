@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.example.foominity.domain.board.ReviewComment;
@@ -48,33 +49,20 @@ public interface ReviewCommentRepository extends JpaRepository<ReviewComment, Lo
             """)
     List<TopReviewProjection> findTopReviewsByAverage(Pageable pageable);
 
+    // @Query("SELECT AVG(rc.star_point) FROM review_comment rc WHERE rc.member_id =
+    // :memberId")
+    // Double findAverageRatingByMemberId(@Param("memberId") Long memberId);
+    // 내가 준 별점들 평균
+    @Query("""
+            SELECT COALESCE(AVG(c.starPoint), 0)
+              FROM ReviewComment c
+             WHERE c.memberId = :memberId
+            """)
+    double findAverageRatingByMemberId(@Param("memberId") Long memberId);
+
+    // 내가 평가한 앨범 수 조회
+    long countByMemberId(Long memberId);
+    // @Query("SELECT COUNT(rc.id) from review_comment rc where rc.member_id
+    // =:memberId")
+    // Long countByMemberId(@Param("memberId") Long memberId);
 }
-
-// package com.example.foominity.repository.board;
-
-// import java.util.List;
-// import java.util.Optional;
-
-// import org.springframework.data.jpa.repository.JpaRepository;
-// import org.springframework.data.jpa.repository.Query;
-// import org.springframework.data.repository.query.Param;
-// import org.springframework.stereotype.Repository;
-
-// import com.example.foominity.domain.board.ReviewComment;
-
-// @Repository
-// public interface ReviewCommentRepository extends JpaRepository<ReviewComment,
-// Long> {
-
-// List<ReviewComment> findByReviewId(Long id);
-
-// Optional<ReviewComment> findByReviewIdAndMemberId(Long reviewId, Long
-// memberId);
-
-// @Query("SELECT AVG(rc.starPoint) FROM ReviewComment rc WHERE rc.review.id =
-// :reviewId")
-// Float findAverageStarPoint(@Param("reviewId") Long reviewId);
-
-// // 내가 쓴 모든 코멘트
-// List<ReviewComment> findByMemberId(Long memberId);
-// }
