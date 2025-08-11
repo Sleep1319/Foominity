@@ -18,8 +18,6 @@ public interface ReviewLikeRepository extends JpaRepository<ReviewLike, Long> {
     Optional<ReviewLike> findByMemberAndReviewId(Member member, Long reviewId);
 
 
-    Optional<ReviewLike> findByMemberAndReview(Member member, Review review);
-
 
     Optional<ReviewLike> findByMemberIdAndReviewId(Long memberId, Long reviewId);
 
