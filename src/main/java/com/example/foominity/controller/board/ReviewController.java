@@ -18,8 +18,6 @@ import com.example.foominity.dto.board.ReviewResponse;
 import com.example.foominity.dto.board.ReviewSimpleResponse;
 import com.example.foominity.dto.board.ReviewUpdateRequest;
 import com.example.foominity.service.board.ReviewService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/api/reviews")
@@ -32,8 +30,10 @@ public class ReviewController {
     /** 전체 조회 */
     @GetMapping
     public ResponseEntity<Page<ReviewSimpleResponse>> findAll(
-            @RequestParam(defaultValue = "0") int page) {
-        Page<ReviewSimpleResponse> res = reviewService.findAll(page);
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) List<String> categories) {
+        Page<ReviewSimpleResponse> res = reviewService.findAll(page, search, categories);
         return ResponseEntity.ok(res);
     }
 

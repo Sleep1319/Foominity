@@ -1,5 +1,6 @@
 package com.example.foominity.service.artist;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -59,34 +60,29 @@ public class ArtistService {
     private final ImageService imageService;
 
     // 아티스트 전체 조회
-    public Page<ArtistSimpleResponse> getArtistList(int page) {
+    public Page<ArtistSimpleResponse> getArtistList(int page, String search, List<String> categories) {
         PageRequest pageable = PageRequest.of(page, 12, Sort.by(Sort.Direction.DESC, "id"));
-        Page<Artist> artists = artistRepository.findAll(pageable);
+        List<Artist> artists;
 
-        List<ArtistSimpleResponse> artistSimpleResponsesList = artists.stream()
-                .map(artist -> {
-                    List<ArtistCategory> artistCategories = artistCategoryRepository
-                            .findByArtistId(artist.getId());
+        if (categories != null && !categories.isEmpty()) {
+            // 카테고리 필터가 있는 경우: 전체 가져오고 id desc 정렬 후 subList로 자름
+            artists = artistRepository.findByCategories(categories, categories.size())
+                    .stream()
+                    .sorted(Comparator.comparing(Artist::getId).reversed())
+                    .toList();
 
-                    List<ArtistCategoryResponse> categoryResponses = artistCategories.stream()
-                            .map(ar -> new ArtistCategoryResponse(
-                                    ar.getCategory().getId(),
-                                    ar.getCategory().getCategoryName()))
-                            .toList();
+            int start = (int) pageable.getOffset();
+            int end = Math.min(start + pageable.getPageSize(), artists.size());
+            List<Artist> paged = artists.subList(start, end);
 
-                    ImageFile imageFile = artist.getImageFile();
-                    String imagePath = (imageFile != null) ? imageFile.getSavePath() : null;
+            List<ArtistSimpleResponse> content = toSimpleResponseList(paged);
+            return new PageImpl<>(content, pageable, artists.size());
+        }
 
-                    return new ArtistSimpleResponse(
-                            artist.getId(),
-                            artist.getName(),
-                            categoryResponses,
-                            imagePath);
-                })
-                .toList();
-
-        return new PageImpl<>(artistSimpleResponsesList, pageable, artists.getTotalElements());
-
+        // 카테고리 필터 없을 경우: DB에서 직접 페이징
+        Page<Artist> pageResult = artistRepository.findAll(pageable);
+        List<ArtistSimpleResponse> content = toSimpleResponseList(pageResult.getContent());
+        return new PageImpl<>(content, pageable, pageResult.getTotalElements());
     }
 
     // 아티스트 조회
@@ -246,7 +242,7 @@ public class ArtistService {
     }
 
     public List<ArtistSimpleResponse> findByCategory(List<String> categories) {
-        List<Artist> matched = artistRepository.findByCategories(categories);
+        List<Artist> matched = artistRepository.findByCategories(categories, categories.size());
 
         return matched.stream().map(artist -> {
             List<ArtistCategory> artistCategories = artistCategoryRepository.findByArtistId(artist.getId());
@@ -298,4 +294,26 @@ public class ArtistService {
         ArtistResponse artist = readArtist(artistId);
         return toArtistRecommend(artist);
     }
+
+    private List<ArtistSimpleResponse> toSimpleResponseList(List<Artist> artists) {
+        return artists.stream().map(artist -> {
+            List<ArtistCategory> artistCategories = artistCategoryRepository.findByArtistId(artist.getId());
+
+            List<ArtistCategoryResponse> categoryResponses = artistCategories.stream()
+                    .map(ac -> new ArtistCategoryResponse(
+                            ac.getCategory().getId(),
+                            ac.getCategory().getCategoryName()))
+                    .toList();
+
+            ImageFile imageFile = artist.getImageFile();
+            String imagePath = (imageFile != null) ? imageFile.getSavePath() : null;
+
+            return new ArtistSimpleResponse(
+                    artist.getId(),
+                    artist.getName(),
+                    categoryResponses,
+                    imagePath);
+        }).toList();
+    }
+
 }

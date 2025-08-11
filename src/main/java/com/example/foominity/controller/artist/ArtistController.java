@@ -39,8 +39,11 @@ public class ArtistController {
     private final ReviewService reviewService;
 
     @GetMapping("/api/artists")
-    public ResponseEntity<?> getArtistList(@RequestParam(defaultValue = "0") int page) {
-        Page<ArtistSimpleResponse> res = artistService.getArtistList(page);
+    public ResponseEntity<?> getArtistList(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) List<String> categories) {
+        Page<ArtistSimpleResponse> res = artistService.getArtistList(page, search, categories);
         return ResponseEntity.ok(res);
     }
 
