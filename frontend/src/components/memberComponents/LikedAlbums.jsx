@@ -51,6 +51,7 @@ const LikedAlbums = () => {
       </Box>
     );
   }
+  if (loading) return <Spinner />;
   if (albums.length === 0) {
     return (
       <Box textAlign="center" py={8}>

@@ -20,12 +20,11 @@ import GuidedChat from "../../components/chatbotComponents/GuidedChat.jsx";
 import RecommendPanel from "../../components/chatbotComponents/RecommendPanel.jsx";
 import GenreChart from "../../components/memberComponents/GenreChart.jsx";
 import ReviewTrendChart from "../../components/memberComponents/ReviewTrendChart.jsx";
+import RecommendedAlbums from "../../components/memberComponents/RecommendAlbums.jsx";
 
 const MyMusic = () => {
   const { state } = useUser();
   const memberId = state.id;
-
-  console.log("아이디: ", memberId);
 
   const [reviewCount, setReviewCount] = useState(null);
   const [averageRating, setAverageRating] = useState(null);
@@ -106,16 +105,24 @@ const MyMusic = () => {
                       <Text fontSize="sm" color="gray.500" fontWeight="medium">
                         작성한 리뷰
                       </Text>
-                      <Text fontSize="lg" fontWeight="semibold">
-                        {reviewCount !== null ? `${reviewCount}개` : <Spinner size="sm" />}
+                      <Text as="div" fontSize="lg" fontWeight="semibold">
+                        {
+                          reviewCount !== null ? `${reviewCount}개` : <Spinner size="sm" />
+                          // "-"
+                        }
                       </Text>
                     </Box>
                     <Box textAlign="right">
                       <Text fontSize="sm" color="gray.500" fontWeight="medium">
                         평균 별점
                       </Text>
-                      <Text fontSize="lg" fontWeight="semibold">
-                        {averageRating !== null ? `${averageRating.toFixed(1)} ★` : <Spinner size="sm" />}
+                      <Text as="div" fontSize="lg" fontWeight="semibold">
+                        {averageRating !== null ? (
+                          `${averageRating.toFixed(1)} ★`
+                        ) : (
+                          //  "-"
+                          <Spinner size="sm" />
+                        )}
                       </Text>
                     </Box>
                   </Flex>
@@ -161,6 +168,7 @@ const MyMusic = () => {
                 </Tabs>
               </Box>
             </SimpleGrid>
+            <RecommendedAlbums />
 
             {/* 즐겨찾기/참여 앨범 */}
             <SimpleGrid columns={[1, 2]} spacing={8} mb={12}>

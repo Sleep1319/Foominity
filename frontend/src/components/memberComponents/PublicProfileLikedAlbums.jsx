@@ -240,13 +240,11 @@ const PublicProfileLikedAlbums = () => {
   const [albums, setAlbums] = useState([]);
   const { id } = useParams();
   const [loading, setLoading] = useState(true);
-  // 모달 컨트롤
   const { isOpen, onOpen, onClose } = useDisclosure();
   const navigate = useNavigate();
 
-  // 미리보기 개수
   const previewCount = 4;
-  const boxSize = 174;
+  const boxSize = 210;
 
   useEffect(() => {
     axios
