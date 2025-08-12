@@ -109,6 +109,10 @@ public class JwtTokenProvider {
         return (String) getClaims(token).get("role");
     }
 
+    public String getNickname(String token) {
+        return getClaims(token).get("nickname", String.class);
+    }
+
     public boolean validateToken(@Nullable String token) {
         try {
             if (token == null || token.trim().isEmpty()) {
@@ -171,6 +175,10 @@ public class JwtTokenProvider {
             }
         }
         return null;
+    }
+
+    public boolean validateSocketToken(@Nullable String token) {
+        return validateToken(token);
     }
 
 }

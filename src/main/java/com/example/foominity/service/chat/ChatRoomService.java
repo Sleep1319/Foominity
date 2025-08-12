@@ -22,4 +22,10 @@ public class ChatRoomService {
                     return chatRoomRepository.save(newRoom).getId();
                 });
     }
+
+    public Long getOwnerId(Long roomId) {
+        return chatRoomRepository.findById(roomId)
+                .map(ChatRoom::getMemberId)
+                .orElseThrow(() -> new IllegalArgumentException("room not found"));
+    }
 }
