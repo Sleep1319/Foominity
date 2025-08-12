@@ -5,13 +5,10 @@ export const fetchUser = createAsyncThunk(
     "user/fetchUser",
     async (_, { rejectWithValue }) => {
         try {
-            console.log("[fetchUser] GET /api/user");
             const res = await axios.get("/api/user", { withCredentials: true });
-            console.log("[fetchUser] success:", res.data);
             return res.data; // UserInfoResponse
         } catch (err) {
             const msg = err?.response?.data || err?.message || "유저 정보 로딩 실패";
-            console.warn("[fetchUser] fail:", msg);
             return rejectWithValue(msg);
         }
     }
@@ -28,13 +25,14 @@ export const logout = createAsyncThunk("user/logout", async (_, { dispatch }) =>
 });
 
 const initialState = {
-    id: null,             // ← memberId 매핑
+    id: null,        // ← memberId 매핑
     email: "",
     username: "",
     nickname: "",
-    role: "",             // ← roleName 매핑
+    role: "",        // ← roleName 매핑
     avatar: null,
     socialType: "",
+    createdAt: "",   // ← 추가
 
     isLoading: true,
     hydrated: false,
@@ -45,13 +43,26 @@ const userSlice = createSlice({
     name: "user",
     initialState,
     reducers: {
+        // id/memberId, role/roleName 혼용해도 안전하게 반영
         updateUser: (state, action) => {
-            Object.assign(state, action.payload || {});
+            const p = action.payload || {};
+            if ("memberId" in p) state.id = p.memberId;
+            if ("id" in p)       state.id = p.id;
+
+            if ("roleName" in p) state.role = p.roleName;
+            if ("role" in p)     state.role = p.role;
+
+            if ("email" in p)      state.email = p.email;
+            if ("username" in p)   state.username = p.username;
+            if ("nickname" in p)   state.nickname = p.nickname;
+            if ("avatar" in p)     state.avatar = p.avatar;
+            if ("socialType" in p) state.socialType = p.socialType;
+            if ("createdAt" in p)  state.createdAt = p.createdAt;
         },
         clearUser: () => ({
             ...initialState,
             isLoading: false,
-            hydrated: true,
+            hydrated: true, // 로그아웃 후 깜빡임 방지
         }),
         setIsLoading: (state, action) => {
             state.isLoading = action.payload;
@@ -63,36 +74,25 @@ const userSlice = createSlice({
     extraReducers: (builder) => {
         builder
             .addCase(fetchUser.pending, (state) => {
-                state.isLoading = true;
+                // 이미 한 번 수화되면 로딩 토글로 깜빡임 유발하지 않음
+                if (!state.hydrated) state.isLoading = true;
             })
             .addCase(fetchUser.fulfilled, (state, action) => {
                 const u = action.payload || {};
-
-                // ✅ 백엔드 DTO(UserInfoResponse) 정확 매핑
-                state.id        = u.memberId ?? null;
-                state.email     = u.email ?? "";
-                state.username  = u.username ?? "";
-                state.nickname  = u.nickname ?? "";
-                state.role      = u.roleName ?? "";     // ADMIN, ROLE_ADMIN 등
-                state.avatar    = u.avatar ?? null;
-                state.socialType= u.socialType ?? "";
+                // 서버 값 있을 때만 덮어씀(미리보기 값 보존)
+                state.id         = u.memberId   ?? state.id;
+                state.email      = u.email      ?? state.email;
+                state.username   = u.username   ?? state.username;
+                state.nickname   = u.nickname   ?? state.nickname;
+                state.role       = u.roleName   ?? state.role;
+                state.avatar     = u.avatar     ?? state.avatar;
+                state.socialType = u.socialType ?? state.socialType;
+                state.createdAt  = u.createdAt  ?? state.createdAt;
 
                 state.isLoading = false;
                 state.hydrated  = true;
-
-                console.log("[userSlice fulfilled] mapped:", {
-                    id: state.id, role: state.role, nickname: state.nickname
-                });
             })
             .addCase(fetchUser.rejected, (state) => {
-                state.id = null;
-                state.email = "";
-                state.username = "";
-                state.nickname = "";
-                state.role = "";
-                state.avatar = null;
-                state.socialType = "";
-
                 state.isLoading = false;
                 state.hydrated = true;
             });

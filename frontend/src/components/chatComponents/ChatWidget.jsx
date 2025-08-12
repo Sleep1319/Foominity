@@ -1,26 +1,34 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Box, Button, Input, VStack,
   HStack, Text, IconButton, Collapse,
 } from "@chakra-ui/react";
 import { CloseIcon, ChatIcon } from "@chakra-ui/icons";
 import ChatSocket, { sendMessage } from "./ChatSocket";
+import { useSelector } from "react-redux";
 
 const ChatWidget = ({ roomId, senderId, isOpen, onToggle }) => {
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState("");
+  const bottomRef = useRef(null);
+  const myNickname = useSelector((s) => s.user.nickname);
 
   const handleReceive = (msg) => {
     setMessages((prev) => [...prev, msg]);
   };
 
   const handleSend = () => {
-    if (inputText.trim()) {
-      sendMessage(inputText);
-      setMessages((prev) => [...prev, { senderId, message: inputText }]);
-      setInputText("");
-    }
+    const text = inputText.trim();
+    if (!text) return;
+    setMessages((prev) => [...prev, { senderId, senderNickname: myNickname, message: text }]);
+    sendMessage(text);
+    setInputText("");
   };
+
+  // 새 메시지 오면 자동 스크롤
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   return (
       <Box position="fixed" bottom="4" right="4" zIndex="9999">
@@ -42,6 +50,10 @@ const ChatWidget = ({ roomId, senderId, isOpen, onToggle }) => {
               shadow="lg"
               border="1px solid #e2e8f0"
           >
+            {roomId && (
+                <ChatSocket roomId={roomId} onMessageReceive={handleReceive} />
+            )}
+
             <VStack align="stretch" spacing="3">
               <Text fontWeight="bold">💬 문의하기</Text>
 
@@ -61,22 +73,26 @@ const ChatWidget = ({ roomId, senderId, isOpen, onToggle }) => {
                       메시지가 없습니다
                     </Text>
                 ) : (
-                    messages.map((msg, idx) => (
-                        <Box
-                            key={idx}
-                            alignSelf={msg.senderId === senderId ? "flex-end" : "flex-start"}
-                            maxW="80%"
-                            p="2"
-                            bg={msg.senderId === senderId ? "teal.100" : "gray.200"}
-                            borderRadius="md"
-                        >
-                          <Text fontSize="xs" fontWeight="bold">
-                            {msg.nickname || msg.senderId}
-                          </Text>
-                          <Text fontSize="sm">{msg.message}</Text>
-                        </Box>
-                    ))
+                    messages.map((msg, idx) => {
+                      const mine = msg?.senderId === senderId;
+                      const displayName =
+                          msg.senderNickname || msg.nickname || (mine ? myNickname : "상대");
+                      return (
+                          <Box
+                              key={idx}
+                              alignSelf={mine ? "flex-end" : "flex-start"}
+                              maxW="80%"
+                              p="2"
+                              bg={mine ? "teal.100" : "gray.200"}
+                              borderRadius="md"
+                          >
+                            <Text fontSize="xs" fontWeight="bold">{displayName}</Text>
+                            <Text fontSize="sm">{msg.message}</Text>
+                          </Box>
+                      );
+                    })
                 )}
+                <div ref={bottomRef} />
               </Box>
 
               <HStack>

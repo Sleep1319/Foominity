@@ -1,13 +1,22 @@
 package com.example.foominity.domain.chat;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "chat_message")
+@Table(
+        name = "chat_message",
+        indexes = {
+                @Index(name = "idx_chat_message_room", columnList = "room_id"),
+                @Index(name = "idx_chat_message_created_at", columnList = "created_at")
+        }
+)
 @NoArgsConstructor
+@Getter
 public class ChatMessage {
 
     @Id
@@ -23,14 +32,13 @@ public class ChatMessage {
     @Column(name = "message", nullable = false, columnDefinition = "TEXT")
     private String message;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false, nullable = false)
+    private LocalDateTime createdAt;
 
-    public ChatMessage(Long roomId, Long memberId, String message, LocalDateTime createdAt) {
+    public ChatMessage(Long roomId, Long memberId, String message) {
         this.roomId = roomId;
         this.memberId = memberId;
         this.message = message;
-        this.createdAt = createdAt;
     }
-
 }

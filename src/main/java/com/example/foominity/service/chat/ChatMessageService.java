@@ -17,14 +17,17 @@ public class ChatMessageService {
     private final ChatMessageRepository chatMessageRepository;
 
     @Transactional
-    public void handleIncomingMessage(ChatMessageDto dto, Long memberId, String nickname) {
-        ChatMessage message = new ChatMessage(
-                dto.getRoomId(),
-                memberId,
-                dto.getMessage(),
-                dto.getCreatedAt() != null ? dto.getCreatedAt() : LocalDateTime.now()
+    public ChatMessageDto handleIncomingMessage(ChatMessageDto dto, Long memberId, String nickname) {
+        ChatMessage saved = chatMessageRepository.save(
+                new ChatMessage(dto.getRoomId(), memberId, dto.getMessage())
         );
 
-        chatMessageRepository.save(message);
+        return new ChatMessageDto(
+                saved.getRoomId(),
+                memberId,
+                nickname,
+                saved.getMessage(),
+                saved.getCreatedAt()
+        );
     }
 }
