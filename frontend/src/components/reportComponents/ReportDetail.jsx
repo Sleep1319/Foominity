@@ -1,15 +1,13 @@
+// ReportDetail.jsx
 import React, { useEffect, useState, useRef } from "react";
 import {
   Box,
-  Heading,
   Text,
   Button,
   Spinner,
   useToast,
   Flex,
   Divider,
-  Icon,
-  Spacer,
   AlertDialog,
   AlertDialogOverlay,
   AlertDialogContent,
@@ -21,13 +19,21 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
+  Image,
+  AspectRatio,
+  Skeleton,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalBody,
+  Badge,
 } from "@chakra-ui/react";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useUser} from "@/redux/useUser.js";
-import ReportCommentForm from "../commentComponents/ReportCommentForm";
-import CommentList from "../commentComponents/CommentList";
+import { useUser } from "@/redux/useUser.js";
+import { BsChevronLeft, BsChevronRight } from "react-icons/bs";
+import Slider from "react-slick"; // ✅ 슬라이더
 
 const getTypeLabel = (type) => {
   switch (type) {
@@ -70,6 +76,29 @@ const getTargetTypeLabel = (targetType) => {
   }
 };
 
+const getTypeBadgeColor = (type) => {
+  switch (type) {
+    case "REPORT":
+      return "red";
+    case "INQUIRY":
+      return "blue";
+    case "REQUEST":
+      return "purple";
+    case "SUGGESTION":
+      return "green";
+    default:
+      return "gray";
+  }
+};
+
+const BACKEND_BASE = "http://localhost:8084";
+const toImageUrl = (p) => {
+  if (!p) return "";
+  if (/^https?:\/\//i.test(p)) return p;
+  const path = p.startsWith("/") ? p : `/${p}`;
+  return `${BACKEND_BASE}${path}`;
+};
+
 const statusOptions = [
   { value: "PENDING", label: "대기 중" },
   { value: "IN_PROGRESS", label: "처리 중" },
@@ -83,22 +112,24 @@ const ReportDetail = () => {
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const [statusLoading, setStatusLoading] = useState(false);
-  // const [commentRefreshKey, setCommentRefreshKey] = useState(0);
   const toast = useToast();
   const { state: user } = useUser();
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef();
 
+  // 라이트박스
+  const [previewIdx, setPreviewIdx] = useState(null);
+  const { isOpen: isImgOpen, onOpen: onImgOpen, onClose: onImgClose } = useDisclosure();
+
+  // 슬라이드
+  const sliderRef = useRef(null);
+  const [currentSlide, setCurrentSlide] = useState(0);
+
   const handleDelete = async () => {
     try {
       await axios.delete(`/api/report/${id}`, { withCredentials: true });
-      toast({
-        title: "게시물 삭제 완료",
-        status: "success",
-        duration: 2000,
-        isClosable: true,
-      });
+      toast({ title: "게시물 삭제 완료", status: "success", duration: 2000, isClosable: true });
       navigate("/report");
     } catch (error) {
       toast({
@@ -118,13 +149,7 @@ const ReportDetail = () => {
         setReport(res.data);
       } catch (err) {
         const message = err.response?.data?.message || err.message;
-        toast({
-          title: "글 조회 실패",
-          description: message,
-          status: "error",
-          duration: 3000,
-          isClosable: true,
-        });
+        toast({ title: "글 조회 실패", description: message, status: "error", duration: 3000, isClosable: true });
       } finally {
         setLoading(false);
       }
@@ -135,10 +160,9 @@ const ReportDetail = () => {
   const formatDate = (dateString) => {
     if (!dateString) return "-";
     const date = new Date(dateString);
-    return `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()} ${String(date.getHours()).padStart(
-      2,
-      "0"
-    )}:${String(date.getMinutes()).padStart(2, "0")}`;
+    const h = String(date.getHours()).padStart(2, "0");
+    const m = String(date.getMinutes()).padStart(2, "0");
+    return `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()} ${h}:${m}`;
   };
 
   const handleStatusSelect = async (selectedStatus) => {
@@ -146,12 +170,7 @@ const ReportDetail = () => {
     try {
       await axios.put(`/api/report/${id}/status`, { status: selectedStatus }, { withCredentials: true });
       setReport((prev) => ({ ...prev, status: selectedStatus }));
-      toast({
-        title: "상태가 변경되었습니다.",
-        status: "success",
-        duration: 1500,
-        isClosable: true,
-      });
+      toast({ title: "상태가 변경되었습니다.", status: "success", duration: 1500, isClosable: true });
     } catch (error) {
       toast({
         title: "상태 변경 실패",
@@ -176,24 +195,42 @@ const ReportDetail = () => {
   if (!report) return null;
 
   const typeLabel = getTypeLabel(report.type);
+  const imagePaths = Array.isArray(report.imagePaths) ? report.imagePaths : [];
+
+  // react-slick 설정
+  const sliderSettings = {
+    dots: true,
+    infinite: imagePaths.length > 1,
+    speed: 300,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    arrows: false, // 커스텀 화살표 사용
+    adaptiveHeight: true,
+    afterChange: (idx) => setCurrentSlide(idx),
+  };
 
   return (
     <Box p={8} maxW="900px" mx="auto" mt="120px" bg="white">
-      <Heading size="lg" mb={6} textAlign="center">
-        {typeLabel} 상세 내역
-      </Heading>
-      <Flex justify="space-between" align="center" mb={6}>
-        <Text color="gray.600" fontSize="md">
-          {formatDate(report.createdDate)}
+      {/* 제목 + 유형 배지 */}
+      <Flex align="center" gap={3} mb={4} wrap="wrap">
+        <Badge colorScheme={getTypeBadgeColor(report.type)} px={2} py={1} borderRadius="full" fontSize="sm">
+          {typeLabel}
+        </Badge>
+        <Text fontSize="3xl" fontWeight="bold">
+          {report.title}
         </Text>
       </Flex>
-      <Divider my={4} />
-      <Flex mb={3} align="center">
-        <Text fontWeight="semibold" minW="120px" fontSize="md">
-          작성자 닉네임
+
+      <Flex align="center" justify="space-between" mb={2}>
+        <Text fontSize="sm">
+          <Text as="span" fontWeight="semibold">
+            {report.nickname}
+          </Text>{" "}
+          <Text as="span" color="gray.500">
+            | {formatDate(report.createdDate)}
+          </Text>
         </Text>
-        <Text fontSize="md">{report.nickname}</Text>
-        <Spacer />
+
         <Box>
           {user?.roleName === "ADMIN" ? (
             <Menu>
@@ -236,35 +273,178 @@ const ReportDetail = () => {
           )}
         </Box>
       </Flex>
+
+      {/* 신고글일 때만 표시 */}
       {report.type === "REPORT" && (
         <>
-          <Flex mb={3}>
-            <Text fontWeight="semibold" minW="120px">
-              신고 대상 번호
-            </Text>
-            <Text>{report.targetId}</Text>
-          </Flex>
-          <Flex mb={3}>
-            <Text fontWeight="semibold" minW="120px">
-              게시판 종류
+          <Divider my={4} />
+          <Flex mb={4}>
+            <Text fontWeight="semibold" minW="100px">
+              게시판
             </Text>
             <Text>{getTargetTypeLabel(report.targetType)}</Text>
           </Flex>
         </>
       )}
+
       <Divider my={4} />
-      <Text fontWeight="semibold" mb={2} fontSize="lg">
-        제목
-      </Text>
-      <Box bg="gray.50" px={5} py={3} borderRadius="md" mb={5}>
-        <Text fontSize="xl">{report.title}</Text>
+
+      {/* 본문 */}
+      <Box mb={8}>
+        <Text whiteSpace="pre-wrap" lineHeight="1.9" fontSize="md">
+          {report.reason}
+        </Text>
       </Box>
-      <Text fontWeight="semibold" mb={2} fontSize="lg">
-        {typeLabel} 내용
-      </Text>
-      <Box bg="gray.50" px={5} py={3} borderRadius="md" whiteSpace="pre-wrap" mb={8}>
-        <Text fontSize="md">{report.reason}</Text>
-      </Box>
+
+      {/* 첨부 이미지 슬라이더 */}
+      {imagePaths.length > 0 && (
+        <Box position="relative" mb={10}>
+          <Slider ref={sliderRef} {...sliderSettings}>
+            {imagePaths.map((p, idx) => {
+              const url = toImageUrl(p);
+              return (
+                <Box key={`${p}-${idx}`} px={{ base: 0, md: 2 }}>
+                  <AspectRatio ratio={4 / 3}>
+                    <Skeleton isLoaded>
+                      <Image
+                        src={url}
+                        alt={`report-image-${idx}`}
+                        objectFit="cover"
+                        w="100%"
+                        h="100%"
+                        draggable={false}
+                        cursor="zoom-in"
+                        onClick={() => {
+                          setPreviewIdx(idx);
+                          onImgOpen();
+                        }}
+                      />
+                    </Skeleton>
+                  </AspectRatio>
+                </Box>
+              );
+            })}
+          </Slider>
+
+          {/* 좌/우 화살표 (요청 스타일) */}
+          {imagePaths.length > 1 && (
+            <>
+              <Box
+                position="absolute"
+                top="50%"
+                left="24px"
+                transform="translateY(-50%)"
+                zIndex={2}
+                cursor="pointer"
+                onClick={() => sliderRef.current?.slickPrev()}
+              >
+                <BsChevronLeft
+                  size={36}
+                  color="white"
+                  style={{
+                    filter: "drop-shadow(0 0 6px #888) drop-shadow(0 0 12px #888) drop-shadow(0 0 20px #888)",
+                  }}
+                />
+              </Box>
+              <Box
+                position="absolute"
+                top="50%"
+                right="24px"
+                transform="translateY(-50%)"
+                zIndex={2}
+                cursor="pointer"
+                onClick={() => sliderRef.current?.slickNext()}
+              >
+                <BsChevronRight
+                  size={36}
+                  color="white"
+                  style={{
+                    filter: "drop-shadow(0 0 6px #888) drop-shadow(0 0 12px #888) drop-shadow(0 0 20px #888)",
+                  }}
+                />
+              </Box>
+            </>
+          )}
+        </Box>
+      )}
+
+      {/* 라이트박스 모달 */}
+      <Modal isOpen={isImgOpen} onClose={onImgClose} size="full">
+        <ModalOverlay />
+        <ModalContent bg="black" userSelect="none">
+          <ModalBody p={0} w="100vw" h="100vh" display="grid" placeItems="center" pos="relative">
+            <Box
+              pos="absolute"
+              top="20px"
+              right="24px"
+              zIndex={1000}
+              cursor="pointer"
+              onClick={onImgClose}
+              color="white"
+              fontSize="28px"
+            >
+              ×
+            </Box>
+
+            {/* 좌/우 화살표 (라이트박스) */}
+            {imagePaths.length > 1 && (
+              <>
+                <Box
+                  pos="absolute"
+                  top="50%"
+                  left="24px"
+                  transform="translateY(-50%)"
+                  zIndex={1000}
+                  cursor="pointer"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setPreviewIdx((p) => (p > 0 ? p - 1 : imagePaths.length - 1));
+                  }}
+                >
+                  <BsChevronLeft
+                    size={36}
+                    color="white"
+                    style={{
+                      filter: "drop-shadow(0 0 6px #888) drop-shadow(0 0 12px #888) drop-shadow(0 0 20px #888)",
+                    }}
+                  />
+                </Box>
+                <Box
+                  pos="absolute"
+                  top="50%"
+                  right="24px"
+                  transform="translateY(-50%)"
+                  zIndex={1000}
+                  cursor="pointer"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setPreviewIdx((p) => (p < imagePaths.length - 1 ? p + 1 : 0));
+                  }}
+                >
+                  <BsChevronRight
+                    size={36}
+                    color="white"
+                    style={{
+                      filter: "drop-shadow(0 0 6px #888) drop-shadow(0 0 12px #888) drop-shadow(0 0 20px #888)",
+                    }}
+                  />
+                </Box>
+              </>
+            )}
+
+            <Image
+              src={toImageUrl(imagePaths[previewIdx ?? currentSlide])}
+              alt={`preview-${previewIdx ?? currentSlide}`}
+              maxW="95vw"
+              maxH="95vh"
+              objectFit="contain"
+              draggable={false}
+            />
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+
+      {/* 하단 액션 */}
       <Flex justify="flex-end" gap={2} mt={6}>
         <Button
           color="white"
@@ -282,36 +462,25 @@ const ReportDetail = () => {
               삭제
             </Button>
             <AlertDialog isOpen={isOpen} leastDestructiveRef={cancelRef} onClose={onClose} isCentered>
-              <AlertDialogOverlay>
-                <AlertDialogContent>
-                  <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                    게시물 삭제
-                  </AlertDialogHeader>
-                  <AlertDialogBody>해당 게시물을 정말 삭제하시겠습니까?</AlertDialogBody>
-                  <AlertDialogFooter>
-                    <Button ref={cancelRef} onClick={onClose}>
-                      취소
-                    </Button>
-                    <Button colorScheme="red" onClick={handleDelete} ml={3}>
-                      삭제
-                    </Button>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialogOverlay>
+              <AlertDialogOverlay />
+              <AlertDialogContent>
+                <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                  게시물 삭제
+                </AlertDialogHeader>
+                <AlertDialogBody>해당 게시물을 정말 삭제하시겠습니까?</AlertDialogBody>
+                <AlertDialogFooter>
+                  <Button ref={cancelRef} onClick={onClose}>
+                    취소
+                  </Button>
+                  <Button colorScheme="red" onClick={handleDelete} ml={3}>
+                    삭제
+                  </Button>
+                </AlertDialogFooter>
+              </AlertDialogContent>
             </AlertDialog>
           </>
         )}
       </Flex>
-
-      {/* --- 댓글 리스트 --- */}
-      {/* <Divider my={12} />
-      <Box px={2}>
-        <CommentList type="reports" id={report.id} key={commentRefreshKey} />
-      </Box> */}
-      {/* --- 댓글 작성 폼 --- */}
-      {/* <Box px={2} mt={2}>
-        <ReportCommentForm reportId={report.id} onSuccess={() => setCommentRefreshKey((k) => k + 1)} />
-      </Box> */}
     </Box>
   );
 };

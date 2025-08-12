@@ -17,9 +17,9 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -64,7 +64,7 @@ public class ReportController {
     }
 
     @PostMapping("/api/report/add")
-    public ResponseEntity<String> createReport(@Valid @RequestBody ReportCreateRequest req,
+    public ResponseEntity<String> createReport(@Valid @ModelAttribute ReportCreateRequest req,
             HttpServletRequest tokenRequest) {
         reportService.createReport(req, tokenRequest);
         return ResponseEntity.ok().build();
@@ -79,8 +79,6 @@ public class ReportController {
     @PutMapping("/api/report/{id}/status")
     public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestBody ReportStatusUpdateRequest req,
             HttpServletRequest tokenRequest) {
-        System.out.println("==== 컨트롤러 req: " + req);
-        System.out.println("==== 컨트롤러 status: " + req.getStatus());
         reportService.updateStatus(id, req.getStatus(), tokenRequest);
         return ResponseEntity.ok().build();
     }

@@ -1,6 +1,9 @@
 package com.example.foominity.dto.report;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.foominity.domain.report.Report;
 import com.example.foominity.domain.report.ReportType;
@@ -45,6 +48,8 @@ public class ReportResponse {
     @NotNull
     private LocalDateTime createdDate;
 
+    private List<String> imagePaths;
+
     public ReportResponse(Long id, ReportType type, String nickname, String title, String status, int views,
             LocalDateTime createdDate) {
         this.id = id;
@@ -68,7 +73,8 @@ public class ReportResponse {
                 report.getReason(),
                 report.getStatus().name(),
                 report.getViews(),
-                report.getCreatedDate());
+                report.getCreatedDate(),
+                report.getImagePaths());
     }
 
 }

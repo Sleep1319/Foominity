@@ -1,11 +1,13 @@
 package com.example.foominity.domain.report;
 
 import com.example.foominity.domain.BaseEntity;
+import com.example.foominity.domain.image.ImageFile;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @NoArgsConstructor
@@ -47,7 +49,13 @@ public class Report extends BaseEntity {
     @Column
     private String nickname;
 
-    public Report(String title, String reason, ReportType type, Long targetId, String targetType, Long memberId, String nickname) {
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinTable(name = "report_image_file", joinColumns = @JoinColumn(name = "report_id"), inverseJoinColumns = @JoinColumn(name = "image_file_id"))
+    @OrderColumn(name = "sort_order") // 정렬 저장
+    private List<ImageFile> images = new ArrayList<>();
+
+    public Report(String title, String reason, ReportType type, Long targetId, String targetType, Long memberId,
+            String nickname) {
         this.title = title;
         this.reason = reason;
         this.type = type;
@@ -65,7 +73,13 @@ public class Report extends BaseEntity {
 
     public void increaseViews() {
         this.views++;
-        System.out.println("[DEBUG] 조회수 증가: 현재 views = " + this.views);
+
+    }
+
+    public List<String> getImagePaths() {
+        return images.stream()
+                .map(ImageFile::getSavePath)
+                .toList();
     }
 
 }
