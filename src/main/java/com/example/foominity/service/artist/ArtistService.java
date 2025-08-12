@@ -264,6 +264,39 @@ public class ArtistService {
         }).toList();
     }
 
+    public List<ArtistSimpleResponse> findByCategoryOr(List<String> categories) {
+        if (categories == null || categories.isEmpty()) {
+            return List.of();
+        }
+
+        List<String> names = categories.stream()
+                .filter(s -> s != null && !s.isBlank())
+                .map(String::trim)
+                .toList();
+
+        List<Artist> matched = artistRepository.findByAnyCategoryNames(names);
+
+        return matched.stream().map(artist -> {
+            List<ArtistCategory> artistCategories = artistCategoryRepository.findByArtistId(artist.getId());
+
+            List<ArtistCategoryResponse> categoryResponses = artistCategories.stream()
+                    .map(ac -> new ArtistCategoryResponse(
+                            ac.getCategory().getId(),
+                            ac.getCategory().getCategoryName()))
+                    .toList();
+
+            ImageFile imageFile = artist.getImageFile();
+            String imagePath = (imageFile != null) ? imageFile.getSavePath() : null;
+
+            return new ArtistSimpleResponse(
+                    artist.getId(),
+                    artist.getName(),
+                    categoryResponses,
+                    imagePath);
+        }).toList();
+
+    }
+
     // 아티스트 맞춤 추천 ai
     public ArtistRecommendRequest toArtistRecommend(ArtistResponse artist) {
 
@@ -277,7 +310,7 @@ public class ArtistService {
         String categoryText = categories.isEmpty() ? "" : String.join(", ", categories) + " 장르에 속합니다.";
 
         String focus = String.format(
-                "이 아티스트는 %s 해당 아티스트와 서브장르가 유사하며 협업 경험이 많은 아티스트를 추천해 주세요.",
+                "이 아티스트는 %s 해당 아티스트와 협업 경험이 많고 서브장르가 유사한 아티스트를 추천해 주세요.",
                 categoryText).trim();
 
         return new ArtistRecommendRequest(

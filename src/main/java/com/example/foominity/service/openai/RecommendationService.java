@@ -37,84 +37,119 @@ public class RecommendationService {
     private final ReviewLikeRepository reviewLikeRepository;
 
     public List<ReviewSimpleResponse> getRecommendationsFromOpenAI(Long reviewId) throws IOException {
+        // 1) GPT에 유사 앨범 질의
         AlbumRecommendRequest req = reviewService.buildRecommendRequest(reviewId);
-        // 앨범명 리스트
-        List<String> gptAlbumTitles = openAIService.askAlbumRecommendations(req);
+        List<String> gptAlbumTitles = Optional.ofNullable(openAIService.askAlbumRecommendations(req))
+                .orElseGet(List::of);
+        log.info("🤖 GPT 원본 앨범명 ({}): {}", gptAlbumTitles.size(), gptAlbumTitles);
 
+        // 2) DB의 앨범명과 매칭 후 추가
         List<ReviewSimpleResponse> results = new ArrayList<>();
         Set<Long> alreadyAddedIds = new HashSet<>();
-        alreadyAddedIds.add(reviewId);
+        alreadyAddedIds.add(reviewId); // 자기 자신 제외
 
-        // AI 추천 앨범과 DB에 저장된 리뷰 앨범 매칭 후 추가
+        List<String> matched = new ArrayList<>();
+        List<String> unmatched = new ArrayList<>();
+
         for (String title : gptAlbumTitles) {
-            reviewService.findByTitle(title).ifPresent(res -> {
-                if (!alreadyAddedIds.contains(res.getId())) { // 중복제거
+            Optional<ReviewSimpleResponse> found = reviewService.findByTitle(title);
+            if (found.isPresent()) {
+                ReviewSimpleResponse res = found.get();
+                if (alreadyAddedIds.add(res.getId())) { // 중복 방지
                     results.add(res);
-                    alreadyAddedIds.add(res.getId());
+                    matched.add(title);
                 }
-            });
+            } else {
+                unmatched.add(title);
+            }
             if (results.size() == 5)
-                break;
+                break; // 최대 5개까지만
         }
 
-        // 추가된 앨범이 부족할 경우 유사 카테고리 앨범으로 추가
+        log.info("✅ DB 매칭 성공 ({}): {}", matched.size(), matched);
+        log.info("❌ DB 매칭 실패 ({}): {}", unmatched.size(), unmatched);
+
+        // 3) 부족하면 같은 카테고리로 채우기 (정렬 없음, 그대로 순회)
         if (results.size() < 5) {
-            List<ReviewSimpleResponse> fallback = reviewService.findByCategory(req.getCategory());
+            // req.getCategory() 가 List<String> 라면 그대로 넘기기
+            List<String> cats = req.getCategory(); // 로그에서 [Alternative, Experimental HipHop, Pop Rap] 형태였음
+            log.info("🧭 fallback 카테고리(OR): {}", cats);
+
+            List<ReviewSimpleResponse> fallback = reviewService.findByCategoryOr(cats);
+            log.info("🧭 fallback 원 후보 개수: {}", fallback.size());
+
             for (ReviewSimpleResponse review : fallback) {
-                if (!alreadyAddedIds.contains(review.getId())) {
+                if (alreadyAddedIds.add(review.getId())) { // 자기 자신/중복 제외
                     results.add(review);
-                    alreadyAddedIds.add(review.getId());
+                    if (results.size() == 5)
+                        break; // 최대 5개까지만
+                }
+            }
+
+            log.info("🧩 Fallback 추가 후 개수: {}", results.size());
+        }
+
+        // 최종 결과
+        log.info("🏁 최종 추천 결과 ({}개): {}", results.size(),
+                results.stream().map(ReviewSimpleResponse::getTitle).toList());
+
+        return results;
+    }
+
+    public List<ArtistSimpleResponse> getArtistRecommendationsFromOpenAI(Long artistId) throws IOException {
+        // 1) GPT에 유사 아티스트 질의
+        ArtistRecommendRequest req = artistService.buildRecommendRequest(artistId);
+        List<String> gptArtistNames = Optional.ofNullable(openAIService.askArtistRecommendations(req))
+                .orElseGet(List::of);
+        log.info("🤖 GPT 원본 아티스트명 ({}): {}", gptArtistNames.size(), gptArtistNames);
+
+        // 2) DB 매칭
+        List<ArtistSimpleResponse> results = new ArrayList<>();
+        Set<Long> alreadyAddedIds = new HashSet<>();
+        alreadyAddedIds.add(artistId); // 자기 자신 제외
+
+        List<String> matched = new ArrayList<>();
+        List<String> unmatched = new ArrayList<>();
+
+        for (String name : gptArtistNames) {
+            Optional<ArtistSimpleResponse> opt = artistService.findByName(name);
+            if (opt.isPresent()) {
+                ArtistSimpleResponse res = opt.get();
+                if (alreadyAddedIds.add(res.getId())) { // 중복 방지
+                    results.add(res);
+                    matched.add(name);
+                }
+            } else {
+                unmatched.add(name);
+            }
+            if (results.size() == 5)
+                break; // 최대 5개
+        }
+
+        log.info("✅ DB 매칭 성공 ({}): {}", matched.size(), matched);
+        log.info("❌ DB 매칭 실패 ({}): {}", unmatched.size(), unmatched);
+
+        // 3) 부족하면 같은 카테고리로 채우기 (정렬 없음)
+        if (results.size() < 5) {
+            List<String> cats = req.getCategory();
+            log.info("🧭 fallback 카테고리(OR): {}", cats);
+
+            List<ArtistSimpleResponse> fallback = artistService.findByCategoryOr(req.getCategory());
+            log.info("🧭 fallback 원 후보 개수: {}", fallback.size());
+
+            for (ArtistSimpleResponse artist : fallback) {
+                if (alreadyAddedIds.add(artist.getId())) {
+                    results.add(artist);
                     if (results.size() == 5)
                         break;
                 }
             }
+            log.info("🧩 Fallback 추가 ({}): {}", results.size());
         }
 
-        log.info("🎯 GPT 추천 앨범명 리스트:");
-        results.forEach(r -> log.info("▶ {}", r.getTitle()));
-
-        return results;
-
-    }
-
-    public List<ArtistSimpleResponse> getArtistRecommendationsFromOpenAI(Long artistId) throws IOException {
-        ArtistRecommendRequest req = artistService.buildRecommendRequest(artistId);
-
-        List<String> gptArtistNames = openAIService.askArtistRecommendations(req);
-
-        List<ArtistSimpleResponse> results = new ArrayList<>();
-        Set<Long> alreadyAddedIds = new HashSet<>();
-        alreadyAddedIds.add(artistId);
-
-        // AI - DB 매칭
-        for (String name : gptArtistNames) {
-            artistService.findByName(name).ifPresent(res -> {
-                if (!alreadyAddedIds.contains(res.getId())) {
-                    results.add(res);
-                    alreadyAddedIds.add(res.getId());
-                }
-            });
-            if (results.size() == 5) {
-                break;
-            }
-        }
-
-        // 추가된 아티스트가 부족할 경우 유사 카테고리 아티스트로 추가
-        if (results.size() < 5) {
-            List<ArtistSimpleResponse> fallback = artistService.findByCategory(req.getCategory());
-            for (ArtistSimpleResponse artist : fallback) {
-                if (!alreadyAddedIds.contains(artist.getId())) {
-                    results.add(artist);
-                    alreadyAddedIds.add(artist.getId());
-                    if (results.size() == 5) {
-                        break;
-                    }
-                }
-            }
-        }
-
-        log.info("🎯 GPT 추천 아티스트 리스트:");
-        results.forEach(a -> log.info("▶ {}", a.getName()));
+        // 4) 최종 결과
+        log.info("🏁 최종 추천 아티스트 ({}개): {}", results.size(),
+                results.stream().map(ArtistSimpleResponse::getName).toList());
 
         return results;
     }

@@ -67,7 +67,6 @@ public class ReviewCommentService {
         Member member = memberRepository.findById(memberId).orElseThrow(NotFoundMemberException::new);
         Review review = reviewRepository.findById(reviewId).orElseThrow(NotFoundReviewException::new);
 
-
         Optional<ReviewComment> existingComment = reviewCommentRepository.findByReviewIdAndMemberId(reviewId, memberId);
         if (existingComment.isPresent()) {
             throw new IllegalStateException();
@@ -129,6 +128,10 @@ public class ReviewCommentService {
     // 내가 준 별점 평균 조회
     public double getAverageRatingByMemberId(Long memberId) {
         return reviewCommentRepository.findAverageRatingByMemberId(memberId);
+    }
+
+    public long getCommentCount(Long reviewId) {
+        return reviewCommentRepository.countByReviewId(reviewId);
     }
 
 }

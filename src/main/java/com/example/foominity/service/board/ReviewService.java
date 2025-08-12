@@ -531,6 +531,53 @@ public class ReviewService {
                 }).toList();
         }
 
+        public List<ReviewSimpleResponse> findByCategoryOr(List<String> categories) {
+                if (categories == null || categories.isEmpty()) {
+                        return List.of(); // 비어있으면 빈 리스트 반환 (원하는 동작에 맞게 조정)
+                }
+
+                // 필요 시 정규화(트림/소문자)
+                List<String> names = categories.stream()
+                                .filter(s -> s != null && !s.isBlank())
+                                .map(String::trim)
+                                // .map(String::toLowerCase) // Repo 쿼리를 LOWER 비교로 바꿨다면 주석 해제
+                                .toList();
+
+                List<Review> matched = reviewRepository.findByAnyCategoryNames(names);
+
+                return matched.stream().map(review -> {
+                        List<AlbumArtist> albumArtists = albumArtistRepository.findByReviewId(review.getId());
+                        List<ArtistSimpleResponse> artistSimpleResponses = albumArtists.stream()
+                                        .map(a -> {
+                                                Artist artist = a.getArtist();
+                                                ImageFile artistImageFile = artist.getImageFile();
+                                                String artistImagePath = (artistImageFile != null)
+                                                                ? artistImageFile.getSavePath()
+                                                                : null;
+                                                return new ArtistSimpleResponse(artist.getId(), artist.getName(),
+                                                                artistImagePath);
+                                        }).toList();
+
+                        List<ReviewCategory> reviewCategory = reviewCategoryRepository.findByReviewId(review.getId());
+                        List<ReviewCategoryResponse> categoryResponses = reviewCategory.stream()
+                                        .map(rc -> new ReviewCategoryResponse(
+                                                        rc.getCategory().getId(),
+                                                        rc.getCategory().getCategoryName()))
+                                        .toList();
+
+                        ImageFile imageFile = review.getImageFile();
+                        String imagePath = (imageFile != null) ? imageFile.getSavePath() : null;
+
+                        return new ReviewSimpleResponse(
+                                        review.getId(),
+                                        review.getTitle(),
+                                        reviewCommentService.getAverageStarPoint(review.getId()),
+                                        artistSimpleResponses,
+                                        categoryResponses,
+                                        imagePath);
+                }).toList();
+        }
+
         public List<String> getCategoriesByMemberId(Long memberId) {
                 // 1. 사용자가 평가한 리뷰 ID 리스트 가져오기
                 List<Long> reviewIds = reviewCommentRepository.findByMemberId(memberId).stream()
@@ -560,11 +607,11 @@ public class ReviewService {
                                 .map(aa -> aa.getArtist().getName())
                                 .toList();
 
-                String categoryText = categories.isEmpty() ? "" : String.join(", ", categories) + " 장르에 속하며";
-                String artistText = artists.isEmpty() ? "" : String.join(", ", artists) + "의 색깔이 잘 드러난 작품입니다.";
+                String categoryText = categories.isEmpty() ? "" : String.join(", ", categories) + " 장르에 속합니다.";
+                String artistText = artists.isEmpty() ? "" : String.join(", ", artists) + "";
 
                 String focus = String.format(
-                                "이 앨범은 %s %s 해당 앨범과 서브장르, 사운드가 최대한 유사한 앨범을 추천해 주세요.",
+                                "이 앨범은 %s %s와 협업 경험이 많은 아티스트 위주로 해당 앨범과 서브장르, 사운드가 최대한 유사한 앨범을 추천해 주세요.",
                                 categoryText,
                                 artistText).trim();
 
@@ -592,9 +639,9 @@ public class ReviewService {
                                 .toList();
 
                 List<String> likeAlbum = reviewLikeRepository.findByMemberId(memberId).stream()
-                                .map(rl ->reviewRepository.findById(rl.getReviewId())
-                                        .map(Review::getTitle)
-                                        .orElse("제목 없음"))
+                                .map(rl -> reviewRepository.findById(rl.getReviewId())
+                                                .map(Review::getTitle)
+                                                .orElse("제목 없음"))
                                 .distinct()
                                 .toList();
 

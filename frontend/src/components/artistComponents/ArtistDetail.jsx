@@ -15,7 +15,7 @@ import {
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { useUser} from "@/redux/useUser.js";
+import { useUser } from "@/redux/useUser.js";
 import RefreshButton from "@/components/ui/RefreshButton";
 
 const ArtistDetail = () => {

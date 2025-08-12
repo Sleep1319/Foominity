@@ -62,7 +62,11 @@ public interface ReviewCommentRepository extends JpaRepository<ReviewComment, Lo
 
     // 내가 평가한 앨범 수 조회
     long countByMemberId(Long memberId);
+
     // @Query("SELECT COUNT(rc.id) from review_comment rc where rc.member_id
     // =:memberId")
     // Long countByMemberId(@Param("memberId") Long memberId);
+
+    // 앨범을 평가한 인원 수 조회
+    long countByReviewId(Long reviewId);
 }
