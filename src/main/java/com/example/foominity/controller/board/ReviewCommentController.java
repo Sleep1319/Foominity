@@ -60,4 +60,11 @@ public class ReviewCommentController {
         return ResponseEntity.ok().build();
     }
 
+    // 코멘트 갯수 조회
+    @GetMapping("/api/reviews/{reviewId}/comments/count")
+    public ResponseEntity<Long> getCommentCount(@PathVariable Long reviewId) {
+        long count = reviewCommentService.getCommentCount(reviewId);
+        return ResponseEntity.ok(count);
+    }
+
 }
