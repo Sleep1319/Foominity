@@ -298,12 +298,23 @@ const ReportDetail = () => {
 
       {/* 첨부 이미지 슬라이더 */}
       {imagePaths.length > 0 && (
-        <Box position="relative" mb={10}>
+        <Box
+          position="relative"
+          mb={10}
+          maxW={{ base: "100%", md: "560px" }} // ✅ 더 작게
+          w="100%"
+          ml={0} // ✅ 왼쪽 정렬 고정
+          sx={{
+            ".slick-list": { padding: "0 !important", margin: "0 !important" }, // ✅ 래퍼 여백 제거
+            ".slick-track": { margin: "0 !important" },
+            ".slick-slide > div": { padding: "0 !important", margin: "0 !important" },
+          }}
+        >
           <Slider ref={sliderRef} {...sliderSettings}>
             {imagePaths.map((p, idx) => {
               const url = toImageUrl(p);
               return (
-                <Box key={`${p}-${idx}`} px={{ base: 0, md: 2 }}>
+                <Box key={`${p}-${idx}`}>
                   <AspectRatio ratio={4 / 3}>
                     <Skeleton isLoaded>
                       <Image
@@ -326,20 +337,20 @@ const ReportDetail = () => {
             })}
           </Slider>
 
-          {/* 좌/우 화살표 (요청 스타일) */}
+          {/* 좌/우 화살표 */}
           {imagePaths.length > 1 && (
             <>
               <Box
                 position="absolute"
                 top="50%"
-                left="24px"
+                left="16px"
                 transform="translateY(-50%)"
                 zIndex={2}
                 cursor="pointer"
                 onClick={() => sliderRef.current?.slickPrev()}
               >
                 <BsChevronLeft
-                  size={36}
+                  size={32}
                   color="white"
                   style={{
                     filter: "drop-shadow(0 0 6px #888) drop-shadow(0 0 12px #888) drop-shadow(0 0 20px #888)",
@@ -349,14 +360,14 @@ const ReportDetail = () => {
               <Box
                 position="absolute"
                 top="50%"
-                right="24px"
+                right="16px"
                 transform="translateY(-50%)"
                 zIndex={2}
                 cursor="pointer"
                 onClick={() => sliderRef.current?.slickNext()}
               >
                 <BsChevronRight
-                  size={36}
+                  size={32}
                   color="white"
                   style={{
                     filter: "drop-shadow(0 0 6px #888) drop-shadow(0 0 12px #888) drop-shadow(0 0 20px #888)",
