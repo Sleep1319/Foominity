@@ -310,7 +310,7 @@ const PublicProfileLikedAlbums = () => {
         <ModalContent>
           <ModalHeader>이 유저가 좋아하는 앨범 전체보기</ModalHeader>
           <ModalCloseButton />
-          <ModalBody maxH="80vh" overflowY="auto">
+          <ModalBody maxH="80vh" overflowY="auto" sx={{ overscrollBehaviorY: "contain" }}>
             <SimpleGrid columns={[2, 3, 4]} spacing={8} py={4}>
               {albums.map((album) => (
                 <VStack

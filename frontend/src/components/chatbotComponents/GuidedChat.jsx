@@ -6,7 +6,7 @@ import { useUser } from "@/redux/useUser.js";
 
 const menuItems = [
   { label: "1. 플레이리스트 추천", key: "recommend" },
-  { label: "2. 뭘로하지", key: "notyet" },
+  { label: "2. 유사곡 추천(미완)", key: "notyet" },
   { label: "3. 가사 번역", key: "translate" },
 ];
 

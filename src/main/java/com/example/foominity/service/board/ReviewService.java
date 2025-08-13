@@ -1,5 +1,6 @@
 package com.example.foominity.service.board;
 
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -310,6 +311,7 @@ public class ReviewService {
                                 .toList();
         }
 
+        // 내가 평가 참여한 앨범 가져오기
         public List<MemberReviewResponse> getParticipatedReviews(Long memberId) {
                 List<ReviewComment> comments = reviewCommentRepository.findByMemberId(memberId);
 
@@ -345,6 +347,8 @@ public class ReviewService {
                         // 내가 준 별점
                         float userStar = rc.getStarPoint();
 
+                        LocalDateTime createdDate = rc.getCreatedDate(); // BaseEntity에서 상속됨
+
                         return new MemberReviewResponse(
                                         review.getId(),
                                         review.getTitle(),
@@ -352,10 +356,12 @@ public class ReviewService {
                                         avg,
                                         userStar,
                                         artistResp,
-                                        catResp);
+                                        catResp,
+                                        createdDate);
                 }).toList();
         }
 
+        // 좋아요 앨범
         public List<MemberReviewResponse> getLikedReviews(Long memberId) {
                 // 1. 내가 좋아요 누른 리뷰(앨범) 가져오기
                 List<ReviewLike> likes = reviewLikeRepository.findByMemberId(memberId);
@@ -592,9 +598,9 @@ public class ReviewService {
                                 .toList();
 
                 List<String> likeAlbum = reviewLikeRepository.findByMemberId(memberId).stream()
-                                .map(rl ->reviewRepository.findById(rl.getReviewId())
-                                        .map(Review::getTitle)
-                                        .orElse("제목 없음"))
+                                .map(rl -> reviewRepository.findById(rl.getReviewId())
+                                                .map(Review::getTitle)
+                                                .orElse("제목 없음"))
                                 .distinct()
                                 .toList();
 

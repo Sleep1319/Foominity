@@ -90,7 +90,7 @@ const MyMusic = () => {
           <TabPanel p={0}>
             <SimpleGrid columns={[1, 2]} spacing={8} mb={14}>
               {/* 왼쪽 카드 */}
-              <Box w="100%" p={6} maxH="350px" borderRadius="lg" border="1px solid #e2e8f0" boxShadow="sm" bg="white">
+              <Box w="100%" p={6} minH="400px" borderRadius="lg" border="1px solid #e2e8f0" boxShadow="sm" bg="white">
                 <VStack align="start" spacing={4}>
                   <Box>
                     <Text fontSize="sm" color="gray.500" fontWeight="medium">
@@ -142,7 +142,7 @@ const MyMusic = () => {
                         borderBottom: "1px solid black",
                       }}
                     >
-                      장르별 좋아요 분포
+                      좋아하는 장르 분포
                     </Tab>
                     <Tab
                       color="gray.600"
@@ -168,7 +168,8 @@ const MyMusic = () => {
                 </Tabs>
               </Box>
             </SimpleGrid>
-            <RecommendedAlbums />
+            {/* <RecommendedAlbums /> */}
+            {/* <AppleMusicChart /> */}
 
             {/* 즐겨찾기/참여 앨범 */}
             <SimpleGrid columns={[1, 2]} spacing={8} mb={12}>
@@ -226,6 +227,7 @@ export default MyMusic;
 // import RecommendPanel from "../../components/chatbotComponents/RecommendPanel.jsx";
 // import GenreChart from "../../components/memberComponents/GenreChart.jsx";
 // import ReviewTrendChart from "../../components/memberComponents/ReviewTrendChart.jsx";
+import AppleMusicChart from "./../../components/homeComponents/AppleMusicChart";
 
 // const MyMusic = () => {
 //   const { state } = useUser();
