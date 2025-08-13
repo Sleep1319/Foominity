@@ -2,6 +2,8 @@ import ChatWidget from "../components/chatComponents/ChatWidget.jsx";
 import { Outlet } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { toggleChat } from "../redux/chatSlice";
+import ChatSocket from "../components/chatComponents/ChatSocket.jsx";
+import WsNotifier from "@/components/chatComponents/webNotifier.jsx";
 
 function ChatLayout() {
     const dispatch = useDispatch();
@@ -12,9 +14,17 @@ function ChatLayout() {
 
     return (
         <>
+            <WsNotifier />
             <main style={{ minHeight: "calc(100vh - 120px)" }}>
                 <Outlet />
             </main>
+
+            {chatOpen && chatRoomId !== null && (
+                <ChatSocket
+                    roomId={chatRoomId}
+                    // 필요하면 여기서 콜백/디스패치 주입 가능
+                />
+            )}
 
             {chatOpen && chatRoomId !== null && (
                 <ChatWidget

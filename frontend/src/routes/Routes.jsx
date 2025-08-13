@@ -35,11 +35,13 @@ import ArtistDetails from "../view/artist/ArtistDetails.jsx";
 import ArtistEdits from "../view/artist/ArtistEdits.jsx";
 import PublicProfile from "../view/member/PublicProfile.jsx";
 import ChatLayout from "../layouts/ChatLayout.jsx";
+import AdminChatPage from "@/view/chat/AdminChatPage.jsx";
 
 function AppRoutes() {
     return (
         <Routes>
             <Route element={<ChatLayout/>}>
+                <Route path="/admin/chat" element={<AdminChatPage/>} />
                 <Route path="/" element={<Home/>}/>
                 <Route path="/users/:id/profile" element={<PublicProfile/>}/>
                 <Route path="/changepassword" element={<ChangePassword/>}/>

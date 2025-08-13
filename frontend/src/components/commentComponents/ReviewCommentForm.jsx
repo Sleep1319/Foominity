@@ -2,18 +2,15 @@
 import React from "react";
 import CommentForm from "./CommentForm.jsx";
 import axios from "axios";
-import { useUser} from "@/redux/useUser.js";
+import { useUser } from "@/redux/useUser.js";
 
 const ReviewCommentForm = ({ reviewId, commentCount = 0, onSuccess }) => {
-  const { state } = useUser()
+  const { state } = useUser();
   const isLoggedIn = !!state;
 
   const handleSubmit = async ({ content, starPoint }) => {
     if (!isLoggedIn) return;
-    await axios.post(`/api/reviews/${reviewId}/comments`,
-        { comment: content, starPoint },
-        {withCredentials: true}
-    );
+    await axios.post(`/api/reviews/${reviewId}/comments`, { comment: content, starPoint }, { withCredentials: true });
     try {
       onSuccess?.();
     } catch (error) {
@@ -22,7 +19,9 @@ const ReviewCommentForm = ({ reviewId, commentCount = 0, onSuccess }) => {
     }
   };
 
-  return <CommentForm isLoggedIn={isLoggedIn} onSubmit={handleSubmit} commentCount={commentCount} showStarRating={true}/>;
+  return (
+    <CommentForm isLoggedIn={isLoggedIn} onSubmit={handleSubmit} commentCount={commentCount} showStarRating={true} />
+  );
 };
 
 export default ReviewCommentForm;
