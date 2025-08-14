@@ -1,3 +1,4 @@
+// src/pages/ReportList.jsx
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -15,12 +16,12 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
-  Icon,
 } from "@chakra-ui/react";
 import { ChevronDownIcon, CheckIcon } from "@chakra-ui/icons";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useUser} from "@/redux/useUser.js";
+import { useUser } from "@/redux/useUser.js";
+import RpeortSearchBar from "./ReportSearchBar";
 
 const getTypeBadge = (type) => {
   switch (type) {
@@ -72,10 +73,11 @@ const ReportList = () => {
   const [reports, setReports] = useState([]);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-  const [_totalElements, setTotalElements] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
   const [pageSize, setPageSize] = useState(20);
   const [filterType, setFilterType] = useState("ALL");
   const [filterStatus, setFilterStatus] = useState("ALL");
+  const [keyword, setKeyword] = useState(""); // 🔍 제목/작성자 검색어
   const navigate = useNavigate();
   const { state: user } = useUser();
 
@@ -95,6 +97,7 @@ const ReportList = () => {
     return `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`;
   }
 
+  // 페이지 복원
   useEffect(() => {
     const savedPage = sessionStorage.getItem("reportListPage");
     if (savedPage !== null) {
@@ -103,10 +106,18 @@ const ReportList = () => {
     }
   }, []);
 
+  // 목록 조회 (서버에 keyword 파라미터 전달)
   useEffect(() => {
     const fetchReports = async () => {
       try {
-        const res = await axios.get(`/api/report/page?page=${page}&size=${pageSize}`);
+        const params = new URLSearchParams({
+          page: String(page),
+          size: String(pageSize),
+        });
+        if (keyword && keyword.trim().length > 0) {
+          params.set("keyword", keyword.trim()); // ⚠️ 백엔드 파라미터명 맞춰 변경 가능
+        }
+        const res = await axios.get(`/api/report/page?${params.toString()}`);
         const { content, totalPages, totalElements, size } = res.data;
         setReports(content);
         setTotalPages(totalPages);
@@ -117,8 +128,9 @@ const ReportList = () => {
       }
     };
     fetchReports();
-  }, [page, pageSize]);
+  }, [page, pageSize, keyword]);
 
+  // 스크롤 위치 복원
   useEffect(() => {
     if (reports.length > 0) {
       const savedY = sessionStorage.getItem("reportScrollY");
@@ -139,15 +151,28 @@ const ReportList = () => {
 
   const canWrite = user && ["BRONZE", "SILVER", "GOLD"].includes(user.roleName);
 
-  // 필터링
+  // 클라이언트 보정 필터(유형/상태/제목/작성자)
   const filteredReports = reports.filter((report) => {
     const typeMatch = filterType === "ALL" || report.type === filterType;
     const statusMatch = filterStatus === "ALL" || report.status === filterStatus;
-    return typeMatch && statusMatch;
+    const kw = keyword.trim().toLowerCase();
+    const keywordMatch =
+      kw.length === 0 ||
+      (report.title && report.title.toLowerCase().includes(kw)) ||
+      (report.nickname && report.nickname.toLowerCase().includes(kw));
+    return typeMatch && statusMatch && keywordMatch;
   });
+
+  // 페이지네이션: 클라 필터로 줄어든 경우 1페이지만 표시(버튼은 활성)
+  const isLocalFilterActive =
+    filterType !== "ALL" ||
+    filterStatus !== "ALL" ||
+    (keyword.trim().length > 0 && filteredReports.length !== reports.length);
+  const displayTotalPages = isLocalFilterActive ? 1 : Math.max(1, totalPages);
 
   return (
     <Box p={6} maxW="1000px" mx="auto" mt={2}>
+      {/* 상단: 유형/상태 필터 + (작성 버튼) */}
       <Flex justify="space-between" mb={4} align="center">
         <HStack spacing={3}>
           {/* 유형 필터 */}
@@ -229,6 +254,7 @@ const ReportList = () => {
         )}
       </Flex>
 
+      {/* 리스트 테이블 */}
       <Table
         variant="simple"
         size="sm"
@@ -265,7 +291,12 @@ const ReportList = () => {
               height="40px"
               onClick={() => handleReportClick(report.id)}
             >
-              <Td>{filteredReports.length - index}</Td>
+              <Td>
+                {/* 인덱스(번호) 로직은 그대로 */}
+                {(keyword && keyword.trim().length > 0) || filterType !== "ALL" || filterStatus !== "ALL"
+                  ? filteredReports.length - index
+                  : totalElements - page * pageSize - index}
+              </Td>
               <Td>{getTypeBadge(report.type)}</Td>
               <Td className="title-cell" fontWeight="bold">
                 {report.title}
@@ -278,7 +309,19 @@ const ReportList = () => {
         </Tbody>
       </Table>
 
-      {/* 페이지네이션 */}
+      {/* 하단: 검색바(오른쪽) */}
+      <Box mt={3} display="flex" justifyContent="flex-end">
+        <RpeortSearchBar
+          defaultValue={keyword}
+          onSearch={(kw) => {
+            setPage(0); // 검색 시 첫 페이지로
+            setKeyword(kw);
+          }}
+          width="280px"
+        />
+      </Box>
+
+      {/* 페이지네이션: 항상 활성(회색 비활성 X) */}
       <HStack spacing={2} justify="center" mt={8}>
         <Button
           size="sm"
@@ -286,11 +329,11 @@ const ReportList = () => {
           color="black"
           border="1px solid black"
           onClick={() => setPage((prev) => Math.max(prev - 1, 0))}
-          isDisabled={page === 0}
         >
           이전
         </Button>
-        {[...Array(totalPages)].map((_, i) => (
+
+        {[...Array(displayTotalPages)].map((_, i) => (
           <Button
             key={i}
             size="sm"
@@ -302,13 +345,13 @@ const ReportList = () => {
             {i + 1}
           </Button>
         ))}
+
         <Button
           size="sm"
           bg="white"
           color="black"
           border="1px solid black"
-          onClick={() => setPage((prev) => Math.min(prev + 1, totalPages - 1))}
-          isDisabled={page >= totalPages - 1}
+          onClick={() => setPage((prev) => Math.min(prev + 1, displayTotalPages - 1))}
         >
           다음
         </Button>

@@ -1,5 +1,9 @@
 package com.example.foominity.dto.report;
 
+import java.util.List;
+
+import org.springframework.web.multipart.MultipartFile;
+
 import com.example.foominity.domain.member.Member;
 import com.example.foominity.domain.report.Report;
 import com.example.foominity.domain.report.ReportType;
@@ -27,6 +31,9 @@ public class ReportCreateRequest {
 
     @NotBlank
     private String reason;
+
+    private List<MultipartFile> images;
+    private List<String> imagePaths;
 
     public Report toEntity(Long memberId, String nickname) {
         return new Report(this.title, this.reason, this.type, this.targetId, this.targetType, memberId, nickname);
