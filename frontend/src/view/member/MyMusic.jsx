@@ -20,6 +20,7 @@ import GuidedChat from "../../components/chatbotComponents/GuidedChat.jsx";
 import RecommendPanel from "../../components/chatbotComponents/RecommendPanel.jsx";
 import GenreChart from "../../components/memberComponents/GenreChart.jsx";
 import ReviewTrendChart from "../../components/memberComponents/ReviewTrendChart.jsx";
+import RecommendedAlbums from "../../components/memberComponents/RecommendAlbums.jsx";
 
 const MyMusic = () => {
   const { state } = useUser();
@@ -76,7 +77,7 @@ const MyMusic = () => {
           {state.nickname} 님의 음악 프로필
         </Text>
       </VStack>
-
+      <RecommendedAlbums />
       <Tabs variant="unstyled" isFitted>
         {/* 상단 네비게이션 탭 */}
         <TabList mb={8} borderBottom="1px solid #ccc">
@@ -178,7 +179,7 @@ const MyMusic = () => {
 
           {/* ───── AI 음악 비서 탭 ───── */}
           <TabPanel p={0}>
-            <Flex gap={6} w="100%">
+            <Flex gap={6} w="100%" mb="50px">
               <Box flex="1" maxW="615px" h="600px">
                 <GuidedChat ref={chatRef} onModeChange={setChatMode} />
               </Box>
