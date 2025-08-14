@@ -25,4 +25,5 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     // 넥네임으로 찾기
     Optional<Member> findByNickname(String nickname);
 
+
 }

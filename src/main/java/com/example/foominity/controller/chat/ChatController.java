@@ -6,6 +6,7 @@ import com.example.foominity.repository.chat.ChatMessageRepository;
 import com.example.foominity.service.chat.ChatMessageService;
 import com.example.foominity.service.chat.ChatRoomService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Controller;
 
 import java.util.Map;
 
-
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 public class ChatController {
@@ -25,6 +26,7 @@ public class ChatController {
     @MessageMapping("/chat.sendMessage")
     public void sendMessage(ChatMessageDto dto,
                             @Header("simpSessionAttributes") Map<String, Object> attributes) {
+        log.info("[WS IN] dto={}, attrs={}", dto, attributes);
         Long senderId = (Long) attributes.get("memberId");
         String nickname = (String) attributes.get("nickname");
         if (senderId == null) throw new IllegalStateException("Unauthenticated");

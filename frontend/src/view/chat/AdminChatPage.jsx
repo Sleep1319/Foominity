@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
     Box, Flex, VStack, HStack, Button, Input, Text, Badge, Divider, Spinner,
 } from "@chakra-ui/react";
@@ -7,39 +7,47 @@ import { Client } from "@stomp/stompjs";
 import axios from "axios";
 
 export default function AdminChatPage() {
-    const [rooms, setRooms] = useState([]);              // [{roomId, memberId, lastMessage, lastAt}]
+    const [rooms, setRooms] = useState([]);           // [{roomId, memberId, memberNickname, lastMessage, lastMessageAt}]
     const [activeRoomId, setActiveRoomId] = useState(null);
-    const [msgInput, setMsgInput] = useState("");
-    const [messages, setMessages] = useState([]);        // [{roomId, senderId, senderNickname, message, createdAt}]
-    const [loadingMsgs, setLoadingMsgs] = useState(false);
-    const bottomRef = useRef(null);
 
-    // STOMP
+    const [messages, setMessages] = useState([]);     // [{roomId, senderId, senderNickname, message, createdAt}]
+    const [loadingMsgs, setLoadingMsgs] = useState(false);
+    const [isConnected, setIsConnected] = useState(false);   // ✅ 연결 상태
+
+    const bottomRef = useRef(null);
     const clientRef = useRef(null);
     const inboxSubRef = useRef(null);
-    const roomSubRef  = useRef(null);
+    const roomSubRef = useRef(null);
 
     const scrollToBottom = () => bottomRef.current?.scrollIntoView({ behavior: "smooth" });
 
-    // 1) 방 목록 로드
+    // 1) 방 목록
     const loadRooms = async () => {
-        const { data } = await axios.get("/api/admin/chat/rooms", { withCredentials: true });
-        setRooms(data || []);
+        try {
+            const { data } = await axios.get("/api/admin/chat/rooms", { withCredentials: true });
+            setRooms(Array.isArray(data) ? data : []);
+        } catch (e) {
+            console.error("[rooms] fail", e?.response?.status, e?.response?.data);
+            setRooms([]);
+        }
     };
 
-    // 2) 특정 방 메시지 로드
+    // 2) 히스토리
     const loadMessages = async (roomId) => {
         setLoadingMsgs(true);
         try {
             const { data } = await axios.get(`/api/admin/chat/rooms/${roomId}/messages`, { withCredentials: true });
-            setMessages(data || []);
+            setMessages(Array.isArray(data) ? data : []);
             setTimeout(scrollToBottom, 0);
+        } catch (e) {
+            console.error("[msgs] fail", e?.response?.status, e?.response?.data);
+            setMessages([]);
         } finally {
             setLoadingMsgs(false);
         }
     };
 
-    // 3) STOMP 연결
+    // 3) STOMP 연결(한 번)
     useEffect(() => {
         let mounted = true;
 
@@ -48,36 +56,46 @@ export default function AdminChatPage() {
                 const { data } = await axios.get("/api/ws-token", { withCredentials: true });
                 const wsToken = data.token;
 
-                const socket = new SockJS("http://localhost:8084/ws");
+                // WS는 프록시 안 쓴다고 했으니 절대주소 + 토큰쿼리 권장
+                const socket = new SockJS(`http://localhost:8084/ws?token=${wsToken}`);
                 const client = new Client({
                     webSocketFactory: () => socket,
-                    reconnectDelay: 5000,
+                    reconnectDelay: 4000,
                     connectHeaders: { Authorization: `Bearer ${wsToken}` },
                     debug: () => {},
                     onConnect: () => {
                         if (!mounted) return;
+                        setIsConnected(true); // ✅ 연결 ON
 
-                        // a) 관리자 인박스 구독 → 새 문의/새 메시지 알림
-                        if (inboxSubRef.current) {
-                            try { inboxSubRef.current.unsubscribe(); } catch {}
-                            inboxSubRef.current = null;
-                        }
+                        // 관리자 인박스 구독
+                        try { inboxSubRef.current?.unsubscribe(); } catch {}
                         inboxSubRef.current = client.subscribe("/topic/admin/inbox", (frame) => {
-                            const evt = JSON.parse(frame.body);  // { roomId, preview, from, createdAt }
-                            // 목록 새로 고침 + UX
-                            loadRooms();
-                            // 선택된 방이 아니면 배지 표현을 위해 lastMessage만 업데이트
-                            setRooms(prev => {
-                                const idx = prev.findIndex(r => r.roomId === evt.roomId);
+                            const evt = JSON.parse(frame.body); // { roomId, preview, from, createdAt }
+
+                            // 목록 미리보기/시간 갱신
+                            setRooms((prev) => {
+                                const idx = prev.findIndex((r) => r.roomId === evt.roomId);
                                 if (idx === -1) return prev;
                                 const next = [...prev];
-                                next[idx] = { ...next[idx], lastMessage: evt.preview, lastAt: evt.createdAt };
+                                next[idx] = { ...next[idx], lastMessage: evt.preview, lastMessageAt: evt.createdAt };
                                 return next;
                             });
+
+                            // 목록이 비어있으면 전체 재로딩
+                            if (!rooms?.length) loadRooms();
                         });
 
-                        // 선택된 방 구독은 아래 별도 effect에서 처리 (activeRoomId 의존)
+                        // 이미 방이 선택돼 있었다면 즉시 히스토리 + 구독
+                        if (activeRoomId) {
+                            loadMessages(activeRoomId);
+                            try { roomSubRef.current?.unsubscribe(); } catch {}
+                            roomSubRef.current = client.subscribe(`/topic/chat/${activeRoomId}`, (f) => {
+                                setMessages((prev) => [...prev, JSON.parse(f.body)]);
+                                setTimeout(scrollToBottom, 0);
+                            });
+                        }
                     },
+                    onWebSocketClose: () => setIsConnected(false), // ✅ 연결 OFF
                 });
 
                 clientRef.current = client;
@@ -89,49 +107,35 @@ export default function AdminChatPage() {
 
         return () => {
             mounted = false;
-            // 구독 해제
-            if (inboxSubRef.current) {
-                try { inboxSubRef.current.unsubscribe(); } catch {}
-                inboxSubRef.current = null;
-            }
-            if (roomSubRef.current) {
-                try { roomSubRef.current.unsubscribe(); } catch {}
-                roomSubRef.current = null;
-            }
-            // 연결 해제
-            if (clientRef.current) {
-                clientRef.current.deactivate();
-                clientRef.current = null;
-            }
+            try { inboxSubRef.current?.unsubscribe(); } catch {}
+            try { roomSubRef.current?.unsubscribe(); } catch {}
+            inboxSubRef.current = null;
+            roomSubRef.current = null;
+            clientRef.current?.deactivate();
+            clientRef.current = null;
         };
-    }, []);
+    }, []); // 한 번만
 
-    // 4) activeRoomId 변경 시: 메시지 로드 + 룸 토픽 재구독
+    // 4) 방 변경 시: 히스토리 로드 + 룸 토픽 재구독 (연결된 뒤에만)
     useEffect(() => {
-        if (!activeRoomId || !clientRef.current || !clientRef.current.connected) {
-            return;
-        }
+        if (!activeRoomId || !isConnected || !clientRef.current?.connected) return;
 
         loadMessages(activeRoomId);
 
-        // 이전 방 구독 해제
-        if (roomSubRef.current) {
-            try { roomSubRef.current.unsubscribe(); } catch {}
-            roomSubRef.current = null;
-        }
-        // 새 방 구독
+        try { roomSubRef.current?.unsubscribe(); } catch {}
         roomSubRef.current = clientRef.current.subscribe(`/topic/chat/${activeRoomId}`, (frame) => {
-            const msg = JSON.parse(frame.body);
-            setMessages(prev => [...prev, msg]);
+            setMessages((prev) => [...prev, JSON.parse(frame.body)]);
             setTimeout(scrollToBottom, 0);
         });
+    }, [activeRoomId, isConnected]);
 
-        // cleanup은 다음 activeRoomId 변경 때 수행
-    }, [activeRoomId, clientRef.current?.connected]);
+    // 최초 목록
+    useEffect(() => {
+        loadRooms();
+    }, []);
 
-    // 최초 방 목록 로드
-    useEffect(() => { loadRooms(); }, []);
-
+    // 5) 전송 (서버 echo만 화면 반영)
+    const [msgInput, setMsgInput] = useState("");
     const send = () => {
         const text = msgInput.trim();
         if (!text || !activeRoomId || !clientRef.current?.connected) return;
@@ -143,17 +147,17 @@ export default function AdminChatPage() {
     };
 
     return (
-        <Flex gap={4} p={4}>
+        <Flex gap={4} p={4} mt={100}>
             {/* 좌측: 방 목록 */}
             <VStack align="stretch" w="340px" border="1px solid #e2e8f0" p={3} rounded="md" spacing={2}>
                 <HStack justify="space-between">
                     <Text fontWeight="bold">문의 목록</Text>
                     <Button size="xs" onClick={loadRooms}>새로고침</Button>
                 </HStack>
-                <Divider />
+                <Divider/>
                 <VStack align="stretch" spacing={1} maxH="75vh" overflowY="auto">
                     {rooms.length === 0 && <Text color="gray.500">아직 방이 없습니다.</Text>}
-                    {rooms.map(r => (
+                    {rooms.map((r) => (
                         <HStack
                             key={r.roomId}
                             p={2}
@@ -165,13 +169,12 @@ export default function AdminChatPage() {
                         >
                             <Box flex="1">
                                 <Text fontSize="sm" noOfLines={1}>
-                                    #{r.roomId} • member:{r.memberId}
+                                    #{r.roomId} • {r.memberNickname ?? `member:${r.memberId}`}
                                 </Text>
                                 <Text fontSize="xs" color="gray.600" noOfLines={1}>
                                     {r.lastMessage || "(메시지 없음)"}
                                 </Text>
                             </Box>
-                            {/* 간단 배지: 최근 메시지 유무 등 표시 */}
                             <Badge colorScheme={activeRoomId === r.roomId ? "teal" : "gray"}>OPEN</Badge>
                         </HStack>
                     ))}
@@ -182,32 +185,25 @@ export default function AdminChatPage() {
             <VStack flex="1" align="stretch" border="1px solid #e2e8f0" p={3} rounded="md" spacing={3}>
                 <HStack justify="space-between">
                     <Text fontWeight="bold">방 #{activeRoomId ?? "-"}</Text>
+                    <Badge colorScheme={isConnected ? "teal" : "red"}>{isConnected ? "CONNECTED" : "DISCONNECTED"}</Badge>
                 </HStack>
-                <Divider />
+                <Divider/>
                 <Box flex="1" minH="60vh" maxH="75vh" overflowY="auto" p={2} bg="gray.50" rounded="md">
                     {loadingMsgs ? (
-                        <Spinner />
+                        <Spinner/>
                     ) : messages.length === 0 ? (
                         <Text color="gray.500">메시지가 없습니다.</Text>
                     ) : (
                         messages.map((m, idx) => (
-                            <Box
-                                key={idx}
-                                maxW="75%"
-                                p={2}
-                                mb={2}
-                                bg="white"
-                                rounded="md"
-                                border="1px solid #e2e8f0"
-                            >
+                            <Box key={idx} maxW="75%" p={2} mb={2} bg="white" rounded="md" border="1px solid #e2e8f0">
                                 <Text fontSize="xs" color="gray.600" mb={1}>
-                                    {m.senderNickname ?? `member:${m.senderId}`} • {m.createdAt?.replace("T"," ").slice(0,16)}
+                                    {m.senderNickname ?? `member:${m.senderId}`} • {m.createdAt?.replace("T", " ").slice(0, 16)}
                                 </Text>
                                 <Text fontSize="sm">{m.message}</Text>
                             </Box>
                         ))
                     )}
-                    <div ref={bottomRef} />
+                    <div ref={bottomRef}/>
                 </Box>
                 <HStack>
                     <Input
@@ -215,9 +211,9 @@ export default function AdminChatPage() {
                         value={msgInput}
                         onChange={(e) => setMsgInput(e.target.value)}
                         onKeyDown={(e) => e.key === "Enter" && send()}
-                        isDisabled={!activeRoomId}
+                        isDisabled={!activeRoomId || !isConnected}
                     />
-                    <Button colorScheme="teal" onClick={send} isDisabled={!activeRoomId}>
+                    <Button colorScheme="teal" onClick={send} isDisabled={!activeRoomId || !isConnected}>
                         전송
                     </Button>
                 </HStack>

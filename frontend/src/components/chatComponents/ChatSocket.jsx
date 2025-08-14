@@ -4,74 +4,84 @@ import { Client } from "@stomp/stompjs";
 import axios from "axios";
 
 let sendMessage = () => {};
+export { sendMessage };
 
-const ChatSocket = ({ roomId, onMessageReceive }) => {
+export default function ChatSocket({ roomId, onMessageReceive }) {
     const clientRef = useRef(null);
+    const subRef = useRef(null);
+    const cbRef = useRef(null);     // 최신 콜백 저장
+
+    // 최신 콜백만 갱신 (연결 재시작 안 함)
+    useEffect(() => {
+        cbRef.current = onMessageReceive;
+    }, [onMessageReceive]);
 
     useEffect(() => {
         if (!roomId) return;
-
         let mounted = true;
 
         (async () => {
             try {
-                // 1) WS 토큰 발급
                 const { data } = await axios.get("/api/ws-token");
                 const wsToken = data.token;
 
-                // 2) STOMP 클라이언트 생성
-                const socket = new SockJS("/ws");
+                const socket = new SockJS(`http://localhost:8084/ws?token=${wsToken}`);
                 const client = new Client({
                     webSocketFactory: () => socket,
-                    reconnectDelay: 5000,
+                    reconnectDelay: 3000,
                     connectHeaders: { Authorization: `Bearer ${wsToken}` },
-                    debug: () => {}, // 콘솔 지저분하면 끄기
+                    debug: (s) => console.log("[STOMP]", s),
                     onConnect: () => {
                         if (!mounted) return;
-                        console.log("WebSocket 연결됨");
+                        console.log("[WS] connected, room:", roomId);
 
-                        // 구독
-                        client.subscribe(`/topic/chat/${roomId}`, (message) => {
-                            const body = JSON.parse(message.body);
-                            onMessageReceive?.(body);
+                        // 이전 구독 해제 후 재구독
+                        try { subRef.current?.unsubscribe(); } catch {}
+                        subRef.current = client.subscribe(`/topic/chat/${roomId}`, (message) => {
+                            try {
+                                const body = JSON.parse(message.body);
+                                cbRef.current?.(body); // 항상 최신 콜백
+                            } catch (e) { console.warn("parse fail", e); }
                         });
 
-                        // 전송 함수 바인딩
+                        // 전송 함수
                         sendMessage = (text) => {
-                            if (!client.connected) return;
+                            if (!client.connected) return console.warn("[WS] not connected");
+                            const receiptId = "send-" + Date.now();
+                            client.watchForReceipt(receiptId, () => {
+                                console.log("[WS] server received:", receiptId);
+                            });
                             client.publish({
                                 destination: "/app/chat.sendMessage",
-                                body: JSON.stringify({ roomId, message: text }), //
+                                headers: { receipt: receiptId },
+                                body: JSON.stringify({ roomId, message: text }),
                             });
                         };
                     },
                     onStompError: (frame) => {
-                        console.error("STOMP error:", frame.headers["message"], frame.body);
+                        console.error("[STOMP error]", frame.headers["message"], frame.body);
                     },
                     onWebSocketClose: (evt) => {
-                        console.warn("WS closed:", evt?.reason);
+                        console.warn("[WS] closed:", evt?.reason);
                     },
                 });
 
                 clientRef.current = client;
                 client.activate();
             } catch (e) {
-                console.error("WS bootstrap failed:", e);
+                console.error("[WS] bootstrap failed:", e);
             }
         })();
 
         return () => {
             mounted = false;
-            if (clientRef.current) {
-                clientRef.current.deactivate();
-                clientRef.current = null;
-                console.log("WebSocket 연결 해제됨");
-            }
+            try { subRef.current?.unsubscribe(); } catch {}
+            subRef.current = null;
+            clientRef.current?.deactivate();
+            clientRef.current = null;
+            console.log("[WS] disconnected");
         };
-    }, [roomId]);
+    }, [roomId]); // ✅ roomId만 의존
 
     return null;
-};
-
-export default ChatSocket;
-export { sendMessage };
+}
