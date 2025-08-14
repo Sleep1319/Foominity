@@ -69,7 +69,7 @@ const CommunityTabs = () => {
           <Tabs variant="line" colorScheme="black" isManual index={0}>
             <TabList>
               <Tab fontWeight="semibold" fontSize="15px" _hover={{ bg: "transparent" }}>
-                인기 댓글
+                오늘의 TOP 50
               </Tab>
             </TabList>
             <TabPanels>

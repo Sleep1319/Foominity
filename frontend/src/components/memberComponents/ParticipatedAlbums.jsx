@@ -70,7 +70,8 @@ const ParticipatedAlbums = () => {
 
       {/* Preview grid */}
       <SimpleGrid columns={2} spacing={4} mb={4}>
-        {preview.map((r, idx) => (
+        {/* {preview.map((r, idx) => ( */}
+        {preview.map((r) => (
           <VStack key={r.id} spacing={2} align="start" w={`${boxSize}px`}>
             <Box w={`${boxSize}px`} h={`${boxSize}px`} cursor="pointer" onClick={() => navigate(`/review/${r.id}`)}>
               <Image
@@ -83,16 +84,45 @@ const ParticipatedAlbums = () => {
                 boxShadow="md"
               />
             </Box>
-            <Text fontSize="sm" color="gray.500">
+            {/* <Text fontSize="sm" color="gray.500">
               #{idx + 1}
-            </Text>
-            <Text fontSize="md" fontWeight="semibold" noOfLines={2}>
+            </Text> */}
+            <Text
+              fontSize="md"
+              fontWeight="semibold"
+              cursor="pointer"
+              noOfLines={2}
+              onClick={() => navigate(`/review/${r.id}`)}
+              _hover={{
+                fontWeight: "bold",
+              }}
+            >
               {r.title}
             </Text>
+
             <Text fontSize="sm" color="gray.600" noOfLines={1}>
-              {r.artists?.map((a) => a.name).join(", ")}
+              {r.artists?.map((a, i) => (
+                <React.Fragment key={a.id ?? i}>
+                  <Text
+                    as="span"
+                    cursor="pointer"
+                    onClick={(e) => {
+                      e.stopPropagation(); // 카드 클릭 막기
+                      navigate(`/artist/${a.id}`);
+                    }}
+                    _hover={{
+                      color: "black",
+                      fontWeight: "medium",
+                    }}
+                  >
+                    {a.name}
+                  </Text>
+                  {i < r.artists.length - 1 && ", "}
+                </React.Fragment>
+              ))}
             </Text>
-            <Text fontSize="sm">평균별점: {r.averageStarPoint.toFixed(1)}</Text>
+
+            {/* <Text fontSize="sm">평균별점: {r.averageStarPoint.toFixed(1)}</Text> */}
           </VStack>
         ))}
       </SimpleGrid>
@@ -103,7 +133,7 @@ const ParticipatedAlbums = () => {
         <ModalContent>
           <ModalHeader>내가 평가한 앨범 전체보기</ModalHeader>
           <ModalCloseButton />
-          <ModalBody maxH="80vh" overflowY="auto">
+          <ModalBody maxH="80vh" overflowY="auto" sx={{ overscrollBehaviorY: "contain" }}>
             <SimpleGrid columns={[2, 3, 4]} spacing={8} py={4}>
               {reviews.map((r) => (
                 <VStack
@@ -131,7 +161,7 @@ const ParticipatedAlbums = () => {
                   <Text fontSize="sm" color="gray.600" noOfLines={1}>
                     {r.artists?.map((a) => a.name).join(", ")}
                   </Text>
-                  <Text fontSize="sm">평균별점: {r.averageStarPoint.toFixed(1)}</Text>
+                  {/* <Text fontSize="sm">평균별점: {r.averageStarPoint.toFixed(1)}</Text> */}
                 </VStack>
               ))}
             </SimpleGrid>

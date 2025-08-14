@@ -6,6 +6,13 @@ import { Box, Text, Select, VStack } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 
 function groupReviews(reviews, days) {
+  console.log("trend input size:", (reviews || []).length);
+  console.table(
+    (reviews || []).slice(0, 8).map((r) => ({
+      createdDate: r?.createdDate,
+    }))
+  );
+
   // days === "all" → 월별 집계
   if (days === "all") {
     // 이번 연도 1월부터 현재 월까지 map 초기화

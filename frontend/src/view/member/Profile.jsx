@@ -7,7 +7,6 @@ import DeleteModal from "../../view/Member/DeleteModal.jsx";
 import MyPostsTable from "../../components/memberComponents/MyPostsTable.jsx";
 import SettingsButton from "../../components/memberComponents/SettingsButton.jsx";
 import MyRequests from "../../components/memberComponents/MyRequests.jsx";
-import ChatBox from "../../components/chatbotComponents/FreeChat.jsx.jsx";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -20,88 +19,90 @@ const Profile = () => {
 
   return (
     <>
-      <Text
-        lineHeight="2.5"
-        textAlign="center"
-        fontSize="3xl"
-        fontWeight="medium"
-        borderBottom="2px solid gray"
-        pb={2}
-        mt={4}
-        ml={5}
-      >
-        마이페이지
-      </Text>
+      <Box maxW="1300px" mx="auto" mt={12} p={6}>
+        <Text
+          lineHeight="2.5"
+          textAlign="center"
+          fontSize="3xl"
+          fontWeight="medium"
+          borderBottom="2px solid gray"
+          pb={2}
+          mt={4}
+          ml={5}
+        >
+          마이페이지
+        </Text>
 
-      <Flex maxW="3xl" mx="auto" mt={70} align="center" justify="flex-start">
-        <HStack spacing={6} align="center" flex="1">
-          {/* Avatar + 미리보기 버튼 */}
-          <Box position="relative" w="12rem" h="12rem">
-            {/* 고정된 미리보기 버튼 */}
-            <Button
-              size="sm"
-              leftIcon={<FaEye />}
-              bg="white"
-              color="black"
-              position="absolute"
-              top="-35px"
-              left="50%"
-              transform="translateX(-50%)"
-              zIndex="2"
-              onClick={handlePreview}
-              border="none"
-              borderColor="gray.400"
-              _hover={{ bg: "gray.100" }}
-            >
-              내 프로필 미리보기
-            </Button>
+        <Flex maxW="3xl" mx="auto" mt={70} align="center" justify="flex-start">
+          <HStack spacing={6} align="center" flex="1">
+            {/* Avatar + 미리보기 버튼 */}
+            <Box position="relative" w="12rem" h="12rem">
+              {/* 고정된 미리보기 버튼 */}
+              <Button
+                size="sm"
+                leftIcon={<FaEye />}
+                bg="white"
+                color="black"
+                position="absolute"
+                top="-35px"
+                left="50%"
+                transform="translateX(-50%)"
+                zIndex="2"
+                onClick={handlePreview}
+                border="none"
+                borderColor="gray.400"
+                _hover={{ bg: "gray.100" }}
+              >
+                내 프로필 미리보기
+              </Button>
 
-            <Avatar
-              border="1px solid gray"
-              boxSize="12rem"
-              src={state.avatar ? `http://localhost:8084${state.avatar}` : "/src/assets/images/defaultProfile.jpg"}
-            />
-          </Box>
+              <Avatar
+                border="1px solid gray"
+                boxSize="12rem"
+                src={state.avatar ? `http://localhost:8084${state.avatar}` : "/src/assets/images/defaultProfile.jpg"}
+              />
+            </Box>
 
-          {/* 유저 정보 */}
-          <VStack align="start" spacing={4}>
-            <HStack>
-              <Icon as={FaUser} />
-              <Text fontWeight="bold" w="80px">
-                닉네임
-              </Text>
-              <Text h="32px" lineHeight="32px">
-                {state.nickname}
-              </Text>
-            </HStack>
-            <HStack>
-              <Icon as={FaIdBadge} />
-              <Text fontWeight="bold" w="80px">
-                이름
-              </Text>
-              <Text>{state.username}</Text>
-            </HStack>
-            <HStack>
-              <Icon as={FaEnvelope} />
-              <Text fontWeight="bold" w="80px">
-                이메일
-              </Text>
-              <Text>{state.email}</Text>
-            </HStack>
-            <HStack>
-              <Icon as={FaUserTag} />
-              <Text fontWeight="bold" w="80px">
-                등급
-              </Text>
-              <Text>{state.roleName}</Text>
-            </HStack>
+            {/* 유저 정보 */}
+            <VStack align="start" spacing={4}>
+              <HStack>
+                <Icon as={FaUser} />
+                <Text fontWeight="bold" w="80px">
+                  닉네임
+                </Text>
+                <Text h="32px" lineHeight="32px">
+                  {state.nickname}
+                </Text>
+              </HStack>
+              <HStack>
+                <Icon as={FaIdBadge} />
+                <Text fontWeight="bold" w="80px">
+                  이름
+                </Text>
+                <Text>{state.username}</Text>
+              </HStack>
+              <HStack>
+                <Icon as={FaEnvelope} />
+                <Text fontWeight="bold" w="80px">
+                  이메일
+                </Text>
+                <Text>{state.email}</Text>
+              </HStack>
+              <HStack>
+                <Icon as={FaUserTag} />
+                <Text fontWeight="bold" w="80px">
+                  등급
+                </Text>
+                <Text>{state.roleName}</Text>
+              </HStack>
+            </VStack>
+          </HStack>
+
+          <VStack mr="83px" mt="20px">
+            <SettingsButton />
           </VStack>
-        </HStack>
-
-        <VStack mr="83px" mt="20px">
-          <SettingsButton />
-        </VStack>
-      </Flex>
+        </Flex>
+      </Box>
 
       <Box maxW="3xl" mx="auto" px={4} mt={8}>
         <MyPostsTable />
