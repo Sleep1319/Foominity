@@ -16,20 +16,8 @@ import {
   Spacer,
   Button,
   useToast,
-  SimpleGrid,
 } from "@chakra-ui/react";
 import { ExternalLinkIcon, RepeatIcon } from "@chakra-ui/icons";
-
-/** 나라 코드 → 라벨 */
-const COUNTRY_LABEL = {
-  kr: "한국",
-  us: "미국",
-  jp: "일본",
-  gb: "영국",
-  fr: "프랑스",
-  de: "독일",
-  // 필요시 추가...
-};
 
 function upscaleArtwork(url = "", size = 1000) {
   try {
@@ -39,7 +27,13 @@ function upscaleArtwork(url = "", size = 1000) {
   }
 }
 
-export const AppleMusicChartUs = ({ country = "kr", boxMaxH = 420, initialVisible = 12, step = 8 }) => {
+const AppleMusicChart = ({
+  // country = "kr",
+  country,
+  boxMaxH = 420, // 인기댓글 박스에 맞춘 기본 높이
+  initialVisible = 12, // 처음 보여줄 개수
+  step = 8, // 스크롤/버튼으로 늘릴 때 개수
+}) => {
   const toast = useToast();
   const [items, setItems] = useState([]);
   const [lastUpdated, setLastUpdated] = useState("");
@@ -91,8 +85,10 @@ export const AppleMusicChartUs = ({ country = "kr", boxMaxH = 420, initialVisibl
     };
   }, [endpoint, toast, refreshKey, initialVisible]);
 
+  // 박스 내부 스크롤 기반 무한 스크롤
   useEffect(() => {
     if (!sentinelRef.current || loading) return;
+
     const observer = new IntersectionObserver(
       (entries) => {
         const [entry] = entries;
@@ -101,26 +97,20 @@ export const AppleMusicChartUs = ({ country = "kr", boxMaxH = 420, initialVisibl
         }
       },
       {
-        root: scrollBoxRef.current,
+        root: scrollBoxRef.current, // 박스 내부를 root로 지정
         rootMargin: "100px 0px",
       }
     );
+
     observer.observe(sentinelRef.current);
     return () => observer.disconnect();
   }, [items.length, loading, step]);
 
   const list = loading ? Array.from({ length: visibleCount }) : items.slice(0, visibleCount);
   const canLoadMore = visibleCount < items.length;
-  const countryLabel = COUNTRY_LABEL[country] ?? country.toUpperCase();
-
   return (
     <Box w="full">
       <Flex align="center" mb={3} gap={3} wrap="wrap">
-        <Heading size="md">Apple Music Most Played — {countryLabel}</Heading>
-        <Badge colorScheme="pink" variant="subtle">
-          Top 50
-        </Badge>
-        <Spacer />
         <HStack>
           {lastUpdated && (
             <Text fontSize="xs" color="gray.500">
@@ -155,6 +145,7 @@ export const AppleMusicChartUs = ({ country = "kr", boxMaxH = 420, initialVisibl
         </Box>
       )}
 
+      {/* 차트 박스 */}
       <Box
         ref={scrollBoxRef}
         maxH={`${boxMaxH}px`}
@@ -167,6 +158,7 @@ export const AppleMusicChartUs = ({ country = "kr", boxMaxH = 420, initialVisibl
         <VStack spacing={3} align="stretch">
           {list.map((item, idx) => {
             const art = item?.artworkUrl100 ? upscaleArtwork(item.artworkUrl100, 200) : undefined;
+
             return (
               <Flex
                 key={item?.id ?? idx}
@@ -227,6 +219,7 @@ export const AppleMusicChartUs = ({ country = "kr", boxMaxH = 420, initialVisibl
           })}
         </VStack>
 
+        {/* 무한 스크롤 센티널 */}
         <Box ref={sentinelRef} h="1px" />
 
         {canLoadMore && (
@@ -241,4 +234,4 @@ export const AppleMusicChartUs = ({ country = "kr", boxMaxH = 420, initialVisibl
   );
 };
 
-export default AppleMusicChartUs;
+export default AppleMusicChart;
