@@ -153,10 +153,24 @@ public class ReportService {
 
     @Transactional
     public void deleteReport(Long id, HttpServletRequest tokenRequest) {
-        Report report = validateReportOwnership(id, tokenRequest);
+        // 1) 인증
+        String token = jwtTokenProvider.resolveTokenFromCookie(tokenRequest);
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw new UnauthorizedException();
+        }
+
+        Long memberId = jwtTokenProvider.getUserIdFromToken(token);
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(NotFoundMemberException::new);
+
+        if (member.getRole() == null || !"ADMIN".equals(member.getRole().getName())) {
+            throw new ForbiddenActionException();
+        }
+
+        Report report = reportRepository.findById(id)
+                .orElseThrow(NotFoundReportException::new);
 
         report.getImages().forEach(imageService::deleteImageFile);
-
         reportRepository.delete(report);
     }
 

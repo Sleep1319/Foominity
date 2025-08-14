@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Box, Flex, VStack, Text, Button, SimpleGrid, useBreakpointValue, HStack, Image } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useUser} from "@/redux/useUser.js";
+import { useUser } from "@/redux/useUser.js";
 
 const NoticeList = () => {
   const [notices, setNotices] = useState([]);
@@ -11,7 +11,7 @@ const NoticeList = () => {
   const ITEMS_PER_ROW = 3;
   const NOTICES_PER_PAGE = ROWS_PER_PAGE * ITEMS_PER_ROW;
   const navigate = useNavigate();
-  const { state: user } = useUser();
+  const { state: _user } = useUser();
 
   useEffect(() => {
     const savedPage = sessionStorage.getItem("noticeListPage");
@@ -69,18 +69,7 @@ const NoticeList = () => {
   return (
     <Box px={{ base: 4, md: 16 }} pt={10} maxW="1600px" mx="auto">
       <Flex justify="space-between" mb={4} align="center">
-        {user?.roleName === "ADMIN" && (
-          <Button
-            color="white"
-            bg="black"
-            size="sm"
-            fontSize="sm"
-            _hover={{ bg: "black", color: "white" }}
-            onClick={() => navigate("/notice/create")}
-          >
-            글 작성
-          </Button>
-        )}
+        {/* 글 작성 버튼 제거 */}
       </Flex>
 
       <Flex direction={useBreakpointValue({ base: "column", md: "row" })} gap={14}>

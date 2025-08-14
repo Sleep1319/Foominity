@@ -18,13 +18,18 @@ import {
   Image,
   SimpleGrid,
 } from "@chakra-ui/react";
-import { useParams, useNavigate, Link as RouterLink } from "react-router-dom";
+import { useParams, useNavigate, Link as RouterLink, useLocation } from "react-router-dom";
 import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
-import { useUser} from "@/redux/useUser.js";
+import { useUser } from "@/redux/useUser.js";
 
 const NoticeDetail = () => {
   const { id } = useParams();
+  const location = useLocation();
+  const search = new URLSearchParams(location.search);
+  const fromAdmin = location.state?.from === "admin" || search.get("from") === "admin";
+  const backPath = fromAdmin ? "/admin?tab=magazine" : "/notice"; // ✅ 매거진 탭으로 고정
+
   const [notice, setNotice] = useState(null);
   const [readMore, setReadMore] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -38,13 +43,8 @@ const NoticeDetail = () => {
   const handleDelete = async () => {
     try {
       await axios.delete(`/api/notices/${id}`, { withCredentials: true });
-      toast({
-        title: "공지 삭제 완료",
-        status: "success",
-        duration: 2000,
-        isClosable: true,
-      });
-      navigate("/notice");
+      toast({ title: "공지 삭제 완료", status: "success", duration: 2000, isClosable: true });
+      navigate(backPath); // ✅ 삭제 후에도 매거진 탭으로
     } catch (error) {
       toast({
         title: "삭제 실패",
@@ -63,13 +63,7 @@ const NoticeDetail = () => {
         setNotice(res.data);
       } catch (err) {
         const message = err.response?.data?.message || err.message || "공지 조회 중 오류가 발생했습니다.";
-        toast({
-          title: "공지 조회 실패",
-          description: message,
-          status: "error",
-          duration: 3000,
-          isClosable: true,
-        });
+        toast({ title: "공지 조회 실패", description: message, status: "error", duration: 3000, isClosable: true });
       } finally {
         setLoading(false);
       }
@@ -240,12 +234,13 @@ const NoticeDetail = () => {
               size="sm"
               fontSize="sm"
               _hover={{ bg: "black", color: "white" }}
-              onClick={() => navigate("/notice")}
+              onClick={() => navigate(backPath)} // ✅ 목록도 매거진 탭으로 복귀
             >
               목록
             </Button>
 
-            {user?.roleName === "ADMIN" && (
+            {/* ✅ 삭제 버튼: 관리자에서 들어온 경우에만 노출 */}
+            {user?.roleName === "ADMIN" && fromAdmin && (
               <>
                 <Button color="white" bg="red.500" size="sm" fontSize="sm" _hover={{ bg: "red.600" }} onClick={onOpen}>
                   삭제
