@@ -8,6 +8,7 @@ import com.example.foominity.dto.board.ReviewResponse;
 import com.example.foominity.dto.board.ReviewSimpleResponse;
 import com.example.foominity.dto.category.CategoryResponse;
 import com.example.foominity.dto.openai.AlbumRecommendRequest;
+import com.example.foominity.dto.openai.CommentSummaryResponse;
 import com.example.foominity.service.board.ReviewService;
 import com.example.foominity.service.openai.OpenAIService;
 import com.example.foominity.service.openai.RecommendationService;
@@ -70,6 +71,19 @@ public class RecommendController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(List.of());
+        }
+    }
+
+    @GetMapping("/api/reviews/{reviewId}/comments/summary")
+    public ResponseEntity<CommentSummaryResponse> summaryByComment(@PathVariable Long reviewId) {
+        log.info("[SUMMARY][IN] reviewId={}", reviewId);
+        try {
+            CommentSummaryResponse result = recommendationService.getCommentSummaryFromOpenAI(reviewId);
+            log.info("[SUMMARY][OUT] reviewId={} OK", reviewId);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            log.error("[SUMMARY][ERR] reviewId={} {}", reviewId, e.toString(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
