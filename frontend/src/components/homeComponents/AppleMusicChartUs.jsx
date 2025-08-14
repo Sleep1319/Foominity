@@ -39,7 +39,7 @@ function upscaleArtwork(url = "", size = 1000) {
   }
 }
 
-export const AppleMusicChart = ({ country = "kr", boxMaxH = 420, initialVisible = 12, step = 8 }) => {
+export const AppleMusicChartUs = ({ country = "kr", boxMaxH = 420, initialVisible = 12, step = 8 }) => {
   const toast = useToast();
   const [items, setItems] = useState([]);
   const [lastUpdated, setLastUpdated] = useState("");
@@ -241,12 +241,4 @@ export const AppleMusicChart = ({ country = "kr", boxMaxH = 420, initialVisible 
   );
 };
 
-/** KR & US를 한 화면에서 보여주는 예시 (복붙용) */
-export default function AppleMusicChartsKRUS() {
-  return (
-    <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
-      <AppleMusicChart country="kr" />
-      <AppleMusicChart country="us" />
-    </SimpleGrid>
-  );
-}
+export default AppleMusicChartUs;
