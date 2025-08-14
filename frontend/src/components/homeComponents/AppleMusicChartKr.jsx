@@ -27,7 +27,7 @@ function upscaleArtwork(url = "", size = 1000) {
   }
 }
 
-const AppleMusicChart = ({
+const AppleMusicChartKr = ({
   country = "kr",
   boxMaxH = 420, // 인기댓글 박스에 맞춘 기본 높이
   initialVisible = 12, // 처음 보여줄 개수
@@ -239,7 +239,7 @@ const AppleMusicChart = ({
   );
 };
 
-export default AppleMusicChart;
+export default AppleMusicChartKr;
 
 // 리스트 로딩 버전========================================================
 

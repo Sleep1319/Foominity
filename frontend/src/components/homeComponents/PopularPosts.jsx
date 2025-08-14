@@ -1,5 +1,5 @@
 import { Box, Heading } from "@chakra-ui/react";
-import AppleMusicChart from "./AppleMusicChart";
+import AppleMusicChartKr from "./AppleMusicChartKr";
 
 const PopularPosts = () => {
   return (
@@ -9,8 +9,8 @@ const PopularPosts = () => {
       </Heading>
 
       {/* 인기댓글 자리 → AppleMusic 차트 삽입 */}
-      <AppleMusicChart
-        country="us"
+      <AppleMusicChartKr
+        country="kr"
         boxMaxH={420} // 사진의 우측 박스 높이에 맞춤
         initialVisible={12} // 첫 표시 개수
         step={8} // 스크롤 시 추가 로드 개수
