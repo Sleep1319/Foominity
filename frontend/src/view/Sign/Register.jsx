@@ -32,6 +32,7 @@ const Register = () => {
   const [code, setCode] = useState("");
   const [isVerified, setIsVerified] = useState(false);
   const [codeSent, setCodeSent] = useState(false);
+  const [isSending, setIsSending] = useState(false);
 
   const validateField = (name, value) => {
     switch (name) {
@@ -84,7 +85,39 @@ const Register = () => {
     }
   };
 
+  const startTimer = (expiresAtIso) => {
+    if (!expiresAtIso) return;
+    const end = new Date(expiresAtIso).getTime();
+    const now = Date.now();
+    const remain = Math.max(0, Math.floor((end - now) / 1000));
+    setTimer(remain);
+
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setTimer(prev => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
+  React.useEffect(() => {
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, []);
+
+  const fmt = (s) => {
+    const m = Math.floor(s / 60);
+    const ss = s % 60;
+    return `${m}:${ss < 10 ? "0" : ""}${ss}`;
+  };
+  const [timer, setTimer] = useState(0);
+  const timerRef = React.useRef(null);
+
   const handleSendCode = async () => {
+    if (isSending) return;                 //연타 방지
     const emailError = validateField("email", form.email);
     if (emailError) {
       setErrors((prev) => ({ ...prev, email: emailError }));
@@ -92,8 +125,8 @@ const Register = () => {
     }
 
     try {
-      const res = await axios.get("/api/check-email", { params: { email: form.email } });
-      if (res.data.exists) {
+      const resCheck = await axios.get("/api/check-email", { params: { email: form.email } });
+      if (resCheck.data.exists) {
         setErrors((prev) => ({ ...prev, email: "이미 사용 중인 이메일입니다." }));
         return;
       }
@@ -103,23 +136,42 @@ const Register = () => {
     }
 
     try {
-      await axios.post("/api/email/send-code", null, { params: { email: form.email } });
-      toast({ title: "인증 코드가 전송되었습니다", status: "success" });
+      setIsSending(true);                  //누르자마자 잠금 + 표시
+      const { data } = await axios.post(
+          "/api/email/send-code",
+          null,
+          { params: { email: form.email }, timeout: 15000 } //타임아웃
+      );
+      startTimer(data?.expiresAt);         //타이머 시작
       setCodeSent(true);
       setIsVerified(false);
+      setCode("");
+      toast({ title: "인증 코드가 전송되었습니다", status: "success" });
     } catch (err) {
-      toast({ title: "코드 전송 실패", description: err.response?.data?.error, status: "error" });
+      const msg = err.response?.data?.error || "코드 전송 실패";
+      toast({ title: "코드 전송 실패", description: msg, status: "error" });
+    } finally {
+      setIsSending(false);                 //응답 받으면 잠금 해제 (이후 타이머가 버튼 제어)
     }
   };
 
   const handleVerifyCode = async () => {
     try {
       await axios.post("/api/email/verify", null, { params: { email: form.email, code } });
-      alert("인증 성공하였습니다.");
       setIsVerified(true);
+      if (timerRef.current) clearInterval(timerRef.current);
+      toast({ title: "인증 성공", status: "success" });
     } catch (err) {
-      toast({ title: "인증 실패", description: err.response?.data?.error, status: "error" });
-      setIsVerified(false);
+      const status = err.response?.status;
+      const msg = err.response?.data?.error || "인증 실패";
+      if (status === 410) {
+        // 만료
+        setIsVerified(false);
+        setTimer(0);
+        toast({ title: "코드 만료", description: "다시 인증 요청해주세요.", status: "warning" });
+      } else {
+        toast({ title: "인증 실패", description: msg, status: "error" });
+      }
     }
   };
 
@@ -169,24 +221,34 @@ const Register = () => {
             <FormControl isRequired>
               <FormLabel>이메일</FormLabel>
               <HStack>
-                <Input name="email" type="email" value={form.email} onChange={handleChange} isReadOnly={isVerified} />
+                <Input name="email" type="email" value={form.email} onChange={handleChange} isReadOnly={isVerified || isSending} />
                 <Button
                   onClick={handleSendCode}
                   size="sm"
-                  isDisabled={!form.email || !!errors.email || isVerified}
+                  isLoading={isSending}
+                  loadingText="전송중..."
+                  isDisabled={!form.email || !!errors.email || isVerified || isSending || (codeSent && timer > 0)}
                   _disabled={{
                     opacity: 0.4,
                     cursor: "default",
                     pointerEvents: "auto", // 기본 이벤트 허용하는 코드
                   }}
                 >
-                  인증 요청
+                  {codeSent && !isVerified
+                      ? (timer > 0 ? `재전송 (${fmt(timer)})` : "재전송")
+                      : "인증 요청"}
                 </Button>
               </HStack>
-              {errors.email && (
-                <Text color="red.500" fontSize="sm">
-                  {errors.email}
-                </Text>
+              {errors.email && <Text color="red.500" fontSize="sm">{errors.email}</Text>}
+              {isSending && (
+                  <Text fontSize="xs" color="gray.600" mt={1}>
+                    인증번호 전송중입니다...
+                  </Text>
+              )}
+              {codeSent && !isVerified && (
+                  <Text fontSize="xs" color={timer > 0 ? "gray.600" : "red.500"} mt={1}>
+                    {timer > 0 ? `코드 유효시간 ${fmt(timer)} 남음` : "코드가 만료되었습니다. 재전송해주세요."}
+                  </Text>
               )}
             </FormControl>
 

@@ -80,21 +80,18 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(VerificationCodeExpiredException.class)
-    public ResponseEntity<?> handleVerificationCodeExpiredException() {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                Map.of("error", "인증 코드가 만료되었습니다."));
+    public ResponseEntity<?> handleExpired(VerificationCodeExpiredException e) {
+        return ResponseEntity.status(410).body(Map.of("error", "코드가 만료되었습니다."));
     }
 
     @ExceptionHandler(VerificationCodeMismatchException.class)
-    public ResponseEntity<?> handleVerificationCodeMismatchException() {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                Map.of("error", "인증 코드가 일치하지 않습니다."));
+    public ResponseEntity<?> handleMismatch(VerificationCodeMismatchException e) {
+        return ResponseEntity.badRequest().body(Map.of("error", "코드가 일치하지 않습니다."));
     }
 
     @ExceptionHandler(VerificationNotRequestedException.class)
-    public ResponseEntity<?> handleVerificationNotRequestedException() {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                Map.of("error", "이메일 인증 요청이 존재하지 않습니다."));
+    public ResponseEntity<?> handleNotRequested(VerificationNotRequestedException e) {
+        return ResponseEntity.status(404).body(Map.of("error", "인증요청 기록이 없습니다."));
     }
 
     @ExceptionHandler(Exception.class)

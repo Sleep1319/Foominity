@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
 public class EmailVerificationController {
@@ -16,8 +19,8 @@ public class EmailVerificationController {
 
     @PostMapping("/api/email/send-code")
     public ResponseEntity<?> sendCode(@RequestParam String email) {
-        emailService.sendVerificationMail(email);
-        return ResponseEntity.ok().build();
+        LocalDateTime expiresAt = emailService.sendVerificationMail(email);
+        return ResponseEntity.ok(Map.of("expiresAt", expiresAt)); // ✅ 만료시각 내려줌
     }
 
     @PostMapping("/api/email/verify")

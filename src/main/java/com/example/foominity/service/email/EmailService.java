@@ -22,16 +22,12 @@ public class EmailService {
     private static final int EXPIRATION_MINUTES = 5;
 
     @Transactional
-    public void sendVerificationMail(String email) {
+    public LocalDateTime sendVerificationMail(String email) {
         String code = VerificationCodeGenerator.generate();
-
         LocalDateTime expiresAt = LocalDateTime.now().plusMinutes(EXPIRATION_MINUTES);
 
         EmailVerification verification = emailVerificationRepository.findByEmail(email)
-                .map(ev -> {
-                    ev.updateCode(code, expiresAt);
-                    return ev;
-                })
+                .map(ev -> { ev.updateCode(code, expiresAt); return ev; })
                 .orElse(new EmailVerification(email, code, expiresAt));
 
         emailVerificationRepository.save(verification);
@@ -39,8 +35,10 @@ public class EmailService {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(email);
         message.setSubject("[Foominity] 이메일 인증 코드");
-        message.setText("인증 코드: " + code);
+        message.setText("인증 코드: " + code + "\n유효시간: " + EXPIRATION_MINUTES + "분");
         mailSender.send(message);
+
+        return expiresAt;
     }
 
     @Transactional
@@ -59,6 +57,8 @@ public class EmailService {
         verification.markVerified();
         return true;
     }
+
+
 
     public boolean isVerified(String email) {
         return emailVerificationRepository.findByEmail(email)
