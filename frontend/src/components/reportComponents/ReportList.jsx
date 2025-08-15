@@ -1,4 +1,3 @@
-// src/pages/ReportList.jsx
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -81,7 +80,6 @@ const ReportList = () => {
   const [filterType, setFilterType] = useState("ALL");
   const [filterStatus, setFilterStatus] = useState("ALL");
 
-  // 🔍 서버에 실제 전달하는 키워드 / 입력창 값
   const [keyword, setKeyword] = useState("");
   const [searchInput, setSearchInput] = useState("");
 
@@ -113,7 +111,7 @@ const ReportList = () => {
     }
   }, []);
 
-  // 목록 조회 (서버에 keyword 파라미터 전달)
+ 
   useEffect(() => {
     const fetchReports = async () => {
       try {
@@ -158,7 +156,7 @@ const ReportList = () => {
 
   const canWrite = user && ["BRONZE", "SILVER", "GOLD"].includes(user.roleName);
 
-  // 클라이언트 보정 필터(유형/상태/제목/작성자)
+
   const filteredReports = reports.filter((report) => {
     const typeMatch = filterType === "ALL" || report.type === filterType;
     const statusMatch = filterStatus === "ALL" || report.status === filterStatus;
@@ -170,14 +168,14 @@ const ReportList = () => {
     return typeMatch && statusMatch && keywordMatch;
   });
 
-  // 페이지네이션: 클라 필터로 줄어든 경우 1페이지만 표시(버튼은 활성)
+
   const isLocalFilterActive =
     filterType !== "ALL" ||
     filterStatus !== "ALL" ||
     (keyword.trim().length > 0 && filteredReports.length !== reports.length);
   const displayTotalPages = isLocalFilterActive ? 1 : Math.max(1, totalPages);
 
-  // 🔎 검색 제출 & ❌ 검색어 초기화
+  
   const submitSearch = (e) => {
     e?.preventDefault?.();
     setPage(0);

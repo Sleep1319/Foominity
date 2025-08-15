@@ -25,7 +25,7 @@ const typeOptions = [
   { value: "SUGGESTION", label: "건의 (UI/UX 개선, 정책/운영 건의)" },
 ];
 
-// 신고 대상 종류 (번호 입력 없음)
+
 const targetTypeOptions = [
   { value: "BOARD", label: "자유게시판" },
   { value: "REVIEW", label: "리뷰게시판" },
@@ -48,7 +48,7 @@ const ReportCreate = () => {
   const initialTargetType = searchParams.get("targetType") || ""; // 게시글 상세에서 넘어온 경우만 존재
 
   const [type, setType] = useState("REPORT");
-  const [targetType, setTargetType] = useState(""); // ✅ 번호 대신 게시판만 선택
+  const [targetType, setTargetType] = useState("");
   const [title, setTitle] = useState("");
   const [reason, setReason] = useState("");
   const [images, setImages] = useState([]);
@@ -89,7 +89,7 @@ const ReportCreate = () => {
     formData.append("type", type);
 
     if (type === "REPORT") {
-      // ✅ 번호는 전송하지 않음. (상세에서 넘어온 경우에만 백엔드로 targetId 추가 전송)
+      
       formData.append("targetType", targetType);
       if (initialId) formData.append("targetId", initialId);
     }
@@ -139,7 +139,7 @@ const ReportCreate = () => {
           </Select>
         </FormControl>
 
-        {/* ✅ REPORT일 때: 게시판만 선택 (상세에서 넘어오면 읽기 전용으로 표시) */}
+       
         {type === "REPORT" && (
           <>
             {initialTargetType ? (

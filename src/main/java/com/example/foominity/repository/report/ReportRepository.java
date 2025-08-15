@@ -21,6 +21,7 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
 
     Page<Report> findByMemberId(Long memberId, Pageable pageable);
 
+    // 신고와 연관된 이미지까지 한 번에 로딩해서 조회
     @EntityGraph(attributePaths = "images")
     Optional<Report> findWithImagesById(Long id);
 }

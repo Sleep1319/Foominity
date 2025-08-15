@@ -177,7 +177,7 @@ export default function AdminPageList() {
 
   return (
     <Box p={6} maxW="1000px" mx="auto" mt={2}>
-      {/* 상단: 유형/상태 필터 */}
+    
       <Flex justify="space-between" mb={4} align="center">
         <HStack spacing={3}>
           <Menu>
@@ -317,7 +317,7 @@ export default function AdminPageList() {
         </Tbody>
       </Table>
 
-      {/* 검색바 — X(초기화) + 검색 */}
+      {/* 검색바 */}
       <Box mt={3} display="flex" justifyContent="flex-end">
         <form onSubmit={submitSearch} style={{ width: "320px" }}>
           <InputGroup>

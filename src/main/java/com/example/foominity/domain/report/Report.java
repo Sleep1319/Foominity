@@ -40,9 +40,6 @@ public class Report extends BaseEntity {
     @Column(name = "status", nullable = false)
     private ReportStatus status = ReportStatus.PENDING;
 
-    @Column(nullable = false, columnDefinition = "int default 0")
-    private int views;
-
     @Column(name = "member_id")
     private Long memberId;
 
@@ -63,17 +60,11 @@ public class Report extends BaseEntity {
         this.targetType = targetType;
         this.memberId = memberId;
         this.nickname = nickname;
-        this.status = ReportStatus.PENDING;
-        this.views = 0;
+        this.status = ReportStatus.PENDING;  
     }
 
     public void updateStatus(ReportStatus status) {
         this.status = status;
-    }
-
-    public void increaseViews() {
-        this.views++;
-
     }
 
     public List<String> getImagePaths() {

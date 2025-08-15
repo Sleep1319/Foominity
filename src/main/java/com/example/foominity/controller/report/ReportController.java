@@ -34,19 +34,21 @@ public class ReportController {
     private final ReportService reportService;
     private final JwtTokenProvider jwtTokenProvider;
 
+    // 페이지네이션 조회
     @GetMapping("/api/report/page")
     public ResponseEntity<?> findAll(@RequestParam(defaultValue = "0") int page) {
         Page<ReportResponse> res = reportService.findAll(page);
         return ResponseEntity.ok(res);
     }
 
+    // 전체 신고 목록(비페이징)
     @GetMapping("/api/report")
     public ResponseEntity<List<ReportResponse>> findAllReports() {
-        List<ReportResponse> res = reportService.findAllReports(); // 전체 조회용 서비스 메서드
+        List<ReportResponse> res = reportService.findAllReports(); 
         return ResponseEntity.ok(res);
     }
 
-    // 내 report 조회
+    // 내 신고 내역 조회(페이징)
     @GetMapping("/api/report/my")
     public ResponseEntity<Page<ReportResponse>> findMyReports(
             HttpServletRequest request,
@@ -58,11 +60,13 @@ public class ReportController {
         return ResponseEntity.ok(reports);
     }
 
+    // 신고 상세 조회
     @GetMapping("/api/report/{id}")
     public ResponseEntity<ReportResponse> findById(@PathVariable Long id) {
         return ResponseEntity.ok(reportService.findById(id));
     }
 
+    // 신고 생성
     @PostMapping("/api/report/add")
     public ResponseEntity<String> createReport(@Valid @ModelAttribute ReportCreateRequest req,
             HttpServletRequest tokenRequest) {
@@ -70,12 +74,14 @@ public class ReportController {
         return ResponseEntity.ok().build();
     }
 
+    // 신고 삭제
     @DeleteMapping("/api/report/{id}")
     public ResponseEntity<String> deleteReport(@PathVariable Long id, HttpServletRequest tokenRequest) {
         reportService.deleteReport(id, tokenRequest);
         return ResponseEntity.ok().build();
     }
 
+    // 신고 상태 변경
     @PutMapping("/api/report/{id}/status")
     public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestBody ReportStatusUpdateRequest req,
             HttpServletRequest tokenRequest) {
