@@ -89,7 +89,7 @@ const UserSection = () => {
           <MenuItemWithIcon icon={FiUser} label="마이페이지" to="/mypage" />
           <MenuItemWithIcon icon={FiMusic} label="내 음악" to="/mymusic" />
           <MenuItemWithIcon icon={BsChatDots} label="문의" onClick={onClickInquiry} />
-          {state?.roleName === "ADMIN" && <MenuItemWithIcon icon={FaUserShield} label="관리자 페이지" to="/" />}
+          {state?.roleName === "ADMIN" && <MenuItemWithIcon icon={FaUserShield} label="관리자 페이지" to="/admin" />}
 
           <MenuDivider />
 

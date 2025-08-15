@@ -16,6 +16,7 @@ const SliderBox = ({ notices = [] }) => {
   const navigate = useNavigate();
 
   const topNotices = notices.slice(0, 4);
+  const currentNotice = topNotices[currentIndex];
 
   const settings = {
     autoplay: true,
@@ -92,7 +93,7 @@ const SliderBox = ({ notices = [] }) => {
         />
       </Box>
 
-      {/* 슬라이더 */}
+      {/* 슬라이더(움직이는 트랙) */}
       <Slider ref={sliderRef} {...settings}>
         {topNotices.map((notice) => (
           <Box
@@ -114,29 +115,45 @@ const SliderBox = ({ notices = [] }) => {
               draggable={false}
               userSelect="none"
             />
-            <Box position="absolute" bottom="120px" left="120px" color="white" textShadow="0 0 10px rgba(0,0,0,0.8)">
-              <Text
-                whiteSpace={notice.title.length >= 70 ? "normal" : "nowrap"}
-                overflow="visible"
-                maxW="800px"
-                lineHeight="1.3"
-                fontSize="4xl"
-                fontWeight="bold"
-              >
-                {notice.title}
-              </Text>
-              <Box mt={4}>
-                <SliderBoxIndicator
-                  total={topNotices.length}
-                  currentIndex={currentIndex}
-                  onDotClick={handleDotClick}
-                  useAbsolute={false}
-                />
-              </Box>
-            </Box>
+            {/* 제목은 이제 밖에서 한 번만 렌더하므로 여기선 제거 */}
           </Box>
         ))}
       </Slider>
+
+      {/* ✅ 제목 + 인디케이터: 트랙 밖(고정 오버레이). 위치는 예전과 동일 */}
+      <Box
+        position="absolute"
+        bottom="120px"
+        left="120px"
+        color="white"
+        textShadow="0 0 10px rgba(0,0,0,0.8)"
+        zIndex="1000"
+        pointerEvents="none" // 기본은 클릭 통과
+      >
+        {/* 현재 슬라이드의 제목 표시 */}
+        {currentNotice && (
+          <Text
+            whiteSpace={currentNotice.title?.length >= 70 ? "normal" : "nowrap"}
+            overflow="visible"
+            maxW="800px"
+            lineHeight="1.3"
+            fontSize="4xl"
+            fontWeight="bold"
+          >
+            {currentNotice.title}
+          </Text>
+        )}
+
+        {/* 인디케이터 (제목 아래) — 클릭 가능하도록 래퍼만 pointerEvents 해제 */}
+        <Box mt={4} pointerEvents="auto">
+          <SliderBoxIndicator
+            total={topNotices.length}
+            currentIndex={currentIndex}
+            onDotClick={handleDotClick}
+            useAbsolute={false} // 내부에서 static 렌더 (오버레이가 위치를 잡아줌)
+          />
+        </Box>
+      </Box>
     </Box>
   );
 };

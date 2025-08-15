@@ -16,12 +16,15 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
+  Input,
+  InputGroup,
+  InputRightElement,
+  CloseButton,
 } from "@chakra-ui/react";
-import { ChevronDownIcon, CheckIcon } from "@chakra-ui/icons";
+import { ChevronDownIcon, CheckIcon, SearchIcon } from "@chakra-ui/icons";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useUser } from "@/redux/useUser.js";
-import RpeortSearchBar from "./ReportSearchBar";
 
 const getTypeBadge = (type) => {
   switch (type) {
@@ -77,7 +80,11 @@ const ReportList = () => {
   const [pageSize, setPageSize] = useState(20);
   const [filterType, setFilterType] = useState("ALL");
   const [filterStatus, setFilterStatus] = useState("ALL");
-  const [keyword, setKeyword] = useState(""); // 🔍 제목/작성자 검색어
+
+  // 🔍 서버에 실제 전달하는 키워드 / 입력창 값
+  const [keyword, setKeyword] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+
   const navigate = useNavigate();
   const { state: user } = useUser();
 
@@ -115,7 +122,7 @@ const ReportList = () => {
           size: String(pageSize),
         });
         if (keyword && keyword.trim().length > 0) {
-          params.set("keyword", keyword.trim()); // ⚠️ 백엔드 파라미터명 맞춰 변경 가능
+          params.set("keyword", keyword.trim());
         }
         const res = await axios.get(`/api/report/page?${params.toString()}`);
         const { content, totalPages, totalElements, size } = res.data;
@@ -169,6 +176,18 @@ const ReportList = () => {
     filterStatus !== "ALL" ||
     (keyword.trim().length > 0 && filteredReports.length !== reports.length);
   const displayTotalPages = isLocalFilterActive ? 1 : Math.max(1, totalPages);
+
+  // 🔎 검색 제출 & ❌ 검색어 초기화
+  const submitSearch = (e) => {
+    e?.preventDefault?.();
+    setPage(0);
+    setKeyword(searchInput);
+  };
+  const clearSearch = () => {
+    setSearchInput("");
+    setKeyword("");
+    setPage(0);
+  };
 
   return (
     <Box p={6} maxW="1000px" mx="auto" mt={2}>
@@ -292,7 +311,6 @@ const ReportList = () => {
               onClick={() => handleReportClick(report.id)}
             >
               <Td>
-                {/* 인덱스(번호) 로직은 그대로 */}
                 {(keyword && keyword.trim().length > 0) || filterType !== "ALL" || filterStatus !== "ALL"
                   ? filteredReports.length - index
                   : totalElements - page * pageSize - index}
@@ -309,19 +327,28 @@ const ReportList = () => {
         </Tbody>
       </Table>
 
-      {/* 하단: 검색바(오른쪽) */}
+      {/* 하단: 검색바 — X(초기화) + 검색 */}
       <Box mt={3} display="flex" justifyContent="flex-end">
-        <RpeortSearchBar
-          defaultValue={keyword}
-          onSearch={(kw) => {
-            setPage(0); // 검색 시 첫 페이지로
-            setKeyword(kw);
-          }}
-          width="280px"
-        />
+        <form onSubmit={submitSearch} style={{ width: "320px" }}>
+          <InputGroup>
+            <Input
+              placeholder="제목/작성자 검색"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+            />
+            <InputRightElement width="5.5rem">
+              <HStack spacing={1}>
+                {searchInput && <CloseButton size="sm" onClick={clearSearch} title="검색어 지우기" />}
+                <Button type="submit" size="sm" variant="ghost">
+                  <SearchIcon />
+                </Button>
+              </HStack>
+            </InputRightElement>
+          </InputGroup>
+        </form>
       </Box>
 
-      {/* 페이지네이션: 항상 활성(회색 비활성 X) */}
+      {/* 페이지네이션 */}
       <HStack spacing={2} justify="center" mt={8}>
         <Button
           size="sm"

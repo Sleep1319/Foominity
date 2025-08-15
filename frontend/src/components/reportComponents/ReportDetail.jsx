@@ -1,4 +1,3 @@
-// ReportDetail.jsx
 import React, { useEffect, useState, useRef } from "react";
 import {
   Box,
@@ -15,10 +14,6 @@ import {
   AlertDialogBody,
   AlertDialogFooter,
   useDisclosure,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
   Image,
   AspectRatio,
   Skeleton,
@@ -28,12 +23,11 @@ import {
   ModalBody,
   Badge,
 } from "@chakra-ui/react";
-import { ChevronDownIcon } from "@chakra-ui/icons";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { useUser } from "@/redux/useUser.js";
 import { BsChevronLeft, BsChevronRight } from "react-icons/bs";
-import Slider from "react-slick"; // ✅ 슬라이더
+import Slider from "react-slick";
 
 const getTypeLabel = (type) => {
   switch (type) {
@@ -99,19 +93,12 @@ const toImageUrl = (p) => {
   return `${BACKEND_BASE}${path}`;
 };
 
-const statusOptions = [
-  { value: "PENDING", label: "대기 중" },
-  { value: "IN_PROGRESS", label: "처리 중" },
-  { value: "RESOLVED", label: "처리 완료" },
-  { value: "REJECTED", label: "거절됨" },
-];
-
 const ReportDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [statusLoading, setStatusLoading] = useState(false);
   const toast = useToast();
   const { state: user } = useUser();
 
@@ -126,11 +113,22 @@ const ReportDetail = () => {
   const sliderRef = useRef(null);
   const [currentSlide, setCurrentSlide] = useState(0);
 
+  // 어디서 왔는지 체크: 어드민에서 오면만 삭제 허용/표시
+  const search = new URLSearchParams(location.search);
+  const fromAdmin = location.state?.from === "admin" || search.get("from") === "admin";
+  const backPath = fromAdmin ? "/admin" : "/report";
+
+  const handleBack = () => navigate(backPath);
+
   const handleDelete = async () => {
+    if (!fromAdmin) {
+      toast({ title: "삭제는 관리자 페이지에서만 가능합니다.", status: "warning", duration: 1800 });
+      return;
+    }
     try {
       await axios.delete(`/api/report/${id}`, { withCredentials: true });
       toast({ title: "게시물 삭제 완료", status: "success", duration: 2000, isClosable: true });
-      navigate("/report");
+      navigate(backPath);
     } catch (error) {
       toast({
         title: "삭제 실패",
@@ -165,25 +163,6 @@ const ReportDetail = () => {
     return `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()} ${h}:${m}`;
   };
 
-  const handleStatusSelect = async (selectedStatus) => {
-    setStatusLoading(true);
-    try {
-      await axios.put(`/api/report/${id}/status`, { status: selectedStatus }, { withCredentials: true });
-      setReport((prev) => ({ ...prev, status: selectedStatus }));
-      toast({ title: "상태가 변경되었습니다.", status: "success", duration: 1500, isClosable: true });
-    } catch (error) {
-      toast({
-        title: "상태 변경 실패",
-        description: error.response?.data?.message || "오류가 발생했습니다.",
-        status: "error",
-        duration: 2000,
-        isClosable: true,
-      });
-    } finally {
-      setStatusLoading(false);
-    }
-  };
-
   if (loading) {
     return (
       <Flex justify="center" mt={10}>
@@ -191,20 +170,18 @@ const ReportDetail = () => {
       </Flex>
     );
   }
-
   if (!report) return null;
 
   const typeLabel = getTypeLabel(report.type);
   const imagePaths = Array.isArray(report.imagePaths) ? report.imagePaths : [];
 
-  // react-slick 설정
   const sliderSettings = {
     dots: true,
     infinite: imagePaths.length > 1,
     speed: 300,
     slidesToShow: 1,
     slidesToScroll: 1,
-    arrows: false, // 커스텀 화살표 사용
+    arrows: false,
     adaptiveHeight: true,
     afterChange: (idx) => setCurrentSlide(idx),
   };
@@ -231,47 +208,21 @@ const ReportDetail = () => {
           </Text>
         </Text>
 
-        <Box>
-          {user?.roleName === "ADMIN" ? (
-            <Menu>
-              <MenuButton
-                as={Button}
-                rightIcon={<ChevronDownIcon />}
-                size="sm"
-                isLoading={statusLoading}
-                bg="black"
-                color="white"
-                _hover={{ bg: "gray.800" }}
-                fontWeight="semibold"
-                borderRadius="999px"
-              >
-                {statusOptions.find((opt) => opt.value === report.status)?.label || "상태 선택"}
-              </MenuButton>
-              <MenuList>
-                {statusOptions.map(({ value, label }) => (
-                  <MenuItem key={value} onClick={() => handleStatusSelect(value)}>
-                    {label}
-                  </MenuItem>
-                ))}
-              </MenuList>
-            </Menu>
-          ) : (
-            <Text
-              fontSize="sm"
-              px={4}
-              py={1}
-              bg="black"
-              color="white"
-              borderRadius="full"
-              fontWeight="bold"
-              display="inline-block"
-              minWidth="70px"
-              textAlign="center"
-            >
-              {getStatusLabel(report.status)}
-            </Text>
-          )}
-        </Box>
+        {/* 상태는 항상 읽기 전용으로 표시 */}
+        <Text
+          fontSize="sm"
+          px={4}
+          py={1}
+          bg="black"
+          color="white"
+          borderRadius="full"
+          fontWeight="bold"
+          display="inline-block"
+          minWidth="70px"
+          textAlign="center"
+        >
+          {getStatusLabel(report.status)}
+        </Text>
       </Flex>
 
       {/* 신고글일 때만 표시 */}
@@ -301,11 +252,11 @@ const ReportDetail = () => {
         <Box
           position="relative"
           mb={10}
-          maxW={{ base: "100%", md: "560px" }} // ✅ 더 작게
+          maxW={{ base: "100%", md: "560px" }}
           w="100%"
-          ml={0} // ✅ 왼쪽 정렬 고정
+          ml={0}
           sx={{
-            ".slick-list": { padding: "0 !important", margin: "0 !important" }, // ✅ 래퍼 여백 제거
+            ".slick-list": { padding: "0 !important", margin: "0 !important" },
             ".slick-track": { margin: "0 !important" },
             ".slick-slide > div": { padding: "0 !important", margin: "0 !important" },
           }}
@@ -463,11 +414,13 @@ const ReportDetail = () => {
           size="sm"
           fontSize="sm"
           _hover={{ bg: "black", color: "white" }}
-          onClick={() => navigate("/report")}
+          onClick={handleBack}
         >
           목록
         </Button>
-        {user?.roleName === "ADMIN" && (
+
+        {/* 어드민 경로(fromAdmin)로 들어온 관리자에게만 삭제 버튼 노출 */}
+        {user?.roleName === "ADMIN" && fromAdmin && (
           <>
             <Button color="white" bg="red.500" size="sm" fontSize="sm" _hover={{ bg: "red.600" }} onClick={onOpen}>
               삭제
