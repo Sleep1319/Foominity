@@ -38,9 +38,11 @@ public class ReportService {
     private final JwtTokenProvider jwtTokenProvider;
     private final ImageService imageService;
 
+    // 이미지 업로드 제한(개수/총용량)
     private static final int MAX_IMAGES = 10;
     private static final long MAX_TOTAL_BYTES = 20L * 1024 * 1024;
 
+    // 전체 신고 목록
     public Page<ReportResponse> findAll(int page) {
         PageRequest pageable = PageRequest.of(page, 20, Sort.by(Sort.Direction.DESC,
                 "id"));
@@ -57,7 +59,6 @@ public class ReportService {
                         report.getTitle(),
                         report.getReason(),
                         report.getStatus().name(),
-                        report.getViews(),
                         report.getCreatedDate(),
                         null))
                 .toList();
@@ -65,12 +66,11 @@ public class ReportService {
                 reports.getTotalElements());
     }
 
+    // 상세 조회
     @Transactional(readOnly = false)
     public ReportResponse findById(Long id) {
         Report report = reportRepository.findWithImagesById(id)
                 .orElseThrow(NotFoundReportException::new);
-
-        report.increaseViews();
 
         reportRepository.save(report);
         return new ReportResponse(
@@ -83,12 +83,12 @@ public class ReportService {
                 report.getTitle(),
                 report.getReason(),
                 report.getStatus().name(),
-                report.getViews(),
                 report.getCreatedDate(),
                 report.getImagePaths());
 
     }
 
+    // 신고 생성
     @Transactional
     public void createReport(ReportCreateRequest req, HttpServletRequest tokenRequest) {
         String token = jwtTokenProvider.resolveTokenFromCookie(tokenRequest);
@@ -151,9 +151,10 @@ public class ReportService {
         return lower.startsWith("http://") || lower.startsWith("https://");
     }
 
+    // 신고 삭제(관리자 전용)
     @Transactional
     public void deleteReport(Long id, HttpServletRequest tokenRequest) {
-        // 1) 인증
+      
         String token = jwtTokenProvider.resolveTokenFromCookie(tokenRequest);
         if (!jwtTokenProvider.validateToken(token)) {
             throw new UnauthorizedException();
@@ -174,6 +175,7 @@ public class ReportService {
         reportRepository.delete(report);
     }
 
+    // 전체 신고 목록
     public List<ReportResponse> findAllReports() {
         List<Report> reports = reportRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
         return reports.stream()
@@ -187,12 +189,12 @@ public class ReportService {
                         report.getTitle(),
                         report.getReason(),
                         report.getStatus().name(),
-                        report.getViews(),
                         report.getCreatedDate(),
                         null))
                 .toList();
     }
 
+    // 처리 상태 변경(관리자 전용)
     @Transactional
     public void updateStatus(Long id, ReportStatus status, HttpServletRequest tokenRequest) {
         String token = jwtTokenProvider.resolveTokenFromCookie(tokenRequest);
@@ -203,7 +205,6 @@ public class ReportService {
         Long memberId = jwtTokenProvider.getUserIdFromToken(token);
         Member member = memberRepository.findById(memberId).orElseThrow(NotFoundMemberException::new);
 
-        // 관리자 권한이 아니면 예외 발생 (roleName == "ADMIN")
         if (member.getRole() == null || !"ADMIN".equals(member.getRole().getName())) {
             throw new ForbiddenActionException();
         }
@@ -248,7 +249,6 @@ public class ReportService {
                         report.getTitle(),
                         report.getReason(),
                         report.getStatus().name(),
-                        report.getViews(),
                         report.getCreatedDate(),
                         null))
                 .toList();

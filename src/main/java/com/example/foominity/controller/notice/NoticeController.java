@@ -32,23 +32,27 @@ public class NoticeController {
 
     private final MagazineService magazineService;
 
+    // 페이지네이션 조회
     @GetMapping("/api/notices/page")
     public ResponseEntity<?> findAll(@RequestParam(defaultValue = "0") int page) {
         Page<MagazineResponse> res = magazineService.findAll(page);
         return ResponseEntity.ok(res);
     }
 
+    // 전체 목록 단건 리스트 조회(비페이징)
     @GetMapping("/api/notices")
     public ResponseEntity<List<MagazineResponse>> findAllNotices() {
-        List<MagazineResponse> res = magazineService.findAllNotices(); // 전체 조회용 서비스 메서드
+        List<MagazineResponse> res = magazineService.findAllNotices(); 
         return ResponseEntity.ok(res);
     }
 
+    // 상세 조회
     @GetMapping("/api/notices/{id}")
     public ResponseEntity<MagazineResponse> findById(@PathVariable Long id) {
         return ResponseEntity.ok(magazineService.findByID(id));
     }
 
+    // 매거진 생성
     @PostMapping(value = "/api/notices/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> createNotice(
             @Valid @ModelAttribute MagazineRequest req,
@@ -58,26 +62,14 @@ public class NoticeController {
         return ResponseEntity.ok().build();
     }
 
+    // 매거진 삭제
     @DeleteMapping("/api/notices/{id}")
     public ResponseEntity<String> deleteNotice(@PathVariable Long id, HttpServletRequest request) {
         magazineService.deleteNotice(id, request);
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/api/notices/main/{id}")
-    public ResponseEntity<String> changeMainNotice(@PathVariable Long id, HttpServletRequest request) {
-        magazineService.changeMainNotice(id, request);
-        return ResponseEntity.ok().build();
-    }
-
-    // @PostMapping("/api/notices/sync")
-    // public ResponseEntity<Void> syncPitchforkToMagazine(HttpServletRequest
-    // request) {
-    // magazineService.syncPitchforkArticles(request);
-    // return ResponseEntity.ok().build();
-    // }
-
-    // ✅ Pitchfork 기사 하나 가져오기 (검수용)
+    // (관리자 검수용) 다음 대기 기사 1건 가져오기
     @GetMapping("/api/notices/pending")
     public ResponseEntity<PendingMagazine> getNextPending() {
         try {
@@ -88,7 +80,7 @@ public class NoticeController {
         }
     }
 
-    // ✅ Pitchfork 기사 최종 등록 (관리자 검수 후 저장)
+    // (관리자 최종 등록) 대기 기사 게시 처리
     @PostMapping(value = "/api/notices/publish", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> publishPending(
             @ModelAttribute @Valid MagazineRequest req,

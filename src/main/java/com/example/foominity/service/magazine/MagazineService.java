@@ -32,7 +32,6 @@ import com.example.foominity.repository.member.MemberRepository;
 import com.example.foominity.repository.notice.MagazineRepository;
 import com.example.foominity.service.image.ImageService;
 
-import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
@@ -53,9 +52,6 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
@@ -68,6 +64,7 @@ public class MagazineService {
     private final Environment env;
     private final MagazineAIService magazineAIService;
 
+    // 페이징된 매거진 목록 조회
     public Page<MagazineResponse> findAll(int page) {
         PageRequest pageable = PageRequest.of(page, 4, Sort.by(Sort.Direction.DESC, "id"));
         Page<Magazine> notices = magazineRepository.findAll(pageable);
@@ -83,6 +80,7 @@ public class MagazineService {
         return new PageImpl<>(magazineResponseList, pageable, notices.getTotalElements());
     }
 
+    // 단건 조회
     public MagazineResponse findByID(Long id) {
         Magazine notice = magazineRepository.findById(id).orElseThrow(NotFoundNoticeException::new);
         return new MagazineResponse(
@@ -97,6 +95,7 @@ public class MagazineService {
                 notice.getPublishedDate());
     }
 
+    // 매거진 생성
     @Transactional
     public void createNotice(MagazineRequest req, HttpServletRequest request) {
         String token = jwtTokenProvider.resolveTokenFromCookie(request);
@@ -126,6 +125,7 @@ public class MagazineService {
         magazineRepository.save(notice);
     }
 
+    // 매거진 삭제
     @Transactional
     public void deleteNotice(Long id, HttpServletRequest request) {
         String token = jwtTokenProvider.resolveTokenFromCookie(request);
@@ -144,33 +144,7 @@ public class MagazineService {
         magazineRepository.delete(notice);
     }
 
-    @Transactional
-    public void changeMainNotice(Long newMainNoticeId, HttpServletRequest request) {
-        String token = jwtTokenProvider.resolveTokenFromCookie(request);
-        if (!jwtTokenProvider.validateToken(token)) {
-            throw new UnauthorizedException();
-        }
-
-        Long memberId = jwtTokenProvider.getUserIdFromToken(token);
-        Member member = memberRepository.findById(memberId).orElseThrow(NotFoundMemberException::new);
-
-        if (!"ADMIN".equals(member.getRole().getName())) {
-            throw new ForbiddenActionException();
-        }
-
-        magazineRepository.findByMainNoticeTrue().ifPresent(mainNotice -> {
-            mainNotice.cancelNotice();
-            magazineRepository.save(mainNotice);
-        });
-
-        magazineRepository.findById(newMainNoticeId)
-                .map(newMain -> {
-                    newMain.changeNotice();
-                    return magazineRepository.save(newMain);
-                })
-                .orElseThrow(NotFoundNoticeException::new);
-    }
-
+    // 전체 매거진 목록 조회
     public List<MagazineResponse> findAllNotices() {
         List<Magazine> notices = magazineRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
         return notices.stream()
@@ -187,6 +161,7 @@ public class MagazineService {
                 .toList();
     }
 
+    // 최신 4개 매거진 조회
     public List<MagazineResponse> getLatest() {
         List<Magazine> noticeList = magazineRepository.findTop4ByOrderByIdDesc()
                 .orElseThrow(NotFoundNoticeException::new);
@@ -205,6 +180,7 @@ public class MagazineService {
                 .toList();
     }
 
+    // Pitchfork RSS에서 대기중인 기사 1건 가져오기
     public PendingMagazine getNextPending() throws NoPendingNewsException {
         try {
             URL feedUrl = new URL("https://pitchfork.com/rss/news/");
@@ -224,6 +200,7 @@ public class MagazineService {
         }
     }
 
+    // Pitchfork 대기기사 발행
     @Transactional
     public void publishPending(MagazineRequest req, HttpServletRequest request) {
         String token = jwtTokenProvider.resolveTokenFromCookie(request);
@@ -270,6 +247,7 @@ public class MagazineService {
         magazineRepository.save(mag);
     }
 
+    // SyndEntry → PendingMagazine 변환 (본문 크롤링·번역·키포인트 추출)
     private PendingMagazine toPending(SyndEntry entry) {
         String full = fetchArticleBodyWithSelenium(entry.getLink());
 
@@ -305,6 +283,7 @@ public class MagazineService {
                 entry.getPublishedDate());
     }
 
+    // Google Translate API로 텍스트 번역
     private String translateText(String text, String targetLanguage) {
         try (FileInputStream keyStream = new FileInputStream(env.getProperty("google.translate.credentials-path"))) {
             GoogleCredentials credentials = GoogleCredentials.fromStream(keyStream);
@@ -325,6 +304,7 @@ public class MagazineService {
         }
     }
 
+    // Selenium으로 Pitchfork 기사 본문 크롤링
     private String fetchArticleBodyWithSelenium(String url) {
         System.setProperty("webdriver.chrome.driver", "C:\\chromedriver\\chromedriver.exe");
 

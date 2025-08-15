@@ -19,7 +19,6 @@ public interface MagazineRepository extends JpaRepository<Magazine, Long> {
 
     Optional<List<Magazine>> findTop4ByOrderByIdDesc();
 
-    Optional<Magazine> findByMainNoticeTrue();
-
+    // 원본 URL 존재 여부 확인 (중복 방지용)
     boolean existsByOriginalUrl(String originalUrl);
 }

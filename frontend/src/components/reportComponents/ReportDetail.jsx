@@ -113,7 +113,7 @@ const ReportDetail = () => {
   const sliderRef = useRef(null);
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  // 어디서 왔는지 체크: 어드민에서 오면만 삭제 허용/표시
+
   const search = new URLSearchParams(location.search);
   const fromAdmin = location.state?.from === "admin" || search.get("from") === "admin";
   const backPath = fromAdmin ? "/admin" : "/report";

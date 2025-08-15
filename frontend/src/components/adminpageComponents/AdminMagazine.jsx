@@ -69,23 +69,23 @@ export default function AdminMagazine() {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
-  const [extItems, setExtItems] = useState(null); // 외부 피드
-  const [intItems, setIntItems] = useState(null); // 비교용(title/link)
-  const [intRaw, setIntRaw] = useState([]); // 🔹 리스트 표시용 원본
+  const [extItems, setExtItems] = useState(null); 
+  const [intItems, setIntItems] = useState(null); 
+  const [intRaw, setIntRaw] = useState([]); 
 
-  // 기본값은 무조건 30에서 시작
+  
   const [baselineMissing, setBaselineMissing] = useState(() => getNumber(LS_BASELINE_MISSING, BASELINE_DEFAULT));
   const [intBaselineCount, setIntBaselineCount] = useState(() => {
     const v = localStorage.getItem(LS_INT_BASE_COUNT);
     const n = Number(v);
-    return Number.isFinite(n) ? n : null; // 최초엔 null → 첫 fetch에서 고정
+    return Number.isFinite(n) ? n : null; 
   });
   const [error, setError] = useState(null);
 
-  // 📄 줄 리스트용 페이지네이션 (NoticeList와 동일 로직)
+  
   const ROWS_PER_PAGE = 7;
   const ITEMS_PER_ROW = 3;
-  const NOTICES_PER_PAGE = ROWS_PER_PAGE * ITEMS_PER_ROW; // 21개/페이지
+  const NOTICES_PER_PAGE = ROWS_PER_PAGE * ITEMS_PER_ROW; 
   const [page, setPage] = useState(0);
 
   useEffect(() => {
@@ -103,11 +103,11 @@ export default function AdminMagazine() {
       // 1) 내부 공지
       const intRes = await axios.get("/api/notices", {
         withCredentials: true,
-        params: { t: Date.now() }, // 캐시 우회
+        params: { t: Date.now() }, 
       });
 
       const data = intRes.data || [];
-      setIntRaw(data); // 🔹 리스트에 사용
+      setIntRaw(data); 
       const internal = data.map((n) => ({
         title: n.title ?? "",
         link: n.link ?? "",
@@ -151,7 +151,7 @@ export default function AdminMagazine() {
 
       const lastExtCount = getNumber(LS_LAST_EXT_COUNT, currentExtCount);
       if (currentExtCount > lastExtCount) {
-        base += currentExtCount - lastExtCount; // 외부가 늘면 기준선 증가
+        base += currentExtCount - lastExtCount; 
       }
       setNumber(LS_LAST_EXT_COUNT, currentExtCount);
       setNumber(LS_BASELINE_MISSING, base);
@@ -165,8 +165,8 @@ export default function AdminMagazine() {
   };
 
   useEffect(() => {
-    fetchAll(); // 첫 로드
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    fetchAll(); 
+    
   }, []);
 
   // 내부/외부 통계
@@ -179,7 +179,7 @@ export default function AdminMagazine() {
     let missing = null;
     if (intTotal !== null && intBaselineCount !== null) {
       const producedSinceBaseline = Math.max(intTotal - intBaselineCount, 0);
-      missing = Math.max(baselineMissing - producedSinceBaseline, 0); // 최소 0
+      missing = Math.max(baselineMissing - producedSinceBaseline, 0); 
     }
     return { missingCount: missing, extTotal, intTotal };
   }, [intItems, extItems, baselineMissing, intBaselineCount]);
@@ -214,11 +214,11 @@ export default function AdminMagazine() {
           {error && (
             <Tooltip label={error} hasArrow>
               <Badge colorScheme="orange" variant="subtle">
-                프런트 추정치 (정확도 제한)
+                프런트 추정치
               </Badge>
             </Tooltip>
           )}
-          {/* 기존 "새로고침" 자리에 "뉴스 불러오기" 버튼 */}
+          
           <Button
             size="sm"
             onClick={() => navigate("/notice/create")}
@@ -249,7 +249,7 @@ export default function AdminMagazine() {
             <StatNumber>{intTotal === null ? <Spinner size="sm" /> : intTotal}</StatNumber>
           </Stat>
 
-          {/* 새로고침 버튼 (검정 배경 / 흰 글자) */}
+          {/* 새로고침 버튼 */}
           {typeof missingCount === "number" && missingCount > 0 && (
             <Button
               size="sm"
@@ -279,10 +279,10 @@ export default function AdminMagazine() {
 
         <Box border="1px solid #e2e8f0" borderRadius="md" overflow="hidden">
           {/* 헤더 */}
-          <Box px={4} py={2} bg="gray.50" borderBottom="1px solid" borderColor="gray.200">
+          <Box px={4} py={2} bg="white" borderBottom="1px solid" borderColor="gray.200">
             <HStack>
               <Box w="60px" textAlign="center" fontWeight="bold">
-                NO
+                번호
               </Box>
               <Box flex="1" fontWeight="bold">
                 제목
@@ -293,14 +293,14 @@ export default function AdminMagazine() {
             </HStack>
           </Box>
 
-          {/* rows */}
+          
           {pageItems.length === 0 ? (
             <Box p={6} textAlign="center" color="gray.500">
               등록된 뉴스가 없습니다.
             </Box>
           ) : (
             pageItems.map((n, idx) => {
-              const no = sortedInt.length - (start + idx); // 전체 기준 역순 번호
+              const no = sortedInt.length - (start + idx); 
               return (
                 <Box
                   key={`${n.id}-${idx}`}
@@ -309,7 +309,7 @@ export default function AdminMagazine() {
                   borderBottom="1px solid"
                   borderColor="gray.200"
                   _hover={{ bg: "gray.50", cursor: "pointer" }}
-                  // ✅ 관리자에서 상세로 이동할 때 플래그 전달
+                  
                   onClick={() => navigate(`/notice/${n.id}?from=admin`, { state: { from: "admin" } })}
                 >
                   <HStack align="center" gap={4}>
@@ -331,7 +331,7 @@ export default function AdminMagazine() {
           )}
         </Box>
 
-        {/* 페이지네이션 (NoticeList와 동일 스타일) */}
+        {/* 페이지네이션 */}
         <HStack spacing={2} justify="center" mt={12}>
           <Button
             size="sm"

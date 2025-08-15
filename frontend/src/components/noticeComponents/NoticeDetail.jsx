@@ -28,7 +28,7 @@ const NoticeDetail = () => {
   const location = useLocation();
   const search = new URLSearchParams(location.search);
   const fromAdmin = location.state?.from === "admin" || search.get("from") === "admin";
-  const backPath = fromAdmin ? "/admin?tab=magazine" : "/notice"; // ✅ 매거진 탭으로 고정
+  const backPath = fromAdmin ? "/admin?tab=magazine" : "/notice"; 
 
   const [notice, setNotice] = useState(null);
   const [readMore, setReadMore] = useState([]);
@@ -44,7 +44,7 @@ const NoticeDetail = () => {
     try {
       await axios.delete(`/api/notices/${id}`, { withCredentials: true });
       toast({ title: "공지 삭제 완료", status: "success", duration: 2000, isClosable: true });
-      navigate(backPath); // ✅ 삭제 후에도 매거진 탭으로
+      navigate(backPath);
     } catch (error) {
       toast({
         title: "삭제 실패",
@@ -234,12 +234,12 @@ const NoticeDetail = () => {
               size="sm"
               fontSize="sm"
               _hover={{ bg: "black", color: "white" }}
-              onClick={() => navigate(backPath)} // ✅ 목록도 매거진 탭으로 복귀
+              onClick={() => navigate(backPath)} 
             >
               목록
             </Button>
 
-            {/* ✅ 삭제 버튼: 관리자에서 들어온 경우에만 노출 */}
+           
             {user?.roleName === "ADMIN" && fromAdmin && (
               <>
                 <Button color="white" bg="red.500" size="sm" fontSize="sm" _hover={{ bg: "red.600" }} onClick={onOpen}>

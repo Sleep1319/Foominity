@@ -56,20 +56,20 @@ const NoticeList = () => {
     return `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`;
   };
 
-  // 게시글 분리
+
   const validNotices = notices.filter((n) => n);
   const main = validNotices[0];
   const sideNotices = validNotices.slice(1, 3);
   const gridNotices = validNotices.slice(3);
 
-  // 페이징 (줄 단위)
+
   const totalPages = Math.ceil(gridNotices.length / NOTICES_PER_PAGE);
   const currentGridNotices = gridNotices.slice(page * NOTICES_PER_PAGE, (page + 1) * NOTICES_PER_PAGE);
 
   return (
     <Box px={{ base: 4, md: 16 }} pt={10} maxW="1600px" mx="auto">
       <Flex justify="space-between" mb={4} align="center">
-        {/* 글 작성 버튼 제거 */}
+        
       </Flex>
 
       <Flex direction={useBreakpointValue({ base: "column", md: "row" })} gap={14}>

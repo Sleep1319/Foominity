@@ -27,9 +27,6 @@ public class Magazine extends BaseEntity {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Column(nullable = false)
-    private boolean mainNotice = false;
-
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "image_file_id")
     private ImageFile imageFile;
@@ -52,14 +49,6 @@ public class Magazine extends BaseEntity {
     public Magazine(String title, String content) {
         this.title = title;
         this.content = content;
-    }
-
-    public void changeNotice() {
-        this.mainNotice = true;
-    }
-
-    public void cancelNotice() {
-        this.mainNotice = false;
     }
 
     public void setImageFile(ImageFile imageFile) {

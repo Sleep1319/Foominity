@@ -43,21 +43,18 @@ public class ReportResponse {
     private String status;
 
     @NotNull
-    private int views;
-
-    @NotNull
     private LocalDateTime createdDate;
 
     private List<String> imagePaths;
 
-    public ReportResponse(Long id, ReportType type, String nickname, String title, String status, int views,
+    public ReportResponse(Long id, ReportType type, String nickname, String title, String status,
             LocalDateTime createdDate) {
         this.id = id;
         this.type = type;
         this.nickname = nickname;
         this.title = title;
         this.status = status;
-        this.views = views;
+     
         this.createdDate = createdDate;
     }
 
@@ -72,7 +69,6 @@ public class ReportResponse {
                 report.getTitle(),
                 report.getReason(),
                 report.getStatus().name(),
-                report.getViews(),
                 report.getCreatedDate(),
                 report.getImagePaths());
     }
