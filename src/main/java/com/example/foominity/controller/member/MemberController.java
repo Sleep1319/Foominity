@@ -151,6 +151,18 @@ public class MemberController {
         return ResponseEntity.ok(new ProfileImageResponse(imageUrl));
     }
 
+    // 프로필 이미지 가져오기
+
+    // @GetMapping("/member/profile-image")
+    // public String getMethodName(HttpServletRequest req) {
+    // Member member = getAuthenticatedMember(req);
+
+    // ImageFile image = member.getProfileImage();
+    // if (image != null) {
+    // imageService.
+    // }
+    // }
+
     // 프로필 이미지 삭제
     @DeleteMapping("/member/profile-image")
     public ResponseEntity<Void> deleteProfileImage(HttpServletRequest req) {

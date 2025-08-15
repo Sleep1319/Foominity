@@ -14,11 +14,14 @@ import com.example.foominity.dto.artist.ArtistSimpleResponse;
 import com.example.foominity.dto.board.ReviewSimpleResponse;
 import com.example.foominity.dto.openai.AlbumRecommendRequest;
 import com.example.foominity.dto.openai.ArtistRecommendRequest;
+import com.example.foominity.dto.openai.CommentSummaryRequest;
+import com.example.foominity.dto.openai.CommentSummaryResponse;
 import com.example.foominity.dto.openai.LikeRecommendRequest;
 import com.example.foominity.repository.artist.ArtistRepository;
 import com.example.foominity.repository.board.ReviewCommentRepository;
 import com.example.foominity.repository.member.ReviewLikeRepository;
 import com.example.foominity.service.artist.ArtistService;
+import com.example.foominity.service.board.ReviewCommentService;
 import com.example.foominity.service.board.ReviewService;
 
 import lombok.RequiredArgsConstructor;
@@ -33,8 +36,9 @@ public class RecommendationService {
     private final OpenAIService openAIService;
     private final ArtistService artistService;
     private final ArtistRepository artistRepository;
-    private final ReviewCommentRepository reviewCommentRepository;
     private final ReviewLikeRepository reviewLikeRepository;
+    private final ReviewCommentRepository reviewCommentRepository;
+    private final ReviewCommentService reviewCommentService;
 
     public List<ReviewSimpleResponse> getRecommendationsFromOpenAI(Long reviewId) throws IOException {
         // 1) GPT에 유사 앨범 질의
@@ -204,4 +208,8 @@ public class RecommendationService {
         return results;
     }
 
+    public CommentSummaryResponse getCommentSummaryFromOpenAI(Long reviewId) throws IOException {
+        CommentSummaryRequest req = reviewCommentService.toCommentSummary(reviewId);
+        return openAIService.askCommentSummary(req);
+    }
 }

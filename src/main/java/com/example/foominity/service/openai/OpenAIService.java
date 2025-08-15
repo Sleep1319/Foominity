@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 
 import com.example.foominity.dto.openai.AlbumRecommendRequest;
 import com.example.foominity.dto.openai.ArtistRecommendRequest;
+import com.example.foominity.dto.openai.CommentSummaryRequest;
+import com.example.foominity.dto.openai.CommentSummaryResponse;
 import com.example.foominity.dto.openai.LikeRecommendRequest;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -59,6 +61,34 @@ public class OpenAIService {
         }
     }
 
+    public String askChatGPTJson(String systemMessage, String prompt) throws IOException {
+        OkHttpClient client = new OkHttpClient();
+
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("model", "gpt-4o");
+        requestBody.put("messages", List.of(
+                Map.of("role", "system", "content", systemMessage),
+                Map.of("role", "user", "content", prompt)));
+        // 👇 JSON만 반환하도록 강제
+        requestBody.put("response_format", Map.of("type", "json_object"));
+
+        Request request = new Request.Builder()
+                .url("https://api.openai.com/v1/chat/completions")
+                .header("Authorization", "Bearer " + apiKey)
+                .post(RequestBody.create(
+                        objectMapper.writeValueAsString(requestBody),
+                        MediaType.get("application/json")))
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                throw new IOException("GPT 호출 실패: " + response);
+            }
+            JsonNode jsonNode = objectMapper.readTree(response.body().string());
+            return jsonNode.get("choices").get(0).get("message").get("content").asText();
+        }
+    }
+
     public List<String> askAlbumRecommendations(AlbumRecommendRequest req) throws IOException {
         String prompt = buildPrompt(req);
         String raw = askChatGPT(GptRole.ALBUM_RECOMMENDER.getMessage(), prompt);
@@ -93,6 +123,37 @@ public class OpenAIService {
                 .map(String::trim)
                 .filter(line -> !line.isEmpty())
                 .toList();
+    }
+
+    public CommentSummaryResponse askCommentSummary(CommentSummaryRequest req) throws IOException {
+        String prompt = commentPrompt(req);
+
+        String json = askChatGPTJson(
+                "You are a strict summarizer.",
+                prompt + "\n\n반드시 이 JSON 스키마로만 출력하세요: {\"positive\": string, \"negative\": string}");
+
+        return new ObjectMapper().readValue(json, CommentSummaryResponse.class);
+    }
+
+    private String commentPrompt(CommentSummaryRequest req) {
+        String joined = String.join("\n", req.getCommentAndRatings());
+
+        return """
+                다음은 특정 앨범에 담긴 리뷰댓글들입니다.
+                각 댓글들에 대해 별점 2.5점 이하는 부정적 댓글, 3.0점 이상은 긍정적 댓글로 분류한 후,
+                긍정적 평가 / 부정적 평가들을 한국어(2~3문장)으로 요약해주세요.
+
+                댓글 목록:
+                %s
+
+                출력 형식(반드시 지켜주세요):
+                긍정:
+                - (요약 2~3문장)
+
+                부정:
+                - (요약 2~3문장)
+
+                """.formatted(joined);
     }
 
     private String buildPrompt(AlbumRecommendRequest req) {

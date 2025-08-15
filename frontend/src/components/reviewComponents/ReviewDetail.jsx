@@ -434,7 +434,7 @@ const ReviewDetail = () => {
             )}
           </Box>
 
-          <ReviewCommentForm reviewId={id} commentCount={review.commentCount || 0} onSuccess={handleCommentSuccess} />
+          <ReviewCommentForm reviewId={id} commentCount={commentCount} onSuccess={handleCommentSuccess} />
           <CommentList key={commentKey} type="reviews" id={id} />
 
           <Text

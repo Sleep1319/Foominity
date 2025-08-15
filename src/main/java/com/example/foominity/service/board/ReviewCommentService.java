@@ -1,7 +1,9 @@
 package com.example.foominity.service.board;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 import com.example.foominity.domain.member.Point;
 import com.example.foominity.domain.member.Role;
@@ -24,6 +26,7 @@ import com.example.foominity.dto.comment.BoardCommentResponse;
 import com.example.foominity.dto.comment.ReviewCommentRequest;
 import com.example.foominity.dto.comment.ReviewCommentResponse;
 import com.example.foominity.dto.comment.ReviewCommentUpdateRequest;
+import com.example.foominity.dto.openai.CommentSummaryRequest;
 import com.example.foominity.repository.board.BoardRepository;
 import com.example.foominity.repository.board.ReviewCommentRepository;
 import com.example.foominity.repository.board.ReviewRepository;
@@ -87,6 +90,35 @@ public class ReviewCommentService {
     public void deleteReviewComment(Long commentId, HttpServletRequest tokenRequest) {
         ReviewComment reviewComment = validateReviewCommentOwnership(commentId, tokenRequest);
         reviewCommentRepository.delete(reviewComment);
+
+    }
+
+    // 평가 댓글 요약 ai
+    public CommentSummaryRequest toCommentSummary(Long reviewId) {
+
+        List<ReviewComment> comments = reviewCommentRepository.findByReviewId(reviewId);
+
+        log.info("[SUMMARY][BUILD] reviewId={} comments={}", reviewId, comments.size());
+
+        List<String> commentTexts = new ArrayList<>();
+        List<Float> ratings = new ArrayList<>();
+
+        for (ReviewComment rc : comments) {
+            commentTexts.add(rc.getContent());
+            ratings.add(rc.getStarPoint());
+        }
+
+        List<String> commentAndRatings = IntStream.range(0, comments.size())
+                .mapToObj(i -> String.format("""
+                        이 댓글이 남긴 앨범에 대한 평론: %s
+                        이 댓글이 남긴 평점: %.1f,
+                        """, commentTexts.get(i), ratings.get(i)))
+                .toList();
+
+        log.info("[SUMMARY][BUILD] reviewId={} linesBuilt={}", reviewId, commentAndRatings.size());
+
+        return new CommentSummaryRequest(
+                commentAndRatings);
 
     }
 
