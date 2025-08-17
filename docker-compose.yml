@@ -60,7 +60,7 @@ services:
 
   frontend:
     build:
-      context: .
+      context: ./frontend
       dockerfile: frontendDockerfile
       args:
         VITE_API_URL: ${VITE_API_URL}
