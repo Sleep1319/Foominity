@@ -87,7 +87,7 @@ const Profile = () => {
               </Button>
 
               <Avatar
-                border="1px solid"
+                border="1px solid gray"
                 borderColor={borderCol}
                 boxSize="12rem"
                 src={state.avatar ? `http://localhost:8084${state.avatar}` : "/src/assets/images/defaultProfile.jpg"}
