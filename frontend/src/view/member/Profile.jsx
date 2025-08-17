@@ -19,7 +19,7 @@ import React, { useState } from "react";
 import { FaUser, FaEnvelope, FaUserTag, FaIdBadge, FaEye } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "@/redux/useUser.js";
-import DeleteModal from "../../view/Member/DeleteModal.jsx";
+import DeleteModal from "../../view/member/DeleteModal.jsx";
 import MyPostsTable from "../../components/memberComponents/MyPostsTable.jsx";
 import SettingsButton from "../../components/memberComponents/SettingsButton.jsx";
 import MyRequests from "../../components/memberComponents/MyRequests.jsx";

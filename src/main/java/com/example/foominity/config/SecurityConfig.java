@@ -43,7 +43,6 @@ public class SecurityConfig {
                 return http.build();
         }
 
-        /** 2) 일반 앱 체인: 기존 정책 유지 (필요에 맞게 수정) */
         @Bean
         @Order(2)
         public SecurityFilterChain appChain(HttpSecurity http) throws Exception {
@@ -51,13 +50,11 @@ public class SecurityConfig {
                                 .csrf(AbstractHttpConfigurer::disable)
                                 .cors(c -> c.configurationSource(corsConfigurationSource()))
                                 .authorizeHttpRequests(auth -> auth
-                                                // 공개 경로들 추가
                                                 .requestMatchers(
                                                                 "/auth/**", "/oauth2/**", "/login/**",
                                                                 "/ws/**", "/public/**", "/images/**", "/favicon.ico")
                                                 .permitAll()
-                                                .anyRequest().permitAll() // ← 지금은 임시로 모두 허용 중이면 유지
-                                // .anyRequest().authenticated() // 배포에서 잠글 거면 이렇게
+                                                .anyRequest().permitAll()
                                 )
                                 .exceptionHandling(ex -> ex
                                                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
@@ -66,14 +63,12 @@ public class SecurityConfig {
                                                 .userInfoEndpoint(info -> info.userService(customOAuth2UserService))
                                                 .successHandler(customOAuth2SuccessHandler));
 
-                // JWT 필터는 이 체인에서만 작동
                 http.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
                                 UsernamePasswordAuthenticationFilter.class);
 
                 return http.build();
         }
 
-        /** CORS: dev/배포 모두 허용할 도메인 등록 */
         @Bean
         public CorsConfigurationSource corsConfigurationSource() {
                 CorsConfiguration conf = new CorsConfiguration();
