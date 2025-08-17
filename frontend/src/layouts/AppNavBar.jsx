@@ -7,7 +7,7 @@ import logoImage from "@/assets/images/doremiSOL_lp.png";
 import {useUser} from "../redux/useUser.js";
 import AuthButtons from "@/components/navComponents/AuthButtons.jsx";
 import UserSection from "@/components/navComponents/UserSection.jsx";
-import SearchNavbar from "@/components/navComponents/SearchNavbar.jsx";
+import SearchNavbar from "@/components/navComponents/SearchNavBar.jsx";
 import {useSelector} from "react-redux";
 
 const AppNavbar = () => {
