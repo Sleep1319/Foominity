@@ -68,7 +68,7 @@ services:
         VITE_RAPIDAPI_KEY:  ${RAPIDAPI_KEY}
     container_name: frontend
     ports:
-      - "127.0.0.1:5173:5173"
+      - "3000:80"
     restart: always
 
 volumes:
