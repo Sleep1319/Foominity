@@ -1,0 +1,76 @@
+services:
+  mysql:
+    build:
+      context: .
+      dockerfile: mysqlDockerfile   # 로케일 필요 없으면 image: mysql:8.0
+    image: my-mysql:korean
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: doremisol
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - /etc/myapp/mysql/my.cnf:/etc/mysql/conf.d/my.cnf:ro
+    # ports: ["3306:3306"]  # 정말 필요할 때만 개방
+    healthcheck:
+      test: ["CMD","mysqladmin","ping","-h","localhost","-p${DB_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+    mem_limit: 768m
+
+  app:
+    build:
+      context: .
+    # dockerfile: Dockerfile  # 기본명이면 생략 가능
+    container_name: springboot-app
+    environment:
+      SPRING_PROFILES_ACTIVE: prod,oauth
+      SERVER_PORT: 8084
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      KAKAO_CLIENT_ID: ${KAKAO_CLIENT_ID}
+      KAKAO_CLIENT_SECRET: ${KAKAO_CLIENT_SECRET}
+      SPOTIFY_CLIENT_ID: ${SPOTIFY_CLIENT_ID}
+      SPOTIFY_CLIENT_SECRET: ${SPOTIFY_CLIENT_SECRET}
+      SEC_LOG_LEVEL: INFO
+      # 선택: 컨테이너 메모리 인식 튜닝
+      # JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=70 -XX:InitialRAMPercentage=20 -XX:+ExitOnOutOfMemoryError"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8084:8084"   # 외부 차단, Nginx만 프록시
+    healthcheck:
+      # curl 필요 → Dockerfile에 curl 설치(아래 파일 참고)
+      test: ["CMD","curl","-f","http://localhost:8084/actuator/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: always
+    mem_limit: 512m
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontendDockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL}
+        VITE_RAPIDAPI_HOST: ${RAPIDAPI_HOST}
+        VITE_RAPIDAPI_KEY:  ${RAPIDAPI_KEY}
+    container_name: frontend
+    ports:
+      - "127.0.0.1:5173:5173"
+    restart: always
+
+volumes:
+  mysql_data:

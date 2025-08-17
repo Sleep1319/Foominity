@@ -1,0 +1,11 @@
+.git
+node_modules
+.build
+dist
+.gradle
+**/target
+**/build
+Dockerfile
+frontendDockerfile
+.env
+*.env
