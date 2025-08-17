@@ -31,9 +31,11 @@ public class ChatService {
                         + "사용자가 제공한 장르와 성향 설문 결과를 바탕으로 10곡으로 구성된 플레이리스트를 추천하세요.";
                 break;
 
-            case "diagnosis":
+            case "similar":
                 systemPrompt = " " +
-                        "Analyze the given song title and artist and suggest improvements.";
+                        "당신은 음악, 노래 추천 전문가 입니다" +
+                        "사용자가 요청한 곡과 비슷한 곡 3곡을 추천, 곡에 대한 짧은 설명을 각각 해주세요."+
+                        "모든 설명은 한국어로 해주세요.";
                 break;
             case "translate":
                 systemPrompt = "당신은 주어진 모든 가사를 번역하는 전문 가사 번역가입니다. " +
