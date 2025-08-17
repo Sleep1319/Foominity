@@ -1,11 +1,9 @@
-# frontendDockerfile  (프론트 전용)
 FROM node:20-alpine AS build
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 COPY . .
 
-# 프론트에서 그대로 사용할 값(공개됨 주의)
 ARG VITE_API_URL
 ARG VITE_RAPIDAPI_HOST
 ARG VITE_RAPIDAPI_KEY

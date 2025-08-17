@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: ${SPRING_PROFILES_ACTIVE:local}   # 서버에선 prod 또는 prod,oauth로 주입
+    active: ${SPRING_PROFILES_ACTIVE:local}
   main:
     allow-bean-definition-overriding: true
   security:
