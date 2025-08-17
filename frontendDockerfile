@@ -1,21 +1,32 @@
+# --- build ---
 FROM node:20-alpine AS build
 WORKDIR /app
-COPY package*.json ./
-RUN npm ci --legacy-peer-deps
-COPY . .
 
+COPY frontend/package*.json ./
+
+ENV NPM_CONFIG_LEGACY_PEER_DEPS=true
+RUN npm install
+
+COPY frontend/. .
+
+# (필요 시) 빌드 변수
 ARG VITE_API_URL
+ARG VITE_BACKEND_URL
 ARG VITE_RAPIDAPI_HOST
 ARG VITE_RAPIDAPI_KEY
 ENV VITE_API_URL=$VITE_API_URL
+ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
 ENV VITE_RAPIDAPI_HOST=$VITE_RAPIDAPI_HOST
 ENV VITE_RAPIDAPI_KEY=$VITE_RAPIDAPI_KEY
 
+# 디버깅용: 지금 읽은 package.json이 맞는지 출력
+RUN echo '--- using this package.json ---' && cat package.json
+
+ENV CI=false
 RUN npm run build
 
-FROM node:20-alpine
-WORKDIR /app
-RUN npm i -g http-server
-COPY --from=build /app/dist ./dist
-EXPOSE 5173
-CMD ["http-server","dist","-p","5173"]
+# --- serve ---
+FROM nginx:alpine
+COPY --from=build /app/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx","-g","daemon off;"]
