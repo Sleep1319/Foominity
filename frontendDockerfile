@@ -1,27 +1,15 @@
-# --- build ---
-FROM node:20-bullseye AS build
+FROM node:20-bookworm AS build
 WORKDIR /app/frontend
 
-# 프론트 의존성
 COPY frontend/package*.json ./
-ENV NPM_CONFIG_LEGACY_PEER_DEPS=true
-RUN npm ci || npm install
 
-# 소스
+RUN npm i -g npm@11
+RUN rm -f package-lock.json
+RUN npm install --legacy-peer-deps
+
 COPY frontend/. .
+ENV NODE_OPTIONS=--max-old-space-size=2048
 ENV CI=false
-
-# 빌드 변수(필요시)
-ARG VITE_API_URL
-ARG VITE_BACKEND_URL
-ARG VITE_RAPIDAPI_HOST
-ARG VITE_RAPIDAPI_KEY
-ENV VITE_API_URL=$VITE_API_URL
-ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
-ENV VITE_RAPIDAPI_HOST=$VITE_RAPIDAPI_HOST
-ENV VITE_RAPIDAPI_KEY=$VITE_RAPIDAPI_KEY
-
-
 RUN npm run build
 
 # --- serve ---
