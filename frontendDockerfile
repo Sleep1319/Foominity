@@ -1,15 +1,17 @@
 # --- build ---
 FROM node:20-alpine AS build
-WORKDIR /app
+WORKDIR /app/frontend
 
+# 프론트 의존성
 COPY frontend/package*.json ./
-
 ENV NPM_CONFIG_LEGACY_PEER_DEPS=true
-RUN npm install
+RUN npm ci || npm install
 
+# 소스
 COPY frontend/. .
+ENV CI=false
 
-# (필요 시) 빌드 변수
+# 빌드 변수(필요시)
 ARG VITE_API_URL
 ARG VITE_BACKEND_URL
 ARG VITE_RAPIDAPI_HOST
@@ -19,47 +21,11 @@ ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
 ENV VITE_RAPIDAPI_HOST=$VITE_RAPIDAPI_HOST
 ENV VITE_RAPIDAPI_KEY=$VITE_RAPIDAPI_KEY
 
-# 디버깅용: 지금 읽은 package.json이 맞는지 출력
-RUN echo '--- using this package.json ---' && cat package.json
 
-ENV CI=false
-RUN npm run buildFROM node:20-alpine AS build
-                 WORKDIR /app
-
-                 # 프론트 의존성 (frontend의 package.json/lock만)
-                 COPY frontend/package*.json ./
-                 ENV NPM_CONFIG_LEGACY_PEER_DEPS=true
-                 RUN npm ci || npm install
-
-                 # 프론트 소스
-                 COPY frontend/. .
-
-                 # 지금 어떤 package.json을 쓰는지/소스가 들어왔는지 확인(디버그)
-                 RUN echo '--- package.json ---' && cat package.json && \
-                     echo '--- has index.html? ---' && test -f index.html && echo YES || (echo NO && exit 1) && \
-                     echo '--- has src? ---' && test -d src && ls -la src | head
-
-                 # (필요시 Vite 빌드 변수)
-                 ARG VITE_API_URL
-                 ARG VITE_BACKEND_URL
-                 ARG VITE_RAPIDAPI_HOST
-                 ARG VITE_RAPIDAPI_KEY
-                 ENV VITE_API_URL=$VITE_API_URL
-                 ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
-                 ENV VITE_RAPIDAPI_HOST=$VITE_RAPIDAPI_HOST
-                 ENV VITE_RAPIDAPI_KEY=$VITE_RAPIDAPI_KEY
-
-                 ENV CI=false
-                 RUN npm run build --verbose || (echo '--- npm logs ---' && ls -la /root/.npm/_logs || true && cat /root/.npm/_logs/* 2>/dev/null || true && exit 1)
-
-                 FROM nginx:alpine
-                 COPY --from=build /app/dist /usr/share/nginx/html
-                 EXPOSE 80
-                 CMD ["nginx","-g","daemon off;"]
-
+RUN npm run build
 
 # --- serve ---
 FROM nginx:alpine
-COPY --from=build /app/dist /usr/share/nginx/html
+COPY --from=build /app/frontend/dist /usr/share/nginx/html
 EXPOSE 80
 CMD ["nginx","-g","daemon off;"]
