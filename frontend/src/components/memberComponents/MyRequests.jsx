@@ -20,7 +20,7 @@ import {
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useUser} from "@/redux/useUser.js";
+import { useUser } from "@/redux/useUser.js";
 
 const getTypeBadge = (type) => {
   switch (type) {
@@ -109,14 +109,13 @@ const MyRequests = () => {
         const res = await axios.get(`/api/report/my?page=${page}&size=${pageSize}`, {
           withCredentials: true,
         });
-        // 구조분해 할당 시 fallback value 추가!
         const { content = [], totalPages = 1, totalElements = 0, size = 20 } = res.data || {};
         setReports(content);
         setTotalPages(totalPages);
         setTotalElements(totalElements);
         setPageSize(size);
       } catch (err) {
-        setReports([]); // 에러나면 빈 배열
+        setReports([]);
         console.error("리포트 목록 조회 실패:", err);
       }
     };
@@ -143,18 +142,26 @@ const MyRequests = () => {
 
   const canWrite = user && ["BRONZE", "SILVER", "GOLD"].includes(user.roleName);
 
-  // reports가 undefined여도 에러 안 나게!
   const filteredReports = (reports || []).filter((report) => {
     const typeMatch = filterType === "ALL" || report.type === filterType;
     const statusMatch = filterStatus === "ALL" || report.status === filterStatus;
     return typeMatch && statusMatch;
   });
 
+  // 🔸 글이 없을 때 메시지 출력
+  if (!reports || reports.length === 0) {
+    return (
+      <Box p={6} maxW="1000px" mx="auto" mt={2}>
+        <Text>문의하신 내용이 없습니다.</Text>
+      </Box>
+    );
+  }
+
   return (
     <>
-      <Text fontSize={20} fontWeight="bold">
+      {/* <Text fontSize={20} fontWeight="bold">
         문의 내역
-      </Text>
+      </Text> */}
       <Box p={6} maxW="1000px" mx="auto" mt={2}>
         <Flex justify="space-between" mb={4} align="center">
           <HStack spacing={4}>
@@ -230,9 +237,8 @@ const MyRequests = () => {
         <Table
           variant="simple"
           size="sm"
-          // tableLayout="fixed"  // prop으로 쓰지 마세요!
           sx={{
-            tableLayout: "fixed", // 이걸로 충분!
+            tableLayout: "fixed",
             th: { textAlign: "center" },
             td: { textAlign: "center", verticalAlign: "middle" },
             ".title-cell": {
@@ -318,3 +324,4 @@ const MyRequests = () => {
 };
 
 export default MyRequests;
+
