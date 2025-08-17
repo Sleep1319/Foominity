@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.foominity.config.jwt.JwtTokenProvider;
+
 import com.example.foominity.domain.member.Member;
 import com.example.foominity.dto.member.MemberRequest;
 import com.example.foominity.dto.member.NicknameChangeRequest;
@@ -15,6 +16,7 @@ import com.example.foominity.exception.NotFoundMemberException;
 import com.example.foominity.exception.UnauthorizedException;
 import com.example.foominity.repository.member.MemberRepository;
 import com.example.foominity.repository.member.ReviewLikeRepository;
+
 import com.example.foominity.service.image.ImageService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,25 +32,31 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final ImageService imageService;
     private final ReviewLikeRepository reviewLikeRepository;
+    
+     /** 회원 탈퇴 */
+   @Transactional
+public void deleteMember(Long memberId, MemberRequest req) {
+    Member member = memberRepository.findById(memberId)
+            .orElseThrow(NotFoundMemberException::new);
 
-    public void deleteMember(Long memberId, MemberRequest req) {
-        // 1) 회원 조회
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(NotFoundMemberException::new);
-
-        // 2) 비밀번호 일치 확인
-        if (!passwordEncoder.matches(req.getPassword(), member.getPassword())) {
-            throw new IllegalStateException("비밀번호가 일치하지 않습니다.");
-        }
-
-        // 3) 프로필 이미지가 있으면 물리 파일 + DB 레코드 삭제
-        if (member.getProfileImage() != null) {
-            imageService.deleteImageFile(member.getProfileImage());
-        }
-
-        // 4) 회원 엔티티 삭제
-        memberRepository.delete(member);
+    String raw = req.getPassword();
+    String enc = member.getPassword();
+    if (enc == null || raw == null || !passwordEncoder.matches(raw, enc)) {
+        throw new IllegalStateException("비밀번호가 일치하지 않습니다.");
     }
+
+    // 프로필 이미지: 물리 파일은 직접 지우되, 엔티티는 cascade로 지워도 되지만
+    // 파일 삭제가 필요하므로 FK를 끊고 파일 삭제 후 진행
+    if (member.getProfileImage() != null) {
+        var img = member.getProfileImage();
+        member.setProfileImage(null);     // FK 해제
+        memberRepository.save(member);    // flush 보장
+        imageService.deleteImageFile(img);// 물리 파일 + image_file 레코드 삭제
+    }
+
+    memberRepository.delete(member);
+}
+
 
     // 닉네임 변경
     @Transactional

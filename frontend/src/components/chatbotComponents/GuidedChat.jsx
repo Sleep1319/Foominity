@@ -112,81 +112,145 @@ function parseRecommendationCards(replyText) {
 
 /* ---- iTunes 메타 데이터 보강: previewUrl / artworkUrl100 ---- */
 
+/* ---- iTunes 메타 데이터 보강: previewUrl / artworkUrl100 ---- */
+
 const IT_COUNTRIES = ["US", "KR"];
 const itunesCache = new Map();
 
-function normalize(s) {
-  return (s || "")
-    .toLowerCase()
-    .replace(/[\p{P}\p{S}]/gu, "")
-    .replace(/\s+/g, " ")
+/** 기본 정규화 */
+function base(s) {
+  return (s || "").normalize("NFKC").toLowerCase().trim();
+}
+
+/** 제목/아티스트에서 괄호/feat/버전/기호 제거 + 공백 정리 */
+function stripDecor(s) {
+  return base(s)
+    // 괄호 안 정보 제거: (feat ...), (Remastered 2019), [From ...]
+    .replace(/\s*(\(|\[).+?(\)|\])\s*/g, " ")
+    // 끝쪽의 "- feat XXX", "- with XXX", "- Single", "- Live" 등 제거
+    .replace(/\s*[-–—]\s*(feat\.?|featuring|with|x)\s+.+$/g, " ")
+    .replace(/\s*[-–—]\s*(single|ep|version|edit|remaster(ed)?|live|from .+)$/g, " ")
+    // & → and 통일
+    .replace(/&/g, " and ")
+    // 영숫자/공백만 남김
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s{2,}/g, " ")
     .trim();
 }
 
+const STOP = new Set(["the", "and", "a", "an", "x", "feat", "featuring", "with"]);
+
+/** 토큰화(불용어 제거) */
+function tokens(s) {
+  return stripDecor(s)
+    .split(/\s+/)
+    .filter((t) => t && !STOP.has(t));
+}
+function tokensSet(s) {
+  return new Set(tokens(s));
+}
+function overlapRatio(a, b) {
+  const A = tokensSet(a);
+  const B = tokensSet(b);
+  if (A.size === 0 || B.size === 0) return 0;
+  let inter = 0;
+  for (const t of A) if (B.has(t)) inter++;
+  return inter / Math.max(A.size, B.size);
+}
+
+/** 점수 계산: 제목/아티스트 겹침 + 정확 일치 가중치, 커버/카라오케 패널티 */
+function computeScore(result, wantedTitle, wantedArtist) {
+  const titleExact = stripDecor(result.trackName) === stripDecor(wantedTitle);
+  const artistExact = stripDecor(result.artistName) === stripDecor(wantedArtist);
+  const titleOv = overlapRatio(result.trackName, wantedTitle);
+  const artistOv = overlapRatio(result.artistName, wantedArtist);
+
+  let s = 0;
+  // 제목 가중치
+  s += titleExact ? 6 : Math.round(titleOv * 4);   // 최대 6점
+  // 아티스트 가중치
+  s += artistExact ? 6 : Math.round(artistOv * 6); // 최대 6점
+
+  // 카라오케/커버/트리뷰트 등은 패널티
+  const nameBlob = `${result.collectionName || ""} ${result.trackName || ""}`;
+  if (/(karaoke|instrumental|tribute|cover)/i.test(nameBlob)) s -= 4;
+
+  return { s, titleOv, artistOv, titleExact, artistExact };
+}
+
+/** iTunes 검색 (음악만, 트랙만) */
 async function fetchItunes(term, country, extraParams = "") {
   const url =
     `https://itunes.apple.com/search?term=${encodeURIComponent(term)}` +
-    `&entity=song&limit=25&country=${country}&lang=ko_kr${extraParams}`;
+    `&media=music&entity=musicTrack&limit=50&country=${country}&lang=ko_kr${extraParams}`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(String(res.status));
   const json = await res.json();
   return json.results || [];
 }
 
-function scoreMatch(r, nt, na) {
-  const rt = normalize(r.trackName);
-  const ra = normalize(r.artistName);
-  let s = 0;
-  if (ra === na) s += 2;
-  else if (ra.includes(na) || na.includes(ra)) s += 1;
-  if (rt === nt) s += 2;
-  else if (rt.includes(nt) || nt.includes(rt)) s += 1;
-  return s;
-}
-
+/** 미리듣기/커버 메타 찾기: 아티스트 겹침 0.6 미만은 필터링(동명이곡 오매칭 방지) */
 async function searchItunesTrackMeta(title, artist) {
-  const key = `${normalize(title)}|${normalize(artist)}`;
-  if (itunesCache.has(key)) return itunesCache.get(key);
+  const cacheKey = `${stripDecor(title)}|${stripDecor(artist)}`;
+  if (itunesCache.has(cacheKey)) return itunesCache.get(cacheKey);
 
-  const nt = normalize(title);
-  const na = normalize(artist);
+  const MIN_ARTIST_OVERLAP = 0.6; // ← 핵심! 아티스트 겹침 하한
+  const queries = [
+    // 1) 제목+아티스트 통합 쿼리
+    (country) => fetchItunes(`${title} ${artist}`, country, ""),
+    // 2) 제목 중심
+    (country) => fetchItunes(title, country, "&attribute=songTerm"),
+  ];
 
-  // 두 단계 시도: ① "title artist" 통합 → ② title 전용(attribute=songTerm)
+  let best = null;
+  let bestScore = -Infinity;
+
   for (const country of IT_COUNTRIES) {
-    const queries = [
-      { term: `${title} ${artist}`, extra: "" },
-      { term: title, extra: "&attribute=songTerm" },
-    ];
-
-    for (const { term, extra } of queries) {
+    for (const q of queries) {
+      let results = [];
       try {
-        const results = await fetchItunes(term, country, extra);
-        let best = null;
-        let bestScore = -1;
-        for (const r of results) {
-          const s = scoreMatch(r, nt, na);
-          if (s > bestScore) {
-            bestScore = s;
-            best = r;
-          }
-        }
-        if (best && bestScore >= 1) {
-          const meta = {
-            previewUrl: best.previewUrl || "",
-            artworkUrl100: best.artworkUrl100 || "",
-          };
-          itunesCache.set(key, meta);
-          return meta;
-        }
+        results = await q(country);
       } catch (e) {
-        // ignore and try next
+        // ignore and move on
+      }
+      if (!results.length) continue;
+
+      // 1차 필터: 아티스트 겹침 0.6 이상만 남김
+      let candidates = results.filter(
+        (r) => overlapRatio(r.artistName, artist) >= MIN_ARTIST_OVERLAP
+      );
+
+      // 그래도 하나도 없으면 살짝 완화(0.45) — 하지만 아예 겹침 0에 가까운 건 절대 허용 X
+      if (!candidates.length) {
+        candidates = results.filter(
+          (r) => overlapRatio(r.artistName, artist) >= 0.45
+        );
+      }
+      if (!candidates.length) continue;
+
+      // 최고 점수 선택
+      for (const r of candidates) {
+        const { s } = computeScore(r, title, artist);
+        if (s > bestScore) {
+          bestScore = s;
+          best = r;
+        }
       }
     }
+    // 국가 한 번에서 충분히 좋은 후보가 나오면 다른 국가는 보지 않아도 됨
+    if (best) break;
   }
 
-  const empty = {};
-  itunesCache.set(key, empty);
-  return empty;
+  const meta =
+    best && bestScore > 0
+      ? {
+          previewUrl: best.previewUrl || "",
+          artworkUrl100: best.artworkUrl100 || "",
+        }
+      : {};
+
+  itunesCache.set(cacheKey, meta);
+  return meta;
 }
 
 async function enrichWithItunesData(items) {
