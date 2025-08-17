@@ -2,6 +2,8 @@ import { useEffect, useRef } from "react";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { increaseUnread, resetUnread } from "@/redux/chatSlice";
 
 let sendMessage = () => {};
 export { sendMessage };
@@ -9,12 +11,22 @@ export { sendMessage };
 export default function ChatSocket({ roomId, onMessageReceive }) {
     const clientRef = useRef(null);
     const subRef = useRef(null);
-    const cbRef = useRef(null);     // 최신 콜백 저장
+    const cbRef = useRef(null);
 
-    // 최신 콜백만 갱신 (연결 재시작 안 함)
-    useEffect(() => {
-        cbRef.current = onMessageReceive;
-    }, [onMessageReceive]);
+    const dispatch = useDispatch();
+    const meId = useSelector((s) => s.user.id);
+    const activeRoomId = useSelector((s) => s.chat.chatRoomId);
+    const chatOpen = useSelector((s) => s.chat.chatOpen);
+
+    // 최신값 refs (콜백 stale 방지)
+    const meIdRef = useRef(meId);
+    const activeRef = useRef(activeRoomId);
+    const openRef = useRef(chatOpen);
+
+    useEffect(() => { cbRef.current = onMessageReceive; }, [onMessageReceive]);
+    useEffect(() => { meIdRef.current = meId; }, [meId]);
+    useEffect(() => { activeRef.current = activeRoomId; }, [activeRoomId]);
+    useEffect(() => { openRef.current = chatOpen; }, [chatOpen]);
 
     useEffect(() => {
         if (!roomId) return;
@@ -30,46 +42,59 @@ export default function ChatSocket({ roomId, onMessageReceive }) {
                     webSocketFactory: () => socket,
                     reconnectDelay: 3000,
                     connectHeaders: { Authorization: `Bearer ${wsToken}` },
-                    debug: (s) => console.log("[STOMP]", s),
+                    debug: () => {},
                     onConnect: () => {
                         if (!mounted) return;
-                        console.log("[WS] connected, room:", roomId);
 
-                        // 이전 구독 해제 후 재구독
                         try { subRef.current?.unsubscribe(); } catch {}
                         subRef.current = client.subscribe(`/topic/chat/${roomId}`, (message) => {
-                            try {
-                                const body = JSON.parse(message.body);
-                                cbRef.current?.(body); // 항상 최신 콜백
-                            } catch (e) { console.warn("parse fail", e); }
+                            let body;
+                            try { body = JSON.parse(message.body); } catch { return; }
+
+                            // 1) 화면에 추가
+                            cbRef.current?.(body);
+
+                            // 2) 내가 보낸 건 카운트 X
+                            const fromMe =
+                                meIdRef.current != null &&
+                                body?.senderId != null &&
+                                Number(body.senderId) === Number(meIdRef.current);
+                            if (fromMe) return;
+
+                            // 3) 보고 있으면 읽음 처리, 아니면 언리드 증가
+                            const isActive =
+                                activeRef.current != null &&
+                                Number(activeRef.current) === Number(roomId);
+                            const isOpen = !!openRef.current;
+                            const isWindowFocused = document.visibilityState === "visible";
+
+                            if (isActive && isOpen && isWindowFocused) {
+                                // 혹시 이전에 쌓인 값이 있으면 함께 제거
+                                dispatch(resetUnread(roomId));
+                            } else {
+                                dispatch(increaseUnread(roomId));
+                            }
                         });
 
                         // 전송 함수
                         sendMessage = (text) => {
-                            if (!client.connected) return console.warn("[WS] not connected");
-                            const receiptId = "send-" + Date.now();
-                            client.watchForReceipt(receiptId, () => {
-                                console.log("[WS] server received:", receiptId);
-                            });
+                            if (!client.connected) return;
                             client.publish({
                                 destination: "/app/chat.sendMessage",
-                                headers: { receipt: receiptId },
                                 body: JSON.stringify({ roomId, message: text }),
                             });
                         };
                     },
+                    onWebSocketClose: () => {},
                     onStompError: (frame) => {
-                        console.error("[STOMP error]", frame.headers["message"], frame.body);
-                    },
-                    onWebSocketClose: (evt) => {
-                        console.warn("[WS] closed:", evt?.reason);
+                        console.error("[STOMP error]", frame.headers?.message, frame.body);
                     },
                 });
 
                 clientRef.current = client;
                 client.activate();
             } catch (e) {
-                console.error("[WS] bootstrap failed:", e);
+                console.error("[WS bootstrap failed]", e);
             }
         })();
 
@@ -79,9 +104,8 @@ export default function ChatSocket({ roomId, onMessageReceive }) {
             subRef.current = null;
             clientRef.current?.deactivate();
             clientRef.current = null;
-            console.log("[WS] disconnected");
         };
-    }, [roomId]); // ✅ roomId만 의존
+    }, [roomId, dispatch]);
 
     return null;
 }

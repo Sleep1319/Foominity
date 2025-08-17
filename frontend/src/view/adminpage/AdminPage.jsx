@@ -4,7 +4,7 @@ import { useLocation } from "react-router-dom";
 
 const AdminReportList = lazy(() => import("../../components/adminpageComponents/AdminPageList.jsx"));
 const AdminMagazine = lazy(() => import("../../components/adminpageComponents/AdminMagazine.jsx"));
-
+const AdminChatPage = lazy(() => import("../chat/AdminChatPage.jsx"))
 export default function AdminPage() {
   const location = useLocation();
 
@@ -12,7 +12,7 @@ export default function AdminPage() {
     () => [
       { label: "신고·문의", Comp: AdminReportList }, // index 0
       { label: "매거진", Comp: AdminMagazine }, // index 1
-      { label: "기타 관리" }, // index 2
+      { label: "채팅 문의", Comp: AdminChatPage }, // index 2
     ],
     []
   );

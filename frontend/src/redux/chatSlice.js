@@ -3,7 +3,8 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
     chatOpen: false,
     chatRoomId: null,
-    unreadCount: {}, // ✅ { roomId: count } 형태로 저장
+    // { [roomId: string]: number }
+    unreadCount: {},
 };
 
 const chatSlice = createSlice({
@@ -24,16 +25,24 @@ const chatSlice = createSlice({
             state.chatRoomId = null;
             state.unreadCount = {};
         },
+
+        // ---------- Unread ----------
         increaseUnread(state, action) {
-            const roomId = action.payload;
-            if (!state.unreadCount[roomId]) {
-                state.unreadCount[roomId] = 0;
-            }
-            state.unreadCount[roomId] += 1;
+            const rid = String(action.payload);
+            state.unreadCount[rid] = (state.unreadCount[rid] || 0) + 1;
         },
         resetUnread(state, action) {
-            const roomId = action.payload;
-            state.unreadCount[roomId] = 0;
+            const rid = String(action.payload);
+            state.unreadCount[rid] = 0;
+        },
+        clearUnread(state) {
+            Object.keys(state.unreadCount).forEach((rid) => {
+                state.unreadCount[rid] = 0;
+            });
+        },
+        setUnread(state, action) {
+            const { roomId, count } = action.payload || {};
+            state.unreadCount[String(roomId)] = count ?? 0;
         },
     },
 });
@@ -45,6 +54,14 @@ export const {
     resetChat,
     increaseUnread,
     resetUnread,
+    clearUnread,
+    setUnread,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;
+/* ------------- SELECTORS ------------- */
+export const selectUnreadMap = (state) => state.chat.unreadCount || {};
+export const selectUnreadForRoom = (roomId) => (state) =>
+    (state.chat.unreadCount && state.chat.unreadCount[String(roomId)]) || 0;
+export const selectUnreadTotal = (state) =>
+    Object.values(state.chat.unreadCount || {}).reduce((a,b)=>a+(b||0),0);

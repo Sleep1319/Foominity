@@ -33,10 +33,8 @@ public class ChatController {
 
         ChatMessageDto out = chatMessageService.handleIncomingMessage(dto, senderId, nickname);
 
-        // 1) 방 브로드캐스트
         messagingTemplate.convertAndSend("/topic/chat/" + out.getRoomId(), out);
 
-        // 2) 관리자 인박스
         String preview = out.getMessage();
         if (preview != null && preview.length() > 120) preview = preview.substring(0, 120) + "…";
         messagingTemplate.convertAndSend("/topic/admin/inbox", Map.of(
@@ -46,7 +44,6 @@ public class ChatController {
                 "createdAt", out.getCreatedAt()
         ));
 
-        // 3) 유저 개인 알림 (관리자가 보낸 경우)
         Long roomOwnerId = chatRoomService.getOwnerId(out.getRoomId());
         if (!senderId.equals(roomOwnerId)) {
             messagingTemplate.convertAndSendToUser(

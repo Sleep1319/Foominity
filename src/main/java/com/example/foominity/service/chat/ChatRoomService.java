@@ -28,4 +28,10 @@ public class ChatRoomService {
                 .map(ChatRoom::getMemberId)
                 .orElseThrow(() -> new IllegalArgumentException("room not found"));
     }
+
+    public Long findExistingRoomId(Long memberId) {
+        return chatRoomRepository.findByMemberId(memberId)
+                .map(ChatRoom::getId)
+                .orElse(null);
+    }
 }

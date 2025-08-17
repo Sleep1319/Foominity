@@ -1,10 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Outlet } from "react-router-dom";
-import { toggleChat } from "../redux/chatSlice";
-import ChatWidget from "../components/chatComponents/ChatWidget.jsx";
-import ChatSocket from "../components/chatComponents/ChatSocket.jsx"; // 아래 “수정본” 사용
-import WsNotifier from "@/components/chatComponents/webNotifier.jsx";
+import { toggleChat, resetUnread } from "@/redux/chatSlice";
+import ChatWidget from "@/components/chatComponents/ChatWidget.jsx";
+import ChatSocket from "@/components/chatComponents/ChatSocket.jsx";
+import WsNotifier from "@/components/chatComponents/WsNotifier.jsx";
+
+const lastSeenKey = (rid) => `chat:lastSeen:${rid}`;
 
 export default function ChatLayout() {
     const dispatch = useDispatch();
@@ -12,37 +14,44 @@ export default function ChatLayout() {
     const chatRoomId = useSelector((s) => s.chat.chatRoomId);
     const senderId = useSelector((s) => s.user.id);
 
-    // ▼ 메시지 상태를 레이아웃에서 관리
     const [messages, setMessages] = useState([]);
 
-    // 방 바뀌면 히스토리 로드 (엔드포인트는 프로젝트에 맞게)
+    // 히스토리 로드
     useEffect(() => {
         if (!chatRoomId) return;
         (async () => {
             try {
-                const r = await fetch(`/api/admin/chat/rooms/${chatRoomId}/messages`);
+                const r = await fetch(`/api/admin/chat/rooms/${chatRoomId}/messages`, { credentials: "include" });
                 const data = await r.json();
                 setMessages(Array.isArray(data) ? data : []);
-            } catch (e) {
-                console.warn("history load fail", e);
+            } catch {
                 setMessages([]);
             }
         })();
     }, [chatRoomId]);
 
-    // 서버에서 온 메시지만 추가 (낙관적 렌더 X)
+    // 소켓 수신
     const handleReceive = (msg) => {
         setMessages((prev) => [...prev, msg]);
     };
 
+    // ★ 위젯 열려 있고 해당 방을 보는 중이면: 새 메시지 들어올 때마다 읽음 처리 + lastSeen 저장
+    useEffect(() => {
+        if (!chatOpen || !chatRoomId) return;
+        try {
+            localStorage.setItem(lastSeenKey(chatRoomId), new Date().toISOString());
+        } catch {}
+        dispatch(resetUnread(String(chatRoomId)));
+    }, [chatOpen, chatRoomId, messages.length, dispatch]);
+
     return (
         <>
             <WsNotifier />
+
             <main style={{ minHeight: "calc(100vh - 120px)" }}>
                 <Outlet />
             </main>
 
-            {/* ✅ 소켓은 레이아웃에 배치 (Collapse 영향 없음) */}
             {chatRoomId != null && (
                 <ChatSocket roomId={chatRoomId} onMessageReceive={handleReceive} />
             )}
@@ -53,7 +62,7 @@ export default function ChatLayout() {
                     senderId={senderId}
                     isOpen={chatOpen}
                     onToggle={() => dispatch(toggleChat())}
-                    messages={messages}              // ▼ 부모 상태 내려줌
+                    messages={messages}
                 />
             )}
         </>

@@ -7,6 +7,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,4 +37,20 @@ public class ChatRoomController {
         response.put("roomId", roomId);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/api/chat/my-room-id")
+    public ResponseEntity<?> getMyRoomId(HttpServletRequest request) {
+        String token = jwtTokenProvider.resolveTokenFromCookie(request);
+        if (token == null || !jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        Long memberId = jwtTokenProvider.getUserIdFromToken(token);
+
+        Long existingRoomId = chatRoomService.findExistingRoomId(memberId); // 아래 서비스에 추가
+        if (existingRoomId == null) {
+            return ResponseEntity.noContent().build(); // 204
+        }
+        return ResponseEntity.ok(Map.of("roomId", existingRoomId));
+    }
+
 }
