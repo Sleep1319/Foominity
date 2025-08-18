@@ -10,7 +10,14 @@ RUN npm install --legacy-peer-deps
 COPY frontend/. .
 ENV NODE_OPTIONS=--max-old-space-size=2048
 ENV CI=false
+ARG VITE_API_URL
+ARG VITE_RAPIDAPI_HOST
+ARG VITE_RAPIDAPI_KEY
+ENV VITE_API_URL=$VITE_API_URL
+ENV VITE_RAPIDAPI_HOST=$VITE_RAPIDAPI_HOST
+ENV VITE_RAPIDAPI_KEY=$VITE_RAPIDAPI_KEY
 RUN npm run build
+
 
 # --- serve ---
 FROM nginx:alpine
