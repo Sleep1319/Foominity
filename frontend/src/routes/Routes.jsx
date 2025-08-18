@@ -34,6 +34,7 @@ import ArtistDetails from "../view/artist/ArtistDetails.jsx";
 
 import ArtistEdits from "../view/artist/ArtistEdits.jsx";
 import PublicProfile from "../view/member/PublicProfile.jsx";
+import Quiz from "./../view/quiz/Quiz";
 
 function AppRoutes() {
   return (
@@ -75,6 +76,9 @@ function AppRoutes() {
 
       {/* Report */}
       <Route path="/report/create" element={<ReportCreateRun />} />
+
+      {/* Quiz */}
+      <Route path="/quiz" element={<Quiz />} />
     </Routes>
   );
 }
