@@ -140,13 +140,13 @@ const BoardCreate = () => {
                   >
                     ×
                   </Button>
-                  <Box fontSize="sm" color="gray.500" mb={2}>
-                    업로드 한 이미지를 본문에 삽입하려면, 드래그로 끌어다 넣어주세요.
-                  </Box>
                 </Box>
               ))}
             </Flex>
           </FormControl>
+          <Box fontSize="sm" color="gray.500" mb={2}>
+            업로드 한 이미지를 본문에 삽입하려면, 드래그로 끌어다 넣어주세요.
+          </Box>
 
           <Box maxW="700px" mx="auto" py={10} px={4}>
             <FormControl>
