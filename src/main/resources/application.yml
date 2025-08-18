@@ -45,3 +45,8 @@ openai:
 spotify:
   client-id: ${SPOTIFY_CLIENT_ID}
   client-secret: ${SPOTIFY_CLIENT_SECRET}
+
+rapidapi:
+  key: ${RAPIDAPI_KEY}
+  hosts:
+    musixmatch: ${RAPIDAPI_HOST}

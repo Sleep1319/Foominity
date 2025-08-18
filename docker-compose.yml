@@ -42,6 +42,8 @@ services:
       KAKAO_CLIENT_SECRET: ${KAKAO_CLIENT_SECRET}
       SPOTIFY_CLIENT_ID: ${SPOTIFY_CLIENT_ID}
       SPOTIFY_CLIENT_SECRET: ${SPOTIFY_CLIENT_SECRET}
+      VITE_RAPIDAPI_HOST: ${RAPIDAPI_HOST}
+      VITE_RAPIDAPI_KEY: ${RAPIDAPI_KEY}
       SEC_LOG_LEVEL: INFO
 
     env_file:
@@ -67,8 +69,7 @@ services:
       dockerfile: frontendDockerfile
       args:
         VITE_API_URL: ${VITE_API_URL}
-        VITE_RAPIDAPI_HOST: ${RAPIDAPI_HOST}
-        VITE_RAPIDAPI_KEY:  ${RAPIDAPI_KEY}
+
 
     container_name: frontend
     ports:
