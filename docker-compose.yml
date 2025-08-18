@@ -10,7 +10,7 @@ services:
       MYSQL_DATABASE: doremisol
     volumes:
       - mysql_data:/var/lib/mysql
-      - /etc/myapp/mysql/my.cnf:/etc/mysql/conf.d/my.cnf:ro
+#      - /etc/myapp/mysql/my.cnf:/etc/mysql/conf.d/my.cnf:ro
     # ports: ["3306:3306"]  # 정말 필요할 때만 개방
     healthcheck:
       test: ["CMD","mysqladmin","ping","-h","localhost","-p${DB_ROOT_PASSWORD}"]
