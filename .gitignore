@@ -11,8 +11,6 @@ frontend/node_modules/
 **/dist/
 **/.gradle/
 
-## application-oauth.yml ##
-src/main/resources/application-oauth.yml
 
 ### STS ###
 .apt_generated
@@ -45,11 +43,6 @@ out/
 ### VS Code ###
 .vscode/
 
-
-application.yml
-docker-compose.yml
-Dockerfile
-frontendDockerfile
 
 uploads/
 src/main/java/com/example/reactbootserver/ReactBootServerApplication.java
@@ -96,7 +89,9 @@ node_modules
 /src/main/java/com/example/foominity/controller/serverTestController.java
 /frontend.zip
 /my.cnf
-/mysqlDockerfile
+
 /src/main/resources/application-local.yml
-/src/main/resources/application-prod.yml
+
 /frontend/env.prod
+
+/application-local.yml
