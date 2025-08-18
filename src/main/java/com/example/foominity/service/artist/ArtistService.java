@@ -64,6 +64,13 @@ public class ArtistService {
         PageRequest pageable = PageRequest.of(page, 12, Sort.by(Sort.Direction.DESC, "id"));
         List<Artist> artists;
 
+        if (search != null && !search.isBlank()) {
+            String q = search.trim();
+            Page<Artist> pageResult = artistRepository.findByNameContainingIgnoreCase(q, pageable);
+            List<ArtistSimpleResponse> content = toSimpleResponseList(pageResult.getContent());
+            return new PageImpl<>(content, pageable, pageResult.getTotalElements());
+        }
+
         if (categories != null && !categories.isEmpty()) {
             // 카테고리 필터가 있는 경우: 전체 가져오고 id desc 정렬 후 subList로 자름
             artists = artistRepository.findByCategories(categories, categories.size())

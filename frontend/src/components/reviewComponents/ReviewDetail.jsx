@@ -432,9 +432,22 @@ const ReviewDetail = () => {
                       >
                         {album.title}
                       </Text>
-                      <Text fontSize="sm" color="gray.600" isTruncated>
-                        {album.artists.map((a) => a.name).join(", ")}
-                      </Text>
+                      <Box>
+                        {album.artists?.map((a) => (
+                          <Text
+                            key={a.id}
+                            fontSize="sm"
+                            color="gray.600"
+                            cursor="pointer"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/artist/${a.id}`);
+                            }}
+                          >
+                            {a.name}
+                          </Text>
+                        ))}
+                      </Box>
                     </Box>
                   </Box>
                 ))}

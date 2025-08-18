@@ -22,6 +22,8 @@ import {
   Center,
   AspectRatio,
   Button,
+  ButtonGroup,
+  Flex,
 } from "@chakra-ui/react";
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import { BsChevronLeft, BsChevronRight } from "react-icons/bs";
@@ -59,6 +61,8 @@ const ReviewGrid = () => {
 
   const [albumLoading, _setAlbumLoading] = useState(false);
 
+  const [sort, setSort] = useState("latest");
+
   // 검색 실행(버튼/Enter)
   const onClickSearch = () => {
     const q = searchTerm.trim();
@@ -80,6 +84,7 @@ const ReviewGrid = () => {
   useEffect(() => {
     const params = new URLSearchParams();
     params.append("page", albumPage);
+    params.append("sort", sort);
     if (committedAlbumSearch) params.append("search", committedAlbumSearch);
     selectedCategories.forEach((c) => params.append("categories", c)); // 서버가 이름 기반이라면 그대로 사용
 
@@ -94,7 +99,7 @@ const ReviewGrid = () => {
         setReviews([]);
         setAlbumTotalPages(1);
       });
-  }, [albumPage, committedAlbumSearch, selectedCategories]);
+  }, [albumPage, committedAlbumSearch, selectedCategories, sort]);
 
   // 아티스트 목록(서버 검색 + 카테고리 + 페이지)
   useEffect(() => {
@@ -171,29 +176,62 @@ const ReviewGrid = () => {
 
             <TopRankedAlbums />
 
-            <HStack mb={6}>
-              <Input
-                placeholder="앨범 제목으로 검색"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && onClickSearch()}
-              />
-              <Button colorScheme="blue" onClick={onClickSearch} isLoading={albumLoading}>
-                검색
-              </Button>
-              {committedAlbumSearch && (
+            <Flex
+              mb={6}
+              align="center"
+              gap={4}
+              // 모바일에선 세로, md↑에선 가로 배치
+              direction={{ base: "column", md: "row" }}
+              justify="space-between"
+            >
+              {/* 왼쪽: 최신순 / 인기순 */}
+              <ButtonGroup isAttached size="sm">
                 <Button
-                  variant="ghost"
+                  variant={sort === "latest" ? "solid" : "outline"}
                   onClick={() => {
-                    setCommittedAlbumSearch("");
+                    setSort("latest");
                     setAlbumPage(0);
                   }}
                 >
-                  검색 초기화
+                  최신순
                 </Button>
-              )}
-            </HStack>
+                <Button
+                  variant={sort === "popular" ? "solid" : "outline"}
+                  onClick={() => {
+                    setSort("popular");
+                    setAlbumPage(0);
+                  }}
+                >
+                  별점순
+                </Button>
+              </ButtonGroup>
 
+              {/* 오른쪽: 검색 입력 + 버튼들 */}
+              <HStack spacing={3} w={{ base: "100%", md: "auto" }}>
+                <Input
+                  placeholder="앨범 제목으로 검색"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && onClickSearch()}
+                  // 모바일에선 꽉 차게, 데스크톱에선 적당한 폭
+                  w={{ base: "100%", md: "360px" }}
+                />
+                <Button colorScheme="blue" onClick={onClickSearch} isLoading={albumLoading}>
+                  검색
+                </Button>
+                {committedAlbumSearch && (
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      setCommittedAlbumSearch("");
+                      setAlbumPage(0);
+                    }}
+                  >
+                    검색 초기화
+                  </Button>
+                )}
+              </HStack>
+            </Flex>
             <HStack spacing={2} mb={2} cursor="pointer" onClick={onToggle}>
               <Text fontWeight="bold">카테고리 필터</Text>
               <Icon as={isOpen ? ChevronUpIcon : ChevronDownIcon} />
