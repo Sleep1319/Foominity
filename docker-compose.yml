@@ -23,7 +23,7 @@ services:
   app:
     build:
       context: .
-    # dockerfile: Dockerfile  # 기본명이면 생략 가능
+      dockerfile: Dockerfile  # 기본명이면 생략 가능
     container_name: springboot-app
     environment:
       SPRING_PROFILES_ACTIVE: prod,oauth
