@@ -23,38 +23,16 @@ services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile  # 기본명이면 생략 가능
+      dockerfile: Dockerfile
     container_name: springboot-app
-    environment:
-      SPRING_PROFILES_ACTIVE: prod,oauth
-      SERVER_PORT: 8084
-      DB_HOST: mysql
-      DB_PORT: 3306
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-      JWT_SECRET: ${JWT_SECRET}
-      MAIL_USERNAME: ${MAIL_USERNAME}
-      MAIL_PASSWORD: ${MAIL_PASSWORD}
-      OPENAI_API_KEY: ${OPENAI_API_KEY}
-      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
-      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
-      KAKAO_CLIENT_ID: ${KAKAO_CLIENT_ID}
-      KAKAO_CLIENT_SECRET: ${KAKAO_CLIENT_SECRET}
-      SPOTIFY_CLIENT_ID: ${SPOTIFY_CLIENT_ID}
-      SPOTIFY_CLIENT_SECRET: ${SPOTIFY_CLIENT_SECRET}
-      VITE_RAPIDAPI_HOST: ${RAPIDAPI_HOST}
-      VITE_RAPIDAPI_KEY: ${RAPIDAPI_KEY}
-      SEC_LOG_LEVEL: INFO
-
     env_file:
       - /home/ubuntu/Foominity/.env
-
     depends_on:
       mysql:
         condition: service_healthy
-    ports: ["127.0.0.1:8084:8084"]
+    ports:
+      - "127.0.0.1:8084:8084"
     healthcheck:
-
       test: ["CMD","curl","-f","http://localhost:8084/actuator/health"]
       interval: 10s
       timeout: 3s
