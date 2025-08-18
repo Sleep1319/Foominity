@@ -52,7 +52,7 @@ const SettingsButton = ({ items: customItems }) => {
             w="135px"
             mb="142px"
             // ml="-45px"
-            ml="-68px"
+            ml="-170px"
             _hover={{ bg: "white", color: "black" }}
           >
             <HiCog style={{ marginRight: 3 }} />
