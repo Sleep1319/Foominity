@@ -7,9 +7,9 @@ services:
     container_name: mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
-      MYSQL_DATABASE: doremisol
+      MYSQL_DATABASE: foominity
     volumes:
-      - mysql_data:/var/lib/mysql
+      - /home/ubuntu/mysql:/var/lib/mysql
 #      - /etc/myapp/mysql/my.cnf:/etc/mysql/conf.d/my.cnf:ro
     # ports: ["3306:3306"]  # 정말 필요할 때만 개방
     healthcheck:
