@@ -52,8 +52,7 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
-    ports:
-      - "127.0.0.1:8084:8084"
+    ports: ["127.0.0.1:8084:8084"]
     healthcheck:
 
       test: ["CMD","curl","-f","http://localhost:8084/actuator/health"]
@@ -72,8 +71,7 @@ services:
 
 
     container_name: frontend
-    ports:
-      - "3000:80"
+    ports: ["127.0.0.1:3000:80"]
     restart: always
 
 volumes:
