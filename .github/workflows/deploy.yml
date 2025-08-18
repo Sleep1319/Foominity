@@ -1,5 +1,5 @@
 name: Deploy to EC2
-
+#자동 빌드 테스트
 on:
   push:
     branches:
