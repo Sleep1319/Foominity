@@ -37,52 +37,56 @@ import PublicProfile from "../view/member/PublicProfile.jsx";
 import ChatLayout from "../layouts/ChatLayout.jsx";
 import AdminChatPage from "@/view/chat/AdminChatPage.jsx";
 import AdminPage from "../view/adminPage/AdminPage.jsx";
+import Quiz from "./../view/quiz/Quiz";
 
 function AppRoutes() {
   return (
-    <Routes>
-      <Route element={<ChatLayout />}>
-        <Route path="/admin/chat" element={<AdminChatPage />} />
-        <Route path="/" element={<Home />} />
-        <Route path="/users/:id/profile" element={<PublicProfile />} />
-        <Route path="/changepassword" element={<ChangePassword />} />
-        <Route path="/findpassword" element={<FindPassword />} />
-        <Route path="/report" element={<ReportLists />} />
-        <Route path="/report/:id" element={<ReportDetails />} />
-        <Route path="/notice" element={<NoticeLists />} />
-        <Route path="/notice/:id" element={<NoticeDetails />} />
-        <Route path="/review" element={<Review />} />
-        <Route path="/review/:id" element={<ReviewDetails />} />
-        <Route path="/deletecomplete" element={<DeleteComplete />} />
-        <Route path="/artist/:id" element={<ArtistDetails />} />
-        <Route element={<ProtectedRoute requireAuth={true} />}>
-          {/* 로그인 필수 페이지 */}
-          <Route path="/mypage/*" element={<MyPage />} />
-          <Route path="/mymusic/" element={<MyMusic />} />
-          <Route path="/review/create" element={<CreateReview />} />
-          <Route path="/artist/update/:id" element={<ArtistEdits />} />
-          <Route path="/admin" element={<AdminPage />} />
+      <Routes>
+        <Route element={<ChatLayout />}>
+          <Route path="/admin/chat" element={<AdminChatPage />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/users/:id/profile" element={<PublicProfile />} />
+          <Route path="/changepassword" element={<ChangePassword />} />
+          <Route path="/findpassword" element={<FindPassword />} />
+          <Route path="/report" element={<ReportLists />} />
+          <Route path="/report/:id" element={<ReportDetails />} />
+          <Route path="/notice" element={<NoticeLists />} />
+          <Route path="/notice/:id" element={<NoticeDetails />} />
+          <Route path="/review" element={<Review />} />
+          <Route path="/review/:id" element={<ReviewDetails />} />
+          <Route path="/deletecomplete" element={<DeleteComplete />} />
+          <Route path="/artist/:id" element={<ArtistDetails />} />
+          <Route element={<ProtectedRoute requireAuth={true} />}>
+            {/* 로그인 필수 페이지 */}
+            <Route path="/mypage/*" element={<MyPage />} />
+            <Route path="/mymusic/" element={<MyMusic />} />
+            <Route path="/review/create" element={<CreateReview />} />
+            <Route path="/artist/update/:id" element={<ArtistEdits />} />
+            <Route path="/admin" element={<AdminPage />} />
+          </Route>
+          <Route path="/mymusic/participatedalbumslist" element={<ParticipatedAlbumsList />} />
+
+          {/* 자유게시판 */}
+          <Route path="/board" element={<BoardLists />} />
+          <Route path="/board/create" element={<BoardCreateRun />} />
+          <Route path="/board/:id" element={<BoardDetails />} />
+          <Route path="/board/update/:id" element={<BoardUpdateRun />} />
+
+          {/* Notice */}
+          <Route path="/notice/create" element={<NoticeCreateRun />} />
+
+          {/* Report */}
+          <Route path="/report/create" element={<ReportCreateRun />} />
         </Route>
-        <Route path="/mymusic/participatedalbumslist" element={<ParticipatedAlbumsList />} />
+        <Route element={<ProtectedRoute requireAuth={false} />}>
+          <Route path="/loginpage" element={<LoginPage />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/social-sign-up" element={<SocialRegister />} />
+        </Route>
+        {/* Quiz */}
+        <Route path="/quiz" element={<Quiz />} />
 
-        {/* 자유게시판 */}
-        <Route path="/board" element={<BoardLists />} />
-        <Route path="/board/create" element={<BoardCreateRun />} />
-        <Route path="/board/:id" element={<BoardDetails />} />
-        <Route path="/board/update/:id" element={<BoardUpdateRun />} />
-
-        {/* Notice */}
-        <Route path="/notice/create" element={<NoticeCreateRun />} />
-
-        {/* Report */}
-        <Route path="/report/create" element={<ReportCreateRun />} />
-      </Route>
-      <Route element={<ProtectedRoute requireAuth={false} />}>
-        <Route path="/loginpage" element={<LoginPage />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/social-sign-up" element={<SocialRegister />} />
-      </Route>
-    </Routes>
+      </Routes>
   );
 }
 
