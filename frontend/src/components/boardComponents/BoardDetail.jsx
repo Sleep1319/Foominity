@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Box, Text, Heading, Flex, Spacer, Spinner, Button, useToast, HStack, Icon } from "@chakra-ui/react";
 import { useParams, useNavigate } from "react-router-dom";
 import { FaRegEye, FaRegComment } from "react-icons/fa";
-import { useUser} from "@/redux/useUser.js";
+import { useUser } from "@/redux/useUser.js";
 import axios from "axios";
 import BoardCommentForm from "@/components/commentComponents/BoardCommentForm.jsx";
 // import CommentList from "@/components/commentComponents/CommenList.jsx";
@@ -159,12 +159,12 @@ const BoardDetail = () => {
           </Button>
           <Spacer />
           {String(loginMemberId) === String(board.memberId) && (
-            <Button bg="blue" color="white" size="sm" onClick={() => navigate(`/board/update/${board.id}`)}>
+            <Button colorScheme="gray" size="sm" onClick={() => navigate(`/board/update/${board.id}`)}>
               수정
             </Button>
           )}
           {user?.roleName === "ADMIN" && (
-            <Button bg="red" color="white" size="sm" onClick={handleDelete}>
+            <Button colorScheme="red" color="white" size="sm" onClick={handleDelete}>
               삭제
             </Button>
           )}

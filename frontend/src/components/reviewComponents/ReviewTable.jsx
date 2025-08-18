@@ -168,7 +168,7 @@ const ReviewGrid = () => {
           <TabPanel>
             {state?.roleName === "ADMIN" && (
               <Box textAlign="right" mb={4}>
-                <Button colorScheme="blackAlpha" onClick={() => navigate("/review/create")}>
+                <Button bg="black" color="white" onClick={() => navigate("/review/create")}>
                   리뷰 작성
                 </Button>
               </Box>
@@ -338,12 +338,13 @@ const ReviewGrid = () => {
               <Button colorScheme="gray" onClick={onClickSearch} isLoading={albumLoading}>
                 검색
               </Button>
-              {committedAlbumSearch && (
+              {/* ✅ 여기 committedArtistSearch 로 수정 */}
+              {committedArtistSearch && (
                 <Button
                   variant="ghost"
                   onClick={() => {
-                    setCommittedAlbumSearch("");
-                    setAlbumPage(0);
+                    setCommittedArtistSearch("");
+                    setArtistPage(0);
                   }}
                 >
                   검색 초기화
@@ -405,29 +406,11 @@ const ReviewGrid = () => {
               ))}
             </SimpleGrid>
 
-            {tabIndex === 1 && artists.length > 0 && (
-              <Box textAlign="center" mt={8}>
-                <HStack justify="center" spacing={4}>
-                  <Button
-                    onClick={() => setArtistPage((prev) => Math.max(prev - 1, 0))}
-                    isDisabled={artistPage === 0}
-                    leftIcon={<BsChevronLeft />}
-                  >
-                    이전
-                  </Button>
-                  <Text fontWeight="bold">
-                    {artistPage + 1} / {artistTotalPages}
-                  </Text>
-                  <Button
-                    onClick={() => setArtistPage((prev) => Math.min(prev + 1, artistTotalPages - 1))}
-                    isDisabled={artistPage >= artistTotalPages - 1}
-                    rightIcon={<BsChevronRight />}
-                  >
-                    다음
-                  </Button>
-                </HStack>
-              </Box>
-            )}
+            <Pagination
+              currentPage={artistPage}
+              totalPages={artistTotalPages}
+              onPageChange={(page) => setArtistPage(page)}
+            />
           </TabPanel>
         </TabPanels>
       </Tabs>

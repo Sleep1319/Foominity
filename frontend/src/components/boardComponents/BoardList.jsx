@@ -20,7 +20,7 @@ import {
 } from "@chakra-ui/react";
 import { FaRegEye } from "react-icons/fa";
 import { SearchIcon } from "@chakra-ui/icons";
-import { useUser} from "@/redux/useUser.js";
+import { useUser } from "@/redux/useUser.js";
 
 const BoardList = ({ currentId }) => {
   const BOARDS_PER_PAGE = 7;
@@ -273,8 +273,8 @@ const BoardList = ({ currentId }) => {
             </InputGroup>
           </form>
           {user && (
-            <Button colorScheme="blue" size="sm" onClick={() => navigate("/board/create")} ml={2} px={6}>
-              글쓰기
+            <Button bg="black" color="white" size="sm" onClick={() => navigate("/board/create")} ml={2} px={6}>
+              글작성
             </Button>
           )}
         </Flex>
