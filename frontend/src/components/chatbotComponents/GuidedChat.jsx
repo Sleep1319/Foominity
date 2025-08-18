@@ -1,11 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  useRef,
-  forwardRef,
-  useImperativeHandle,
-  useCallback,
-} from "react";
+import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle, useCallback } from "react";
 import {
   Box,
   VStack,
@@ -67,7 +60,7 @@ function parseRecommendationCards(replyText) {
   // 2) 번호가 붙은 "한 줄 리스트" 패턴
   // 예: "1. Title - Artist  이유: ~~~"
   const lineRe =
-    /^\s*\d+\s*(?:[)\.\-:])?\s*(.+?)\s*(?:-|–|—)\s*(.+?)(?:\s*(?:\||-|—)?\s*(?:이유|reason)[:：]\s*(.+))?\s*$/gmi;
+    /^\s*\d+\s*(?:[)\.\-:])?\s*(.+?)\s*(?:-|–|—)\s*(.+?)(?:\s*(?:\||-|—)?\s*(?:이유|reason)[:：]\s*(.+))?\s*$/gim;
   const oneLineItems = [];
   let m;
   let idx = 1;
@@ -93,7 +86,10 @@ function parseRecommendationCards(replyText) {
   const items = [];
   idx = 1;
   for (const b of blocks) {
-    const lines = b.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+    const lines = b
+      .split(/\r?\n/)
+      .map((l) => l.trim())
+      .filter(Boolean);
     if (!lines.length) continue;
 
     const first = lines[0].replace(/^\s*\d+\s*(?:[)\.\-:]+)?\s*/, "");
@@ -112,8 +108,6 @@ function parseRecommendationCards(replyText) {
 
 /* ---- iTunes 메타 데이터 보강: previewUrl / artworkUrl100 ---- */
 
-/* ---- iTunes 메타 데이터 보강: previewUrl / artworkUrl100 ---- */
-
 const IT_COUNTRIES = ["US", "KR"];
 const itunesCache = new Map();
 
@@ -124,18 +118,20 @@ function base(s) {
 
 /** 제목/아티스트에서 괄호/feat/버전/기호 제거 + 공백 정리 */
 function stripDecor(s) {
-  return base(s)
-    // 괄호 안 정보 제거: (feat ...), (Remastered 2019), [From ...]
-    .replace(/\s*(\(|\[).+?(\)|\])\s*/g, " ")
-    // 끝쪽의 "- feat XXX", "- with XXX", "- Single", "- Live" 등 제거
-    .replace(/\s*[-–—]\s*(feat\.?|featuring|with|x)\s+.+$/g, " ")
-    .replace(/\s*[-–—]\s*(single|ep|version|edit|remaster(ed)?|live|from .+)$/g, " ")
-    // & → and 통일
-    .replace(/&/g, " and ")
-    // 영숫자/공백만 남김
-    .replace(/[^a-z0-9\s]/g, " ")
-    .replace(/\s{2,}/g, " ")
-    .trim();
+  return (
+    base(s)
+      // 괄호 안 정보 제거: (feat ...), (Remastered 2019), [From ...]
+      .replace(/\s*(\(|\[).+?(\)|\])\s*/g, " ")
+      // 끝쪽의 "- feat XXX", "- with XXX", "- Single", "- Live" 등 제거
+      .replace(/\s*[-–—]\s*(feat\.?|featuring|with|x)\s+.+$/g, " ")
+      .replace(/\s*[-–—]\s*(single|ep|version|edit|remaster(ed)?|live|from .+)$/g, " ")
+      // & → and 통일
+      .replace(/&/g, " and ")
+      // 영숫자/공백만 남김
+      .replace(/[^a-z0-9\s]/g, " ")
+      .replace(/\s{2,}/g, " ")
+      .trim()
+  );
 }
 
 const STOP = new Set(["the", "and", "a", "an", "x", "feat", "featuring", "with"]);
@@ -167,7 +163,7 @@ function computeScore(result, wantedTitle, wantedArtist) {
 
   let s = 0;
   // 제목 가중치
-  s += titleExact ? 6 : Math.round(titleOv * 4);   // 최대 6점
+  s += titleExact ? 6 : Math.round(titleOv * 4); // 최대 6점
   // 아티스트 가중치
   s += artistExact ? 6 : Math.round(artistOv * 6); // 최대 6점
 
@@ -216,15 +212,11 @@ async function searchItunesTrackMeta(title, artist) {
       if (!results.length) continue;
 
       // 1차 필터: 아티스트 겹침 0.6 이상만 남김
-      let candidates = results.filter(
-        (r) => overlapRatio(r.artistName, artist) >= MIN_ARTIST_OVERLAP
-      );
+      let candidates = results.filter((r) => overlapRatio(r.artistName, artist) >= MIN_ARTIST_OVERLAP);
 
       // 그래도 하나도 없으면 살짝 완화(0.45) — 하지만 아예 겹침 0에 가까운 건 절대 허용 X
       if (!candidates.length) {
-        candidates = results.filter(
-          (r) => overlapRatio(r.artistName, artist) >= 0.45
-        );
+        candidates = results.filter((r) => overlapRatio(r.artistName, artist) >= 0.45);
       }
       if (!candidates.length) continue;
 
@@ -282,13 +274,7 @@ function RecommendationCards({ items }) {
             bg="white"
           >
             {it.artworkUrl100 ? (
-              <Image
-                src={it.artworkUrl100}
-                alt={it.title}
-                boxSize="56px"
-                borderRadius="md"
-                flexShrink={0}
-              />
+              <Image src={it.artworkUrl100} alt={it.title} boxSize="56px" borderRadius="md" flexShrink={0} />
             ) : (
               <Box
                 boxSize="56px"
@@ -335,15 +321,7 @@ function SeedTrackCard({ meta }) {
   if (!meta) return null;
   const { title, artist, artworkUrl100, previewUrl } = meta;
   return (
-    <HStack
-      align="stretch"
-      borderWidth="1px"
-      borderRadius="lg"
-      p={3}
-      spacing={3}
-      bg="white"
-      maxW="70%"
-    >
+    <HStack align="stretch" borderWidth="1px" borderRadius="lg" p={3} spacing={3} bg="white" maxW="70%">
       {artworkUrl100 ? (
         <Image src={artworkUrl100} alt={title} boxSize="56px" borderRadius="md" />
       ) : (
@@ -386,9 +364,8 @@ const GuidedChat = forwardRef(function GuidedChat({ onModeChange }, ref) {
 
   const { state } = useUser();
 
-  // ✅ 스마트 오토스크롤
-  const scrollRef = useRef(null);      // 대화 리스트 컨테이너
-  const stickRef = useRef(true);       // 바닥 고정 여부
+  const scrollRef = useRef(null); // 대화 리스트 컨테이너
+  const stickRef = useRef(true); // 바닥 고정 여부
   const [showJump, setShowJump] = useState(false); // '맨 아래로' 버튼
 
   // 세션 가드
@@ -509,10 +486,10 @@ const GuidedChat = forwardRef(function GuidedChat({ onModeChange }, ref) {
     onModeChange(item.key);
 
     const prompts = {
-      recommend:
-        "플레이리스트 추천을 선택하셨습니다. 오른쪽 화면에서 질문에 답해주세요!",
+      recommend: "플레이리스트 추천을 선택하셨습니다. 오른쪽 화면에서 질문에 답해주세요!",
       similar:
-        "오른쪽 패널에서 원곡을 검색해 선택하면 자동으로 전송됩니다. (또는 아래에 직접 '제목 - 아티스트' 입력)",
+        "오른쪽 패널에서 원곡을 검색해 선택하면 자동으로 전송됩니다! (또는 아래에 직접 '제목 - 아티스트' 입력)\n\n" +
+        "※ 입력하신 곡을 찾을 수 없는 경우 기능이 제한될 수 있습니다.",
       translate: "번역할 가사를 입력해주세요.",
     };
     push({ sender: "BOT", content: prompts[item.key] });
@@ -616,15 +593,7 @@ const GuidedChat = forwardRef(function GuidedChat({ onModeChange }, ref) {
       )}
 
       {/* 대화 내역 */}
-      <VStack
-        ref={scrollRef}
-        onScroll={handleScroll}
-        spacing={3}
-        flexGrow={1}
-        overflowY="auto"
-        mb={4}
-        align="stretch"
-      >
+      <VStack ref={scrollRef} onScroll={handleScroll} spacing={3} flexGrow={1} overflowY="auto" mb={4} align="stretch">
         {messages.map((m, i) => {
           if (m.type === "cards" && m.sender === "BOT") {
             return (
@@ -657,12 +626,7 @@ const GuidedChat = forwardRef(function GuidedChat({ onModeChange }, ref) {
           }
 
           return (
-            <HStack
-              key={i}
-              justify={m.sender === "USER" ? "flex-end" : "flex-start"}
-              align="flex-start"
-              spacing={3}
-            >
+            <HStack key={i} justify={m.sender === "USER" ? "flex-end" : "flex-start"} align="flex-start" spacing={3}>
               {m.sender === "BOT" && (
                 <Avatar
                   size="md"
@@ -671,12 +635,7 @@ const GuidedChat = forwardRef(function GuidedChat({ onModeChange }, ref) {
                   src="/src/assets/images/doremisolChatProfile.png"
                 />
               )}
-              <Box
-                bg={m.sender === "USER" ? "blue.100" : "gray.100"}
-                p={3}
-                borderRadius="md"
-                maxW="70%"
-              >
+              <Box bg={m.sender === "USER" ? "blue.100" : "gray.100"} p={3} borderRadius="md" maxW="70%">
                 <Text whiteSpace="pre-wrap">{m.content}</Text>
               </Box>
               {m.sender === "USER" && (
@@ -684,11 +643,7 @@ const GuidedChat = forwardRef(function GuidedChat({ onModeChange }, ref) {
                   size="md"
                   name="You"
                   border="1px solid gray"
-                  src={
-                    state.avatar
-                      ? `http://localhost:8084${state.avatar}`
-                      : "/src/assets/images/defaultProfile.jpg"
-                  }
+                  src={state.avatar ? `http://localhost:8084${state.avatar}` : "/src/assets/images/defaultProfile.jpg"}
                 />
               )}
             </HStack>
@@ -723,12 +678,7 @@ const GuidedChat = forwardRef(function GuidedChat({ onModeChange }, ref) {
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
             isDisabled={loading}
           />
-          <IconButton
-            icon={<ArrowRightIcon />}
-            aria-label="Send"
-            onClick={handleSend}
-            isLoading={loading}
-          />
+          <IconButton icon={<ArrowRightIcon />} aria-label="Send" onClick={handleSend} isLoading={loading} />
         </HStack>
       )}
     </Box>

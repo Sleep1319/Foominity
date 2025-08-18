@@ -263,14 +263,15 @@ const MyRequests = () => {
             </Tr>
           </Thead>
           <Tbody>
-            {filteredReports.map((report, index) => (
+            {filteredReports.map((report) => (
               <Tr
                 key={report.id}
                 style={{ cursor: "pointer" }}
                 height="40px"
                 onClick={() => handleReportClick(report.id)}
               >
-                <Td>{filteredReports.length - index}</Td>
+                {/* <Td>{filteredReports.length - index}</Td> */}
+                <Td>{report.id}</Td>
                 <Td>{getTypeBadge(report.type)}</Td>
                 <Td className="title-cell" fontWeight="bold">
                   {report.title}
@@ -324,4 +325,3 @@ const MyRequests = () => {
 };
 
 export default MyRequests;
-
