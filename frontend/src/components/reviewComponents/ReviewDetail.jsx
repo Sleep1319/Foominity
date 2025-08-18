@@ -188,24 +188,15 @@ const ReviewDetail = () => {
           </Text>
 
           {state?.roleName === "ADMIN" && (
-            <Box textAlign="right" mt={6}>
-              <Button colorScheme="blue" onClick={() => navigate(`/review/update/${id}`)}>
-                수정
-              </Button>
-            </Box>
-          )}
-          {/* ✅ 삭제 버튼: 관리자만 */}
-          {state?.roleName === "ADMIN" && (
-            <Box display="flex" justifyContent="flex-end" mb={2}>
-              <Text
-                fontSize="sm"
-                color="red.500"
-                cursor="pointer"
-                onClick={handleDelete}
-                _hover={{ textDecoration: "underline" }}
-              >
-                삭제하기
-              </Text>
+            <Box mt={6}>
+              <HStack justify="flex-end" spacing={3}>
+                <Button colorScheme="gray" onClick={() => navigate(`/artist/update/${id}`)}>
+                  수정
+                </Button>
+                <Button colorScheme="red" variant="outline" onClick={handleDelete}>
+                  삭제
+                </Button>
+              </HStack>
             </Box>
           )}
 

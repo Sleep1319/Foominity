@@ -168,7 +168,7 @@ const ReviewGrid = () => {
           <TabPanel>
             {state?.roleName === "ADMIN" && (
               <Box textAlign="right" mb={4}>
-                <Button colorScheme="blue" onClick={() => navigate("/review/create")}>
+                <Button colorScheme="blackAlpha" onClick={() => navigate("/review/create")}>
                   리뷰 작성
                 </Button>
               </Box>
@@ -216,7 +216,7 @@ const ReviewGrid = () => {
                   // 모바일에선 꽉 차게, 데스크톱에선 적당한 폭
                   w={{ base: "100%", md: "360px" }}
                 />
-                <Button colorScheme="blue" onClick={onClickSearch} isLoading={albumLoading}>
+                <Button colorScheme="gray" onClick={onClickSearch} isLoading={albumLoading}>
                   검색
                 </Button>
                 {committedAlbumSearch && (
@@ -335,7 +335,7 @@ const ReviewGrid = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && onClickSearch()}
               />
-              <Button colorScheme="blue" onClick={onClickSearch} isLoading={albumLoading}>
+              <Button colorScheme="gray" onClick={onClickSearch} isLoading={albumLoading}>
                 검색
               </Button>
               {committedAlbumSearch && (
