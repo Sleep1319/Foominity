@@ -100,6 +100,7 @@ const UserSection = () => {
             <MenuItemWithIcon icon={FiMusic} label="내 음악" to="/mymusic" />
 
             {/* 메뉴 열려 있을 땐 "문의" 항목 우측에 점 */}
+            {state?.roleName !== "ADMIN" && (
             <MenuItemWithIcon
                 icon={BsChatDots}
                 label="문의"
@@ -110,7 +111,7 @@ const UserSection = () => {
                   </Box>
                 }
             />
-
+            )}
             {state?.roleName === "ADMIN" && (
                 <MenuItemWithIcon icon={FaUserShield} label="관리자 페이지" to="/admin" />
             )}
