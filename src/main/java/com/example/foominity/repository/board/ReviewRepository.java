@@ -55,6 +55,14 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
         List<Review> findByCategories(@Param("names") List<String> names, @Param("size") long size);
 
         @Query("""
+                        SELECT r
+                        FROM Review r
+                        WHERE (:search IS NULL OR :search = ''
+                               OR LOWER(r.title) LIKE LOWER(CONCAT('%', :search, '%')))
+                        """)
+        Page<Review> findByTitleContainingIgnoreCase(@Param("search") String search, Pageable pageable);
+
+        @Query("""
                             SELECT r
                             FROM ReviewCategory rc
                             JOIN rc.review r
@@ -76,6 +84,56 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
         Page<Review> findFilteredReviews(
                         @Param("search") String search,
                         @Param("categories") List<String> categories,
+                        Pageable pageable);
+
+        // 인기순 정렬
+
+        @Query(value = """
+                        select r
+                        from Review r
+                        left join ReviewComment rc on rc.review = r
+                        group by r.id
+                        order by coalesce(avg(rc.starPoint), 0) desc, r.id desc
+                        """, countQuery = "select count(r) from Review r")
+        Page<Review> findAllOrderByAvgRating(Pageable pageable);
+
+        @Query(value = """
+                        select r
+                        from Review r
+                        left join ReviewComment rc on rc.review = r
+                        where (:search is null or :search = ''
+                               or lower(r.title) like lower(concat('%', :search, '%')))
+                        group by r.id
+                        order by coalesce(avg(rc.starPoint), 0) desc, r.id desc
+                        """, countQuery = """
+                        select count(r)
+                        from Review r
+                        where (:search is null or :search = ''
+                               or lower(r.title) like lower(concat('%', :search, '%')))
+                        """)
+        Page<Review> searchByTitleOrderByAvg(@Param("search") String search, Pageable pageable);
+
+        @Query(value = """
+                        select r
+                        from ReviewCategory rcg
+                          join rcg.review r
+                          join rcg.category c
+                          left join ReviewComment cm on cm.review = r
+                        where c.categoryName in :names
+                        group by r.id
+                        having count(distinct c.categoryName) = :size
+                        order by coalesce(avg(cm.starPoint), 0) desc, r.id desc
+                        """, countQuery = """
+                        select count(distinct r.id)
+                        from ReviewCategory rcg
+                          join rcg.review r
+                          join rcg.category c
+                        where c.categoryName in :names
+                        group by r.id
+                        having count(distinct c.categoryName) = :size
+                        """)
+        Page<Review> findByCategoriesOrderByAvg(@Param("names") List<String> names,
+                        @Param("size") long size,
                         Pageable pageable);
 
 }

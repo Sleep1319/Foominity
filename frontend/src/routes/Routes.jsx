@@ -56,14 +56,18 @@ function AppRoutes() {
           <Route path="/review/:id" element={<ReviewDetails />} />
           <Route path="/deletecomplete" element={<DeleteComplete />} />
           <Route path="/artist/:id" element={<ArtistDetails />} />
+
+          {/* 로그인 필수 페이지 */}
           <Route element={<ProtectedRoute requireAuth={true} />}>
-            {/* 로그인 필수 페이지 */}
             <Route path="/mypage/*" element={<MyPage />} />
             <Route path="/mymusic/" element={<MyMusic />} />
             <Route path="/review/create" element={<CreateReview />} />
+            {/* 리뷰 수정은 ReviewEdits 사용하는 걸로 맞춤 */}
+            <Route path="/review/update/:id" element={<ReviewEdits />} />
             <Route path="/artist/update/:id" element={<ArtistEdits />} />
             <Route path="/admin" element={<AdminPage />} />
           </Route>
+
           <Route path="/mymusic/participatedalbumslist" element={<ParticipatedAlbumsList />} />
 
           {/* 자유게시판 */}
@@ -77,16 +81,19 @@ function AppRoutes() {
 
           {/* Report */}
           <Route path="/report/create" element={<ReportCreateRun />} />
-        </Route>
-        <Route element={<ProtectedRoute requireAuth={false} />}>
-          <Route path="/loginpage" element={<LoginPage />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/social-sign-up" element={<SocialRegister />} />
-        </Route>
-        {/* Quiz */}
-        <Route path="/quiz" element={<Quiz />} />
 
+          {/* 로그인/회원가입 (requireAuth = false) */}
+          <Route element={<ProtectedRoute requireAuth={false} />}>
+            <Route path="/loginpage" element={<LoginPage />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/social-sign-up" element={<SocialRegister />} />
+          </Route>
+
+          {/* Quiz */}
+          <Route path="/quiz" element={<Quiz />} />
+        </Route>
       </Routes>
+
   );
 }
 

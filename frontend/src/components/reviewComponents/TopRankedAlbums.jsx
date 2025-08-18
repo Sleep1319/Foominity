@@ -140,9 +140,27 @@ const TopRankedAlbums = () => {
                 <Text fontSize="lg" fontWeight="semibold" whiteSpace="normal">
                   {a.title}
                 </Text>
-                <Text fontSize="md" color="gray.600" whiteSpace="normal">
+                <Box>
+                  {a.artists?.map((ar) => (
+                    <Text
+                      key={ar.id}
+                      fontSize="lg"
+                      fontWeight="semibold"
+                      whiteSpace="normal"
+                      color="gray.600"
+                      cursor="pointer"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/artist/${ar.id}`);
+                      }}
+                    >
+                      {ar.name}
+                    </Text>
+                  ))}
+                </Box>
+                {/* <Text fontSize="md" color="gray.600" whiteSpace="normal">
                   {a.artists.map((ar) => ar.name).join(", ")}
-                </Text>
+                </Text> */}
               </VStack>
             </Box>
           ))}

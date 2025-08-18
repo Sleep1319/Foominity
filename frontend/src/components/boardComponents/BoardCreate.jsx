@@ -2,7 +2,7 @@ import React, { useState, useRef } from "react";
 import { Box, Heading, Input, Button, FormControl, FormLabel, VStack, useToast, Flex, Select } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useUser} from "@/redux/useUser.js";
+import { useUser } from "@/redux/useUser.js";
 import { Editor } from "@toast-ui/react-editor";
 import "@toast-ui/editor/dist/toastui-editor.css";
 
@@ -170,7 +170,7 @@ const BoardCreate = () => {
           </Box>
 
           <Flex gap={3}>
-            <Button colorScheme="blue" type="submit" isLoading={isSubmitting} px={10}>
+            <Button bg="black" color="white" type="submit" isLoading={isSubmitting} px={10}>
               등록
             </Button>
             <Button variant="outline" onClick={() => navigate("/board")} px={8}>
