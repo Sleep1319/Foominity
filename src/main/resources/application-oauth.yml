@@ -11,8 +11,10 @@ spring:
             authorization-grant-type: authorization_code
             client-name: Google
           kakao:
+            provider: kakao
             client-id: ${KAKAO_CLIENT_ID}
             client-secret: ${KAKAO_CLIENT_SECRET:}
+            client-authentication-method: client_secret_post
             scope: [profile_nickname, account_email]
             redirect-uri: "{baseUrl}/login/oauth2/code/kakao"
             authorization-grant-type: authorization_code
