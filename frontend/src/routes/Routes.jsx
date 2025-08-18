@@ -12,6 +12,7 @@ import SocialRegister from "../view/Sign/SocialRegister.jsx";
 import Review from "../view/review/Review.jsx";
 import ReviewDetails from "../view/review/ReviewDetails.jsx";
 import CreateReview from "../view/review/CreateReviews.jsx";
+import ReviewEdits from "../view/review/ReviewEdits.jsx";
 
 import BoardLists from "./../view/board/BoardLists";
 import BoardCreateRun from "../view/board/BoardCreateRun.jsx";
@@ -60,6 +61,7 @@ function AppRoutes() {
           <Route path="/mypage/*" element={<MyPage />} />
           <Route path="/mymusic/" element={<MyMusic />} />
           <Route path="/review/create" element={<CreateReview />} />
+          <Route path="/review/update/:id" element={<ReviewEdits />} />
           <Route path="/artist/update/:id" element={<ArtistEdits />} />
           <Route path="/admin" element={<AdminPage />} />
         </Route>

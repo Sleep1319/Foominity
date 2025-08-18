@@ -75,26 +75,38 @@ public class ReviewService {
         private final ReviewLikeRepository reviewLikeRepository;
 
         // 리뷰 전체 조회
+        // 리뷰 전체 조회
         public Page<ReviewSimpleResponse> findAll(int page, String search, List<String> categories) {
                 PageRequest pageable = PageRequest.of(page, 12, Sort.by(Sort.Direction.DESC, "id"));
-                List<Review> reviews;
 
+                // 1) 검색(검색어가 있으면 카테고리 무시)
+                if (search != null && !search.isBlank()) {
+                        String q = search.trim();
+                        Page<Review> pageResult = reviewRepository.findByTitleContainingIgnoreCase(q, pageable);
+                        List<ReviewSimpleResponse> content = toSimpleResponseList(pageResult.getContent());
+                        return new PageImpl<>(content, pageable, pageResult.getTotalElements());
+                }
+
+                // 2) 카테고리 필터
                 if (categories != null && !categories.isEmpty()) {
-                        // 카테고리 필터가 있는 경우: 전체 가져오고 id desc 정렬 후 subList로 자름
-                        reviews = reviewRepository.findByCategories(categories, categories.size())
+                        List<Review> all = reviewRepository.findByCategories(categories, categories.size())
                                         .stream()
                                         .sorted(Comparator.comparing(Review::getId).reversed())
                                         .toList();
 
                         int start = (int) pageable.getOffset();
-                        int end = Math.min(start + pageable.getPageSize(), reviews.size());
-                        List<Review> paged = reviews.subList(start, end);
+                        if (start >= all.size()) {
+                                // 요청한 페이지에 데이터가 없을 때 안전하게 빈 페이지 반환
+                                return new PageImpl<>(List.of(), pageable, all.size());
+                        }
+                        int end = Math.min(start + pageable.getPageSize(), all.size());
+                        List<Review> paged = all.subList(start, end);
 
                         List<ReviewSimpleResponse> content = toSimpleResponseList(paged);
-                        return new PageImpl<>(content, pageable, reviews.size());
+                        return new PageImpl<>(content, pageable, all.size());
                 }
 
-                // 카테고리 필터 없을 경우: DB에서 직접 페이징
+                // 3) 전체 목록(페이징)
                 Page<Review> pageResult = reviewRepository.findAll(pageable);
                 List<ReviewSimpleResponse> content = toSimpleResponseList(pageResult.getContent());
                 return new PageImpl<>(content, pageable, pageResult.getTotalElements());

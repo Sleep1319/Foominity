@@ -11,6 +11,7 @@ import {
   GridItem,
   AspectRatio,
   Divider,
+  Button,
 } from "@chakra-ui/react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -186,6 +187,13 @@ const ReviewDetail = () => {
             Review
           </Text>
 
+          {state?.roleName === "ADMIN" && (
+            <Box textAlign="right" mt={6}>
+              <Button colorScheme="blue" onClick={() => navigate(`/review/update/${id}`)}>
+                수정
+              </Button>
+            </Box>
+          )}
           {/* ✅ 삭제 버튼: 관리자만 */}
           {state?.roleName === "ADMIN" && (
             <Box display="flex" justifyContent="flex-end" mb={2}>

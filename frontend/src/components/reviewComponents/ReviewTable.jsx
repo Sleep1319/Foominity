@@ -25,91 +25,111 @@ import {
 } from "@chakra-ui/react";
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import { BsChevronLeft, BsChevronRight } from "react-icons/bs";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useUser } from "@/redux/useUser.js";
 import Slider from "react-slick";
-import { useLocation } from "react-router-dom";
 import Pagination from "../ui/Pagination";
 
 const ReviewGrid = () => {
   const { state, isLoading } = useUser();
   const [reviews, setReviews] = useState([]);
   const [artists, setArtists] = useState([]);
+
+  // 입력값과, 서버에 실제로 보낼 확정 검색어(탭별)
   const [searchTerm, setSearchTerm] = useState("");
+  const [committedAlbumSearch, setCommittedAlbumSearch] = useState("");
+  const [committedArtistSearch, setCommittedArtistSearch] = useState("");
+
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const { isOpen, onToggle } = useDisclosure();
   const navigate = useNavigate();
 
-  // 탭 상태 관리
+  // 탭 상태
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const initialTabIndex = queryParams.get("tab") === "artist" ? 1 : 0;
   const [tabIndex, setTabIndex] = useState(initialTabIndex);
 
-  // 페이지 정보 추가
+  // 페이지 상태
   const [albumPage, setAlbumPage] = useState(0);
   const [artistPage, setArtistPage] = useState(0);
   const [albumTotalPages, setAlbumTotalPages] = useState(1);
   const [artistTotalPages, setArtistTotalPages] = useState(1);
 
+  const [albumLoading, _setAlbumLoading] = useState(false);
+
+  // 검색 실행(버튼/Enter)
+  const onClickSearch = () => {
+    const q = searchTerm.trim();
+    if (tabIndex === 0) {
+      setAlbumPage(0);
+      setCommittedAlbumSearch(q); // 앨범 서버 검색
+    } else {
+      setArtistPage(0);
+      setCommittedArtistSearch(q); // 아티스트 서버 검색
+    }
+  };
+
+  // 카테고리 목록
   useEffect(() => {
     axios.get("/api/categories").then((res) => setCategories(res.data));
   }, []);
 
-  // 앨범
+  // 앨범 목록(서버 검색 + 카테고리 + 페이지)
   useEffect(() => {
     const params = new URLSearchParams();
     params.append("page", albumPage);
-
-    if (searchTerm.trim() !== "") {
-      params.append("search", searchTerm.trim());
-    }
-
-    selectedCategories.forEach((c) => params.append("categories", c));
+    if (committedAlbumSearch) params.append("search", committedAlbumSearch);
+    selectedCategories.forEach((c) => params.append("categories", c)); // 서버가 이름 기반이라면 그대로 사용
 
     axios
       .get(`/api/reviews?${params.toString()}`)
       .then((res) => {
-        setReviews(res.data.content);
-        setAlbumTotalPages(res.data.totalPages);
+        setReviews(res.data.content ?? []);
+        setAlbumTotalPages(res.data.totalPages ?? 1);
       })
       .catch((err) => {
         console.error("리뷰 요청 에러:", err);
+        setReviews([]);
+        setAlbumTotalPages(1);
       });
-  }, [albumPage, searchTerm, selectedCategories]);
+  }, [albumPage, committedAlbumSearch, selectedCategories]);
 
-  // 아티스트
+  // 아티스트 목록(서버 검색 + 카테고리 + 페이지)
   useEffect(() => {
     const params = new URLSearchParams();
     params.append("page", artistPage);
-
-    if (searchTerm.trim() !== "") {
-      params.append("search", searchTerm.trim());
-    }
-
+    if (committedArtistSearch) params.append("search", committedArtistSearch);
     selectedCategories.forEach((c) => params.append("categories", c));
 
     axios
       .get(`/api/artists?${params.toString()}`)
       .then((res) => {
-        setArtists(res.data.content);
-        setArtistTotalPages(res.data.totalPages);
+        setArtists(res.data.content ?? []);
+        setArtistTotalPages(res.data.totalPages ?? 1);
       })
       .catch((err) => {
         console.error("아티스트 요청 에러:", err);
+        setArtists([]);
+        setArtistTotalPages(1);
       });
-  }, [artistPage, searchTerm, selectedCategories]);
+  }, [artistPage, committedArtistSearch, selectedCategories]);
 
   // 카테고리 변경 시 페이지 초기화
   useEffect(() => {
     setAlbumPage(0);
     setArtistPage(0);
-  }, [searchTerm, selectedCategories]);
+  }, [selectedCategories]);
 
+  // 탭 변경 시 초기화
   useEffect(() => {
     setSearchTerm("");
+    setCommittedAlbumSearch("");
+    setCommittedArtistSearch("");
     setSelectedCategories([]);
+    setAlbumPage(0);
+    setArtistPage(0);
   }, [tabIndex]);
 
   const handleCategoryToggle = (categoryName) => {
@@ -118,26 +138,8 @@ const ReviewGrid = () => {
     );
   };
 
-  // 이미지 효과
+  // 이미지 로딩 효과
   const [imageLoaded, setImageLoaded] = useState({});
-
-  // const filteredReviews = reviews.filter((r) => {
-  //   const matchTitle = r.title.toLowerCase().includes(searchTerm.toLowerCase());
-  //   const matchCategory =
-  //     selectedCategories.length === 0 ||
-  //     selectedCategories.every((selected) => r.categories?.some((c) => c.categoryName === selected));
-  //   return matchTitle && matchCategory;
-  // });
-
-  // const filteredArtists = artists.filter((a) => {
-  //   const matchName = a.name.toLowerCase().includes(searchTerm.toLowerCase());
-  //   const matchCategory =
-  //     selectedCategories.length === 0 ||
-  //     selectedCategories.every((selected) => a.categories?.some((c) => c.categoryName === selected));
-  //   return matchName && matchCategory;
-  // });
-
-  // const filteredArtists = artists.filter((a) => a.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
   if (isLoading) {
     return (
@@ -169,12 +171,28 @@ const ReviewGrid = () => {
 
             <TopRankedAlbums />
 
-            <Input
-              placeholder="앨범 제목으로 검색"
-              mb={6}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+            <HStack mb={6}>
+              <Input
+                placeholder="앨범 제목으로 검색"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && onClickSearch()}
+              />
+              <Button colorScheme="blue" onClick={onClickSearch} isLoading={albumLoading}>
+                검색
+              </Button>
+              {committedAlbumSearch && (
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setCommittedAlbumSearch("");
+                    setAlbumPage(0);
+                  }}
+                >
+                  검색 초기화
+                </Button>
+              )}
+            </HStack>
 
             <HStack spacing={2} mb={2} cursor="pointer" onClick={onToggle}>
               <Text fontWeight="bold">카테고리 필터</Text>
@@ -198,7 +216,9 @@ const ReviewGrid = () => {
             <Divider my={6} borderColor="black" />
 
             {reviews.length === 0 ? (
-              <Text>검색된 결과가 없습니다.</Text>
+              <Text>
+                {committedAlbumSearch ? `"${committedAlbumSearch}"에 대한 결과가 없습니다.` : "검색된 결과가 없습니다."}
+              </Text>
             ) : (
               <SimpleGrid columns={{ base: 1, sm: 2, md: 4 }} spacing={6}>
                 {reviews.map((r) => (
@@ -270,13 +290,28 @@ const ReviewGrid = () => {
 
           {/* 아티스트 탭 */}
           <TabPanel>
-            <Input
-              placeholder="아티스트 이름으로 검색"
-              mb={6}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-
+            <HStack mb={6}>
+              <Input
+                placeholder="아티스트 이름으로 검색"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && onClickSearch()}
+              />
+              <Button colorScheme="blue" onClick={onClickSearch} isLoading={albumLoading}>
+                검색
+              </Button>
+              {committedAlbumSearch && (
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setCommittedAlbumSearch("");
+                    setAlbumPage(0);
+                  }}
+                >
+                  검색 초기화
+                </Button>
+              )}
+            </HStack>
             <HStack spacing={2} mb={2} cursor="pointer" onClick={onToggle}>
               <Text fontWeight="bold">카테고리 필터</Text>
               <Icon as={isOpen ? ChevronUpIcon : ChevronDownIcon} />
@@ -331,6 +366,7 @@ const ReviewGrid = () => {
                 </Box>
               ))}
             </SimpleGrid>
+
             {tabIndex === 1 && artists.length > 0 && (
               <Box textAlign="center" mt={8}>
                 <HStack justify="center" spacing={4}>
@@ -363,7 +399,7 @@ const ReviewGrid = () => {
 
 export default ReviewGrid;
 
-// ✅ 상단 앨범 슬라이더 컴포넌트
+// ✅ 상단 앨범 슬라이더 (변경 없음)
 const TopRankedAlbums = () => {
   const [albums, setAlbums] = useState([]);
   const sliderRef = useRef(null);
