@@ -15,8 +15,8 @@ public class ReviewCommentResponse {
 
     private Long id;
 
+    private Long memberId;
     private String nickname;
-
     private String comment;
 
     private float starPoint;
@@ -27,6 +27,7 @@ public class ReviewCommentResponse {
     public static ReviewCommentResponse fromEntity(ReviewComment comment) {
         return new ReviewCommentResponse(
                 comment.getId(),
+                comment.getMemberId(),
                 comment.getNickname(),
                 comment.getContent(),
                 comment.getStarPoint(),

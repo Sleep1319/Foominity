@@ -32,8 +32,9 @@ public class ReviewController {
     public ResponseEntity<Page<ReviewSimpleResponse>> findAll(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(required = false) String search,
-            @RequestParam(required = false) List<String> categories) {
-        Page<ReviewSimpleResponse> res = reviewService.findAll(page, search, categories);
+            @RequestParam(required = false) List<String> categories,
+            @RequestParam(defaultValue = "latest") String sort) {
+        Page<ReviewSimpleResponse> res = reviewService.findAll(page, search, categories, sort);
         return ResponseEntity.ok(res);
     }
 

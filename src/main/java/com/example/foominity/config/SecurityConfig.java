@@ -76,7 +76,8 @@ public class SecurityConfig {
                 conf.setAllowedOriginPatterns(List.of(
                                 "http://localhost:5173",
                                 "http://localhost:8084", // 필요시
-                                "https://your-prod-domain.com" // 배포 도메인
+                                "https://www.doremisol.kro.kr",
+                                "https://doremisol.kro.kr"
                 ));
                 conf.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
                 conf.setAllowedHeaders(List.of("*"));

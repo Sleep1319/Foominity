@@ -11,6 +11,7 @@ import {
   GridItem,
   AspectRatio,
   Divider,
+  Button,
 } from "@chakra-ui/react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -186,18 +187,16 @@ const ReviewDetail = () => {
             Review
           </Text>
 
-          {/* ✅ 삭제 버튼: 관리자만 */}
           {state?.roleName === "ADMIN" && (
-            <Box display="flex" justifyContent="flex-end" mb={2}>
-              <Text
-                fontSize="sm"
-                color="red.500"
-                cursor="pointer"
-                onClick={handleDelete}
-                _hover={{ textDecoration: "underline" }}
-              >
-                삭제하기
-              </Text>
+            <Box mt={6}>
+              <HStack justify="flex-end" spacing={3}>
+                <Button colorScheme="gray" onClick={() => navigate(`/artist/update/${id}`)}>
+                  수정
+                </Button>
+                <Button colorScheme="red" variant="outline" onClick={handleDelete}>
+                  삭제
+                </Button>
+              </HStack>
             </Box>
           )}
 
@@ -424,9 +423,22 @@ const ReviewDetail = () => {
                       >
                         {album.title}
                       </Text>
-                      <Text fontSize="sm" color="gray.600" isTruncated>
-                        {album.artists.map((a) => a.name).join(", ")}
-                      </Text>
+                      <Box>
+                        {album.artists?.map((a) => (
+                          <Text
+                            key={a.id}
+                            fontSize="sm"
+                            color="gray.600"
+                            cursor="pointer"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/artist/${a.id}`);
+                            }}
+                          >
+                            {a.name}
+                          </Text>
+                        ))}
+                      </Box>
                     </Box>
                   </Box>
                 ))}

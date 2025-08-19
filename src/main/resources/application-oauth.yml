@@ -19,6 +19,8 @@ spring:
             redirect-uri: "{baseUrl}/login/oauth2/code/kakao"
             authorization-grant-type: authorization_code
             client-name: Kakao
+            provider: kakao
+
         provider:
           google:
             authorization-uri: https://accounts.google.com/o/oauth2/v2/auth

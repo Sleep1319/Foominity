@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Modal,
   ModalOverlay,
@@ -8,7 +8,6 @@ import {
   ModalBody,
   Input,
   Image,
-  Select,
   Button,
   Table,
   Thead,
@@ -19,25 +18,44 @@ import {
   Text,
   IconButton,
   Flex,
+  Spinner,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { SearchIcon } from "@chakra-ui/icons";
 
+const API_HOST = "http://localhost:8084";
+
 const ArtistSearchModal = ({ isOpen, onClose, onSelect }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchType, setSearchType] = useState("name");
   const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  // 모달 닫힐 때 초기화 (원하면 제거 가능)
+  useEffect(() => {
+    if (!isOpen) {
+      setSearchTerm("");
+      setResults([]);
+      setLoading(false);
+    }
+  }, [isOpen]);
 
   const handleSearch = async () => {
+    const term = searchTerm.trim();
+    if (!term) {
+      setResults([]);
+      return;
+    }
     try {
-      const res = await axios.get(`/api/artists?page=0`);
-      const filtered = res.data.content.filter((artist) =>
-        artist[searchType]?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      setResults(filtered);
+      setLoading(true);
+      const res = await axios.get("/api/artists", {
+        params: { page: 0, size: 50, search: term },
+      });
+      setResults(res.data?.content ?? []);
     } catch (err) {
       console.error("아티스트 검색 실패", err);
       setResults([]);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -49,12 +67,13 @@ const ArtistSearchModal = ({ isOpen, onClose, onSelect }) => {
         <ModalCloseButton />
         <ModalBody overflowY="auto" maxH="70vh">
           <Flex gap={2} mb={4}>
-            <Select w="200px" value={searchType} onChange={(e) => setSearchType(e.target.value)}>
-              <option value="name">아티스트명</option>
-              <option value="nationality">국적</option>
-            </Select>
-            <Input placeholder="검색" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
-            <IconButton icon={<SearchIcon />} onClick={handleSearch} />
+            <Input
+              placeholder="아티스트명으로 검색"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            />
+            <IconButton aria-label="아티스트 검색" icon={<SearchIcon />} onClick={handleSearch} isLoading={loading} />
           </Flex>
 
           <Table>
@@ -65,33 +84,53 @@ const ArtistSearchModal = ({ isOpen, onClose, onSelect }) => {
               </Tr>
             </Thead>
             <Tbody>
-              {results.map((artist) => (
-                <Tr key={artist.id}>
-                  <Td>
-                    <Flex align="center" gap={3}>
-                      <Image
-                        src={artist.imagePath ? `http://localhost:8084/${artist.imagePath}` : "/default-avatar.png"}
-                        alt={artist.name}
-                        boxSize="40px"
-                        objectFit="cover"
-                        borderRadius="full"
-                      />
-                      <Text>{artist.name}</Text>
+              {loading && (
+                <Tr>
+                  <Td colSpan={2}>
+                    <Flex align="center" gap={2}>
+                      <Spinner size="sm" />
+                      <Text>검색 중…</Text>
                     </Flex>
                   </Td>
-                  <Td>
-                    <Button
-                      size="sm"
-                      onClick={() => {
-                        onSelect(artist);
-                        onClose();
-                      }}
-                    >
-                      선택
-                    </Button>
+                </Tr>
+              )}
+
+              {!loading && results.length === 0 && (
+                <Tr>
+                  <Td colSpan={2}>
+                    <Text color="gray.500">검색 결과가 없습니다.</Text>
                   </Td>
                 </Tr>
-              ))}
+              )}
+
+              {!loading &&
+                results.map((artist) => (
+                  <Tr key={artist.id}>
+                    <Td>
+                      <Flex align="center" gap={3}>
+                        <Image
+                          src={artist.imagePath ? `${API_HOST}/${artist.imagePath}` : "/default-avatar.png"}
+                          alt={artist.name}
+                          boxSize="40px"
+                          objectFit="cover"
+                          borderRadius="full"
+                        />
+                        <Text>{artist.name}</Text>
+                      </Flex>
+                    </Td>
+                    <Td>
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          onSelect(artist);
+                          onClose();
+                        }}
+                      >
+                        선택
+                      </Button>
+                    </Td>
+                  </Tr>
+                ))}
             </Tbody>
           </Table>
         </ModalBody>
