@@ -4,11 +4,11 @@ import { Link as RouterLink } from "react-router-dom";
 import { SearchIcon } from "@chakra-ui/icons";
 
 import logoImage from "@/assets/images/doremiSOL_lp.png";
-import {useUser} from "../redux/useUser.js";
+import { useUser } from "../redux/useUser.js";
 import AuthButtons from "@/components/navComponents/AuthButtons.jsx";
 import UserSection from "@/components/navComponents/UserSection.jsx";
 import SearchNavbar from "@/components/navComponents/SearchNavbar.jsx";
-import {useSelector} from "react-redux";
+import { useSelector } from "react-redux";
 
 const AppNavbar = () => {
   const { state } = useUser();
@@ -43,6 +43,9 @@ const AppNavbar = () => {
           </Button>
           <Button as={RouterLink} to="/report" variant="ghost" color="white" _hover={{ bg: "transparent" }}>
             Report
+          </Button>
+          <Button as={RouterLink} to="/quiz" variant="ghost" color="white" _hover={{ bg: "transparent" }}>
+            Quiz
           </Button>
         </HStack>
 
