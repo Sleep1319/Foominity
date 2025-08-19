@@ -203,7 +203,7 @@ const Register = () => {
         textAlign="center"
         fontSize="3xl"
         fontWeight="medium"
-        borderBottom="2px solid gray"
+        // borderBottom="2px solid gray"
         pb={2}
         mt={4}
         ml={5}

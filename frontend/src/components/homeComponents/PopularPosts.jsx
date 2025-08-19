@@ -53,7 +53,7 @@ export default function AppleMusicCountryGrid() {
     <Box>
       <HStack justify="space-between" mb={4}>
         <Heading size="md">국가별 차트</Heading>
-        <Text color="gray.500">from Apple Music RSS</Text>
+        <Text color="gray.500">from Apple Music</Text>
       </HStack>
 
       <SimpleGrid columns={[2, 2, 4]} spacing={5}>
