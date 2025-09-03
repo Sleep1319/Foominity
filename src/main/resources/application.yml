@@ -25,6 +25,10 @@ spring:
           auth: true
           starttls:
             enable: true
+  cloud:
+    gcp:
+      credentials:
+        location: file:/etc/secrets/magazinetranslation-5dc5ba5ef0bd.json
 
 server:
   port: ${SERVER_PORT:8084}
@@ -45,8 +49,24 @@ openai:
 spotify:
   client-id: ${SPOTIFY_CLIENT_ID}
   client-secret: ${SPOTIFY_CLIENT_SECRET}
+  api-base-url: https://api.spotify.com
+  auth-url: https://accounts.spotify.com/api/token
+  market: KR
 
 rapidapi:
   key: ${RAPIDAPI_KEY}
   hosts:
     musixmatch: ${RAPIDAPI_HOST}
+
+#  quiz:
+#    duration-seconds: 30
+#    hint-seconds: 15
+#    round-ttl-seconds: 60
+#    reveal-on-wrong: true #오답 시 정답 공개
+#    filter:
+#      allowed-genres: k-pop #, pop # 비워두면 모든 장르 허용
+#      min-year: 1990 # **년도 이후 곡
+#      max-year: 2050
+#      exclude-explicit: true
+#    oauth:
+#      user-auth-enabled: true

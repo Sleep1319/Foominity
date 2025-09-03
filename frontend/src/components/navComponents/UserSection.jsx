@@ -10,8 +10,18 @@ import { FaUserShield } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import { useUser } from "@/redux/useUser.js";
 import { setChatRoomId, toggleChat, resetUnread } from "@/redux/chatSlice.js";
-import handleCreateOrFindRoom from "@/components/chatComponents/handleCreateOrFindRoom"; // 인자 없이 호출하는 버전
+import handleCreateOrFindRoom from "@/components/chatComponents/handleCreateOrFindRoom";
 import NotificationDot from "@/components/common/NotificationDot.jsx";
+import defaultProfile from "@/assets/images/defaultProfile.jpg";
+
+// 임시 공통 url생성 (추후 통합 관리 변경)
+const API_HOST = (import.meta.env.VITE_API_URL || window.location.origin).replace(/\/$/, "");
+function toAbs(urlOrPath) {
+  if (!urlOrPath) return "";
+  if (/^https?:\/\//i.test(urlOrPath)) return urlOrPath;
+  if (urlOrPath.startsWith("/")) return `${API_HOST}${urlOrPath}`;
+  return `${API_HOST}/${urlOrPath}`;
+}
 
 const UserSection = () => {
   const dispatch = useDispatch();
@@ -24,12 +34,11 @@ const UserSection = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const onClickInquiry = async () => {
-    // ✅ 네가 올린 handleCreateOrFindRoom는 인자 없이 POST /api/chat-room 호출하는 버전이므로 그대로 사용
     const roomId = await handleCreateOrFindRoom();
     if (roomId) {
       dispatch(setChatRoomId(roomId));
       dispatch(toggleChat());
-      dispatch(resetUnread(String(roomId))); // 들어가면 읽음 처리
+      dispatch(resetUnread(String(roomId)));
     }
   };
 
@@ -76,8 +85,8 @@ const UserSection = () => {
       </MenuItem>
   );
 
-  const avatarSrc =
-      state.avatar ? `http://localhost:8084${state.avatar}` : "/src/assets/images/defaultProfile.jpg";
+  // 아바타 경로 통일: 서버가 "/uploads/..." 같은 상대경로 주면 toAbs로 절대화
+  const avatarSrc = state.avatar ? toAbs(state.avatar) : defaultProfile;
 
   return (
       <Box display="flex" alignItems="center" gap={3} top="20px" right="20px" zIndex="1000">
@@ -99,19 +108,20 @@ const UserSection = () => {
             <MenuItemWithIcon icon={FiUser} label="마이페이지" to="/mypage" />
             <MenuItemWithIcon icon={FiMusic} label="내 음악" to="/mymusic" />
 
-            {/* 메뉴 열려 있을 땐 "문의" 항목 우측에 점 */}
+            {/* 메뉴 열려 있을 땐 "문의" 우측에 점 */}
             {state?.roleName !== "ADMIN" && (
-            <MenuItemWithIcon
-                icon={BsChatDots}
-                label="문의"
-                onClick={onClickInquiry}
-                rightAddon={
-                  <Box position="relative" w="16px" h="16px">
-                    <NotificationDot show={isOpen && totalUnread > 0} size={8} top={2} right={2} />
-                  </Box>
-                }
-            />
+                <MenuItemWithIcon
+                    icon={BsChatDots}
+                    label="문의"
+                    onClick={onClickInquiry}
+                    rightAddon={
+                      <Box position="relative" w="16px" h="16px">
+                        <NotificationDot show={isOpen && totalUnread > 0} size={8} top={2} right={2} />
+                      </Box>
+                    }
+                />
             )}
+
             {state?.roleName === "ADMIN" && (
                 <MenuItemWithIcon icon={FaUserShield} label="관리자 페이지" to="/admin" />
             )}

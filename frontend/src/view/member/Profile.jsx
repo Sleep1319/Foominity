@@ -23,6 +23,11 @@ import DeleteModal from "../../view/member/DeleteModal.jsx";
 import MyPostsTable from "../../components/memberComponents/MyPostsTable.jsx";
 import SettingsButton from "../../components/memberComponents/SettingsButton.jsx";
 import MyRequests from "../../components/memberComponents/MyRequests.jsx";
+import defaultProfile from "@/assets/images/defaultProfile.jpg";
+
+const API_HOST = (import.meta.env.VITE_API_URL || window.location.origin).replace(/\/$/, "");
+const toAbs = (p) => (!p ? "" : /^https?:\/\//i.test(p) ? p : `${API_HOST}/${String(p).replace(/^\/+/, "")}`);
+
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -87,10 +92,10 @@ const Profile = () => {
               </Button>
 
               <Avatar
-                border="1px solid gray"
-                borderColor={borderCol}
-                boxSize="12rem"
-                src={state.avatar ? `http://localhost:8084${state.avatar}` : "/src/assets/images/defaultProfile.jpg"}
+                  border="1px solid gray"
+                  borderColor={borderCol}
+                  boxSize="12rem"
+                  src={state.avatar ? toAbs(state.avatar) : defaultProfile}
               />
             </Box>
 

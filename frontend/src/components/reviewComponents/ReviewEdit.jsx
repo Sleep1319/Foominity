@@ -52,7 +52,8 @@ const ReviewEdit = () => {
 
   const serverHost = useMemo(() => {
     // 이미지 경로 미리보기 용 (백엔드 정적 서빙 주소에 맞게 조정)
-    return "http://localhost:8084";
+    const v = import.meta.env.VITE_API_URL?.replace(/\/$/, "");
+    return v || window.location.origin;
   }, []);
 
   // 공통 목록 로딩
@@ -181,11 +182,20 @@ const ReviewEdit = () => {
     }
 
     const formData = new FormData();
-    formData.append("title", title);
-    formData.append("released", released || ""); // LocalDate 문자열
+    // formData.append("title", title);
+    // formData.append("released", released || ""); // LocalDate 문자열
+    formData.append("title", title.trim());
+
+    if (released) {
+      formData.append("released", released); // YYYY-MM-DD
+    }
 
     // tracklist(List<String>)
-    tracklist.filter((t) => t !== null && t !== undefined).forEach((t) => formData.append("tracklist", t ?? ""));
+    // tracklist.filter((t) => t !== null && t !== undefined).forEach((t) => formData.append("tracklist", t ?? ""));
+    tracklist
+        .map((t) => (t ?? "").trim())
+        .filter((t) => t.length > 0)
+        .forEach((t) => formData.append("tracklist", t));
 
     // image(MultipartFile)
     if (imageFile) {
@@ -193,10 +203,18 @@ const ReviewEdit = () => {
     }
 
     // categoryIds(List<Long>)
-    selectedCategoryIds.forEach((cid) => formData.append("categoryIds", cid));
+    // selectedCategoryIds.forEach((cid) => formData.append("categoryIds", cid));
+    selectedCategoryIds
+        .map((v) => Number(v))
+        .filter((n) => Number.isFinite(n))
+        .forEach((cid) => formData.append("categoryIds", cid));
 
     // artistIds(List<Long>)
-    selectedArtistIds.forEach((aid) => formData.append("artistIds", aid));
+    // selectedArtistIds.forEach((aid) => formData.append("artistIds", aid));
+    selectedArtistIds
+        .map((v) => Number(v))
+        .filter((n) => Number.isFinite(n))
+        .forEach((aid) => formData.append("artisIds", aid));
 
     try {
       await axios.put(`/api/reviews/${id}`, formData, {

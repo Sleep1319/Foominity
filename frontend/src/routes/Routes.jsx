@@ -38,6 +38,7 @@ import ChatLayout from "../layouts/ChatLayout.jsx";
 import AdminChatPage from "@/view/chat/AdminChatPage.jsx";
 import AdminPage from "../view/adminPage/AdminPage.jsx";
 import Quiz from "./../view/quiz/Quiz";
+import ReviewEdits from "@/view/review/ReviewEdits.jsx";
 
 function AppRoutes() {
   return (
@@ -66,7 +67,7 @@ function AppRoutes() {
             <Route path="/review/update/:id" element={<ReviewEdits />} />
             <Route path="/artist/update/:id" element={<ArtistEdits />} />
             <Route path="/admin" element={<AdminPage />} />
-            <Route path="/review/update/:id" element={<ReviewEdits />} />
+
           </Route>
 
           <Route path="/mymusic/participatedalbumslist" element={<ParticipatedAlbumsList />} />

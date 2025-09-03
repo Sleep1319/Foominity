@@ -5,7 +5,7 @@ import com.example.foominity.exception.NotFoundImageException;
 import com.example.foominity.repository.image.ImageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,6 +16,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
 @Service
@@ -24,76 +25,98 @@ import java.util.UUID;
 public class ImageService {
 
     private final ImageRepository imageRepository;
-    // 서버 업로드 폴더 경로 (절대경로)
-    private final String uploadDir = System.getProperty("user.dir") + "/uploads/";
 
     /**
-     * 일반 파일 업로드 (직접 업로드)
+     * 업로드 루트 디렉터리(절대경로)
+     * - 도커/배포:  /app/uploads   (docker-compose에서 - /home/ubuntu/Foominity/uploads:/app/uploads 로 마운트)
+     * - 로컬:      프로젝트 루트의 /uploads (fallback)
      */
+    @Value("${app.upload-dir:/app/uploads}")
+    private String uploadRoot;
+
+    /** DB에는 항상 "uploads/파일명" 같은 상대경로만 저장 */
+    private static final String DB_PREFIX = "uploads/";
+
+    private Path ensureUploadDir() throws IOException {
+        Path dir = Paths.get(uploadRoot).toAbsolutePath().normalize();
+        Files.createDirectories(dir);
+        return dir;
+    }
+
+    private static String randomNameFromOriginal(String originalName) {
+        String safeName = (originalName == null || originalName.isBlank()) ? "file" : originalName;
+        // 운영체제에 따라 문제될 수 있는 문자를 간단히 제거
+        safeName = safeName.replaceAll("[\\\\/:*?\"<>|]", "_");
+        return UUID.randomUUID() + "_" + safeName;
+    }
+
     @Transactional
     public ImageFile imageUpload(MultipartFile file) {
         try {
-            String originalName = file.getOriginalFilename();
-            String uuid = UUID.randomUUID().toString();
-            String newFileName = uuid + "_" + originalName;
+            Path saveDir = ensureUploadDir();
 
-            // 실제 저장 디렉토리 생성 (없으면)
-            Path saveDir = Paths.get(uploadDir).toAbsolutePath();
-            Files.createDirectories(saveDir);
+            String newFileName = randomNameFromOriginal(file.getOriginalFilename());
+            Path savePath = saveDir.resolve(newFileName).normalize();
 
-            // 저장 경로
-            Path savePath = saveDir.resolve(newFileName);
+            // 실제 저장
             file.transferTo(savePath.toFile());
 
-            // DB에는 상대 경로로 저장
+            // DB에는 상대 경로만
             ImageFile image = new ImageFile();
-            image.setOriginalName(originalName);
-            image.setSavePath("uploads/" + newFileName);
+            image.setOriginalName(file.getOriginalFilename());
+            image.setSavePath(DB_PREFIX + newFileName);
 
             return imageRepository.save(image);
-
         } catch (IOException e) {
+            log.error("이미지 업로드 실패", e);
             throw new RuntimeException("이미지 업로드 실패", e);
         }
     }
 
-    /**
-     * 외부 URL에서 이미지를 다운로드하여 저장
-     */
+    /** 외부 URL에서 이미지 다운로드 후 저장 */
     @Transactional
     public ImageFile downloadAndSaveFromUrl(String imageUrl) {
         try (InputStream in = new URL(imageUrl).openStream()) {
-            String uuid = UUID.randomUUID().toString();
-            String fileExt = imageUrl.contains(".") ? imageUrl.substring(imageUrl.lastIndexOf('.')) : ".jpg";
-            String newFileName = uuid + fileExt;
+            Path saveDir = ensureUploadDir();
 
-            Path saveDir = Paths.get(uploadDir).toAbsolutePath();
-            Files.createDirectories(saveDir);
+            // 확장자 추출 (없으면 .jpg)
+            String ext = ".jpg";
+            int idx = imageUrl.lastIndexOf('.');
+            if (idx != -1 && idx < imageUrl.length() - 1) {
+                String candidate = imageUrl.substring(idx).toLowerCase();
+                if (candidate.length() <= 10) ext = candidate;
+            }
+            String newFileName = UUID.randomUUID() + ext;
 
-            Path savePath = saveDir.resolve(newFileName);
-            Files.copy(in, savePath);
+            Path savePath = saveDir.resolve(newFileName).normalize();
+            Files.copy(in, savePath, StandardCopyOption.REPLACE_EXISTING);
 
             ImageFile image = new ImageFile();
-            image.setOriginalName(imageUrl.substring(imageUrl.lastIndexOf('/') + 1));
-            image.setSavePath("uploads/" + newFileName);
+            String original = imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
+            image.setOriginalName(original);
+            image.setSavePath(DB_PREFIX + newFileName);
 
             return imageRepository.save(image);
-
         } catch (IOException e) {
+            log.error("외부 이미지 다운로드 실패 url={}", imageUrl, e);
             throw new RuntimeException("외부 이미지 다운로드 실패", e);
         }
     }
 
-    /**
-     * 업로드/저장된 이미지 삭제
-     */
+    /** 업로드/저장된 이미지 삭제 */
     @Transactional
     public void deleteImageFile(ImageFile imageFile) {
         try {
-            Path path = Paths.get(System.getProperty("user.dir")).resolve(imageFile.getSavePath());
-            Files.deleteIfExists(path);
+            Path root = Paths.get(uploadRoot).toAbsolutePath().normalize();
+            // DB에는 "uploads/파일명" 이 들어있으므로, 파일명 부분만 뽑아 합칩니다.
+            String dbPath = imageFile.getSavePath(); // e.g.) uploads/abc.jpg
+            String fileName = dbPath.replaceFirst("^uploads/", "");
+            Path real = root.resolve(fileName).normalize();
+
+            Files.deleteIfExists(real);
             imageRepository.delete(imageFile);
         } catch (IOException e) {
+            log.warn("이미지 삭제 실패: {}", imageFile.getSavePath(), e);
             throw new NotFoundImageException();
         }
     }

@@ -27,6 +27,12 @@ services:
     container_name: springboot-app
     env_file:
       - /home/ubuntu/Foominity/.env
+    user: "1000:1000"
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/etc/secrets/magazinetranslation-5dc5ba5ef0bd.json
+    volumes:
+      - /etc/secrets:/etc/secrets:ro
+      - ./uploads:/app/uploads
     depends_on:
       mysql:
         condition: service_healthy

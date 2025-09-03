@@ -22,7 +22,7 @@ import CreateArtistModal from "../artistComponents/CreateArtistModal";
 import CheckCreateReviewModal from "./CheckCreateReviewModal";
 import AppleMusicSearchModal from "./AppleMusicSearchModal";
 
-const BACKEND_HOST = "http://localhost:8084"; // 서버 포트에 맞게 변경
+const API_HOST = (import.meta.env.VITE_API_URL?.replace(/\/$/, "")) || window.location.origin; // 서버 포트에 맞게 변경
 
 const CreateReview = () => {
   const [title, setTitle] = useState("");
@@ -51,14 +51,19 @@ const CreateReview = () => {
     setTitle(album.title || "");
     setReleased(album.releaseDate ? album.releaseDate.slice(0, 10) : "");
     setImage(null); // 파일 업로드값은 비움
+    setImagePath("");
 
     // iTunes 이미지 → 서버 저장
     if (album.imageUrl) {
       try {
-        const res = await axios.post("/api/images/download", { imageUrl: album.imageUrl });
+        const res = await axios.post("/api/images/download", { imageUrl: album.imageUrl },
+            {
+              headers: { "Content-Type": "application/json" },
+              withCredentials: true,
+            })
         const { savePath } = res.data;
-        setImagePreviewUrl(`${BACKEND_HOST}/${savePath}`);
         setImagePath(savePath);
+        setImagePreviewUrl(`${API_HOST}/${savePath}`)
       } catch (err) {
         setImagePreviewUrl(album.imageUrl);
         setImagePath("");
