@@ -32,6 +32,11 @@ import { useUser } from "@/redux/useUser.js";
 import Slider from "react-slick";
 import Pagination from "../ui/Pagination";
 
+const noCover = "/images/no-cover.png";
+/* ===== 공통 URL 유틸 ===== */
+const API_HOST = (import.meta.env.VITE_API_URL || window.location.origin).replace(/\/$/, "");
+const toAbs = (p) => (!p ? "" : /^https?:\/\//i.test(p) ? p : `${API_HOST}/${String(p).replace(/^\/+/, "")}`);
+
 const ReviewGrid = () => {
   const { state, isLoading } = useUser();
   const [reviews, setReviews] = useState([]);
@@ -86,19 +91,19 @@ const ReviewGrid = () => {
     params.append("page", albumPage);
     params.append("sort", sort);
     if (committedAlbumSearch) params.append("search", committedAlbumSearch);
-    selectedCategories.forEach((c) => params.append("categories", c)); // 서버가 이름 기반이라면 그대로 사용
+    selectedCategories.forEach((c) => params.append("categories", c));
 
     axios
-      .get(`/api/reviews?${params.toString()}`)
-      .then((res) => {
-        setReviews(res.data.content ?? []);
-        setAlbumTotalPages(res.data.totalPages ?? 1);
-      })
-      .catch((err) => {
-        console.error("리뷰 요청 에러:", err);
-        setReviews([]);
-        setAlbumTotalPages(1);
-      });
+        .get(`/api/reviews?${params.toString()}`)
+        .then((res) => {
+          setReviews(res.data.content ?? []);
+          setAlbumTotalPages(res.data.totalPages ?? 1);
+        })
+        .catch((err) => {
+          console.error("리뷰 요청 에러:", err);
+          setReviews([]);
+          setAlbumTotalPages(1);
+        });
   }, [albumPage, committedAlbumSearch, selectedCategories, sort]);
 
   // 아티스트 목록(서버 검색 + 카테고리 + 페이지)
@@ -109,16 +114,16 @@ const ReviewGrid = () => {
     selectedCategories.forEach((c) => params.append("categories", c));
 
     axios
-      .get(`/api/artists?${params.toString()}`)
-      .then((res) => {
-        setArtists(res.data.content ?? []);
-        setArtistTotalPages(res.data.totalPages ?? 1);
-      })
-      .catch((err) => {
-        console.error("아티스트 요청 에러:", err);
-        setArtists([]);
-        setArtistTotalPages(1);
-      });
+        .get(`/api/artists?${params.toString()}`)
+        .then((res) => {
+          setArtists(res.data.content ?? []);
+          setArtistTotalPages(res.data.totalPages ?? 1);
+        })
+        .catch((err) => {
+          console.error("아티스트 요청 에러:", err);
+          setArtists([]);
+          setArtistTotalPages(1);
+        });
   }, [artistPage, committedArtistSearch, selectedCategories]);
 
   // 카테고리 변경 시 페이지 초기화
@@ -139,7 +144,7 @@ const ReviewGrid = () => {
 
   const handleCategoryToggle = (categoryName) => {
     setSelectedCategories((prev) =>
-      prev.includes(categoryName) ? prev.filter((c) => c !== categoryName) : [...prev, categoryName]
+        prev.includes(categoryName) ? prev.filter((c) => c !== categoryName) : [...prev, categoryName]
     );
   };
 
@@ -148,279 +153,288 @@ const ReviewGrid = () => {
 
   if (isLoading) {
     return (
-      <Center h="300px">
-        <Spinner size="xl" />
-        <Text ml={4}>로딩 중...</Text>
-      </Center>
+        <Center h="300px">
+          <Spinner size="xl" />
+          <Text ml={4}>로딩 중...</Text>
+        </Center>
     );
   }
 
   return (
-    <Box maxW="1200px" mx="auto" px={4} py={8}>
-      <Tabs index={tabIndex} onChange={setTabIndex} variant="enclosed">
-        <TabList mb={4}>
-          <Tab>앨범</Tab>
-          <Tab>아티스트</Tab>
-        </TabList>
+      <Box maxW="1200px" mx="auto" px={4} py={8}>
+        <Tabs index={tabIndex} onChange={setTabIndex} variant="enclosed">
+          <TabList mb={4}>
+            <Tab>앨범</Tab>
+            <Tab>아티스트</Tab>
+          </TabList>
 
-        <TabPanels>
-          {/* 앨범 탭 */}
-          <TabPanel>
-            {state?.roleName === "ADMIN" && (
-              <Box textAlign="right" mb={4}>
-                <Button bg="black" color="white" onClick={() => navigate("/review/create")}>
-                  리뷰 작성
-                </Button>
-              </Box>
-            )}
+          <TabPanels>
+            {/* 앨범 탭 */}
+            <TabPanel>
+              {state?.roleName === "ADMIN" && (
+                  <Box textAlign="right" mb={4}>
+                    <Button bg="black" color="white" onClick={() => navigate("/review/create")}>
+                      리뷰 작성
+                    </Button>
+                  </Box>
+              )}
 
-            <TopRankedAlbums />
+              <TopRankedAlbums />
 
-            <Flex
-              mb={6}
-              align="center"
-              gap={4}
-              // 모바일에선 세로, md↑에선 가로 배치
-              direction={{ base: "column", md: "row" }}
-              justify="space-between"
-            >
-              {/* 왼쪽: 최신순 / 인기순 */}
-              <ButtonGroup isAttached size="sm">
-                <Button
-                  variant={sort === "latest" ? "solid" : "outline"}
-                  onClick={() => {
-                    setSort("latest");
-                    setAlbumPage(0);
-                  }}
-                >
-                  최신순
-                </Button>
-                <Button
-                  variant={sort === "popular" ? "solid" : "outline"}
-                  onClick={() => {
-                    setSort("popular");
-                    setAlbumPage(0);
-                  }}
-                >
-                  별점순
-                </Button>
-              </ButtonGroup>
+              <Flex
+                  mb={6}
+                  align="center"
+                  gap={4}
+                  direction={{ base: "column", md: "row" }}
+                  justify="space-between"
+              >
+                {/* 왼쪽: 최신순 / 별점순 */}
+                <ButtonGroup isAttached size="sm">
+                  <Button
+                      variant={sort === "latest" ? "solid" : "outline"}
+                      onClick={() => {
+                        setSort("latest");
+                        setAlbumPage(0);
+                      }}
+                  >
+                    최신순
+                  </Button>
+                  <Button
+                      variant={sort === "popular" ? "solid" : "outline"}
+                      onClick={() => {
+                        setSort("popular");
+                        setAlbumPage(0);
+                      }}
+                  >
+                    별점순
+                  </Button>
+                </ButtonGroup>
 
-              {/* 오른쪽: 검색 입력 + 버튼들 */}
-              <HStack spacing={3} w={{ base: "100%", md: "auto" }}>
+                {/* 오른쪽: 검색 */}
+                <HStack spacing={3} w={{ base: "100%", md: "auto" }}>
+                  <Input
+                      placeholder="앨범 제목으로 검색"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && onClickSearch()}
+                      w={{ base: "100%", md: "360px" }}
+                  />
+                  <Button colorScheme="gray" onClick={onClickSearch} isLoading={albumLoading}>
+                    검색
+                  </Button>
+                  {committedAlbumSearch && (
+                      <Button
+                          variant="ghost"
+                          onClick={() => {
+                            setCommittedAlbumSearch("");
+                            setAlbumPage(0);
+                          }}
+                      >
+                        검색 초기화
+                      </Button>
+                  )}
+                </HStack>
+              </Flex>
+
+              {/* 필터 */}
+              <HStack spacing={2} mb={2} cursor="pointer" onClick={onToggle}>
+                <Text fontWeight="bold">카테고리 필터</Text>
+                <Icon as={isOpen ? ChevronUpIcon : ChevronDownIcon} />
+              </HStack>
+              <Collapse in={isOpen} animateOpacity>
+                <SimpleGrid columns={[2, 3, 4]} spacing={2} mb={4}>
+                  {categories.map((category) => (
+                      <Checkbox
+                          key={category.id}
+                          isChecked={selectedCategories.includes(category.categoryName)}
+                          onChange={() => handleCategoryToggle(category.categoryName)}
+                      >
+                        {category.categoryName}
+                      </Checkbox>
+                  ))}
+                </SimpleGrid>
+              </Collapse>
+
+              <Divider my={6} borderColor="black" />
+
+              {/* 앨범 리스트 */}
+              {reviews.length === 0 ? (
+                  <Text>
+                    {committedAlbumSearch ? `"${committedAlbumSearch}"에 대한 결과가 없습니다.` : "검색된 결과가 없습니다."}
+                  </Text>
+              ) : (
+                  <SimpleGrid columns={{ base: 1, sm: 2, md: 4 }} spacing={6}>
+                    {reviews.map((r) => (
+                        <Box
+                            key={r.id}
+                            borderWidth="1px"
+                            borderRadius="md"
+                            overflow="hidden"
+                            boxShadow="sm"
+                            _hover={{ boxShadow: "md" }}
+                            cursor="pointer"
+                            onClick={() => navigate(`/review/${r.id}`)}
+                        >
+                          <AspectRatio ratio={1} w="100%">
+                            <Image
+                                src={toAbs(r.imagePath)}
+                                alt={r.title}
+                                objectFit="cover"
+                                transition="opacity 0.6s ease"
+                                opacity={imageLoaded[r.id] ? 1 : 0}
+                                onLoad={() =>
+                                    setImageLoaded((prev) => ({
+                                      ...prev,
+                                      [r.id]: true,
+                                    }))
+                                }
+                                onError={(e) => {
+                                  e.currentTarget.src = noCover; // 기본 이미지
+                                  setImageLoaded((prev) => ({ ...prev, [r.id]: true }));
+                                }}
+                            />
+                          </AspectRatio>
+                          <VStack align="start" spacing={1} p={3}>
+                            <Text
+                                fontSize="xl"
+                                fontWeight="bold"
+                                color="gray.600"
+                                cursor="pointer"
+                                onClick={() => navigate(`/review/${r.id}`)}
+                            >
+                              {r.title}
+                            </Text>
+                            <Box>
+                              {r.artists?.map((a) => (
+                                  <Text
+                                      key={a.id}
+                                      fontWeight="bold"
+                                      color="gray.600"
+                                      cursor="pointer"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        navigate(`/artist/${a.id}`);
+                                      }}
+                                  >
+                                    {a.name}
+                                  </Text>
+                              ))}
+                            </Box>
+                            <Text fontSize="sm">
+                              평균별점: {typeof r.averageStarPoint === "number" ? r.averageStarPoint.toFixed(1) : "0.0"}
+                            </Text>
+                          </VStack>
+                        </Box>
+                    ))}
+                  </SimpleGrid>
+              )}
+
+              <Pagination
+                  currentPage={albumPage}
+                  totalPages={albumTotalPages}
+                  onPageChange={(page) => setAlbumPage(page)}
+              />
+            </TabPanel>
+
+            {/* 아티스트 탭 */}
+            <TabPanel>
+              <HStack mb={6}>
                 <Input
-                  placeholder="앨범 제목으로 검색"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && onClickSearch()}
-                  // 모바일에선 꽉 차게, 데스크톱에선 적당한 폭
-                  w={{ base: "100%", md: "360px" }}
+                    placeholder="아티스트 이름으로 검색"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && onClickSearch()}
                 />
                 <Button colorScheme="gray" onClick={onClickSearch} isLoading={albumLoading}>
                   검색
                 </Button>
-                {committedAlbumSearch && (
-                  <Button
-                    variant="ghost"
-                    onClick={() => {
-                      setCommittedAlbumSearch("");
-                      setAlbumPage(0);
-                    }}
-                  >
-                    검색 초기화
-                  </Button>
+                {committedArtistSearch && (
+                    <Button
+                        variant="ghost"
+                        onClick={() => {
+                          setCommittedArtistSearch("");
+                          setArtistPage(0);
+                        }}
+                    >
+                      검색 초기화
+                    </Button>
                 )}
               </HStack>
-            </Flex>
-            <HStack spacing={2} mb={2} cursor="pointer" onClick={onToggle}>
-              <Text fontWeight="bold">카테고리 필터</Text>
-              <Icon as={isOpen ? ChevronUpIcon : ChevronDownIcon} />
-            </HStack>
 
-            <Collapse in={isOpen} animateOpacity>
-              <SimpleGrid columns={[2, 3, 4]} spacing={2} mb={4}>
-                {categories.map((category) => (
-                  <Checkbox
-                    key={category.id}
-                    isChecked={selectedCategories.includes(category.categoryName)}
-                    onChange={() => handleCategoryToggle(category.categoryName)}
-                  >
-                    {category.categoryName}
-                  </Checkbox>
-                ))}
-              </SimpleGrid>
-            </Collapse>
+              <HStack spacing={2} mb={2} cursor="pointer" onClick={onToggle}>
+                <Text fontWeight="bold">카테고리 필터</Text>
+                <Icon as={isOpen ? ChevronUpIcon : ChevronDownIcon} />
+              </HStack>
 
-            <Divider my={6} borderColor="black" />
-
-            {reviews.length === 0 ? (
-              <Text>
-                {committedAlbumSearch ? `"${committedAlbumSearch}"에 대한 결과가 없습니다.` : "검색된 결과가 없습니다."}
-              </Text>
-            ) : (
-              <SimpleGrid columns={{ base: 1, sm: 2, md: 4 }} spacing={6}>
-                {reviews.map((r) => (
-                  <Box
-                    key={r.id}
-                    borderWidth="1px"
-                    borderRadius="md"
-                    overflow="hidden"
-                    boxShadow="sm"
-                    _hover={{ boxShadow: "md" }}
-                    cursor="pointer"
-                    onClick={() => navigate(`/review/${r.id}`)}
-                  >
-                    <AspectRatio ratio={1} w="100%">
-                      <Image
-                        src={r.imagePath ? `http://localhost:8084/${r.imagePath}` : ""}
-                        alt={r.title}
-                        objectFit="cover"
-                        transition="opacity 0.6s ease"
-                        opacity={imageLoaded[r.id] ? 1 : 0}
-                        onLoad={() =>
-                          setImageLoaded((prev) => ({
-                            ...prev,
-                            [r.id]: true,
-                          }))
-                        }
-                      />
-                    </AspectRatio>
-                    <VStack align="start" spacing={1} p={3}>
-                      <Text
-                        fontSize="xl"
-                        fontWeight="bold"
-                        color="gray.600"
-                        cursor="pointer"
-                        onClick={() => navigate(`/review/${r.id}`)}
+              <Collapse in={isOpen} animateOpacity>
+                <SimpleGrid columns={[2, 3, 4]} spacing={2} mb={4}>
+                  {categories.map((category) => (
+                      <Checkbox
+                          key={category.id}
+                          isChecked={selectedCategories.includes(category.categoryName)}
+                          onChange={() => handleCategoryToggle(category.categoryName)}
                       >
-                        {r.title}
-                      </Text>
-                      <Box>
-                        {r.artists?.map((a) => (
-                          <Text
-                            key={a.id}
-                            fontWeight="bold"
-                            color="gray.600"
-                            cursor="pointer"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              navigate(`/artist/${a.id}`);
+                        {category.categoryName}
+                      </Checkbox>
+                  ))}
+                </SimpleGrid>
+              </Collapse>
+
+              <Divider my={6} borderColor="black" />
+
+              <SimpleGrid columns={{ base: 2, sm: 3, md: 4 }} spacing={6}>
+                {artists.map((artist) => (
+                    <Box
+                        key={artist.id}
+                        borderWidth="1px"
+                        borderRadius="md"
+                        overflow="hidden"
+                        boxShadow="sm"
+                        _hover={{ boxShadow: "md" }}
+                        cursor="pointer"
+                        onClick={() => navigate(`/artist/${artist.id}`)}
+                    >
+                      <AspectRatio ratio={1}>
+                        <Image
+                            src={toAbs(artist.imagePath)}
+                            alt={artist.name}
+                            objectFit="cover"
+                            transition="opacity 0.4s ease"
+                            opacity={imageLoaded[artist.id] ? 1 : 0}
+                            onLoad={() =>
+                                setImageLoaded((prev) => ({
+                                  ...prev,
+                                  [artist.id]: true,
+                                }))
+                            }
+                            onError={(e) => {
+                              e.currentTarget.src = noCover;
+                              setImageLoaded((prev) => ({ ...prev, [artist.id]: true }));
                             }}
-                          >
-                            {a.name}
-                          </Text>
-                        ))}
+                        />
+                      </AspectRatio>
+                      <Box p={3}>
+                        <Text fontWeight="bold">{artist.name}</Text>
                       </Box>
-                      <Text fontSize="sm">
-                        평균별점: {typeof r.averageStarPoint === "number" ? r.averageStarPoint.toFixed(1) : "0.0"}
-                      </Text>
-                    </VStack>
-                  </Box>
+                    </Box>
                 ))}
               </SimpleGrid>
-            )}
-            <Pagination
-              currentPage={albumPage}
-              totalPages={albumTotalPages}
-              onPageChange={(page) => setAlbumPage(page)}
-            />
-          </TabPanel>
 
-          {/* 아티스트 탭 */}
-          <TabPanel>
-            <HStack mb={6}>
-              <Input
-                placeholder="아티스트 이름으로 검색"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && onClickSearch()}
+              <Pagination
+                  currentPage={artistPage}
+                  totalPages={artistTotalPages}
+                  onPageChange={(page) => setArtistPage(page)}
               />
-              <Button colorScheme="gray" onClick={onClickSearch} isLoading={albumLoading}>
-                검색
-              </Button>
-              {/* ✅ 여기 committedArtistSearch 로 수정 */}
-              {committedArtistSearch && (
-                <Button
-                  variant="ghost"
-                  onClick={() => {
-                    setCommittedArtistSearch("");
-                    setArtistPage(0);
-                  }}
-                >
-                  검색 초기화
-                </Button>
-              )}
-            </HStack>
-            <HStack spacing={2} mb={2} cursor="pointer" onClick={onToggle}>
-              <Text fontWeight="bold">카테고리 필터</Text>
-              <Icon as={isOpen ? ChevronUpIcon : ChevronDownIcon} />
-            </HStack>
-
-            <Collapse in={isOpen} animateOpacity>
-              <SimpleGrid columns={[2, 3, 4]} spacing={2} mb={4}>
-                {categories.map((category) => (
-                  <Checkbox
-                    key={category.id}
-                    isChecked={selectedCategories.includes(category.categoryName)}
-                    onChange={() => handleCategoryToggle(category.categoryName)}
-                  >
-                    {category.categoryName}
-                  </Checkbox>
-                ))}
-              </SimpleGrid>
-            </Collapse>
-
-            <Divider my={6} borderColor="black" />
-
-            <SimpleGrid columns={{ base: 2, sm: 3, md: 4 }} spacing={6}>
-              {artists.map((artist) => (
-                <Box
-                  key={artist.id}
-                  borderWidth="1px"
-                  borderRadius="md"
-                  overflow="hidden"
-                  boxShadow="sm"
-                  _hover={{ boxShadow: "md" }}
-                  cursor="pointer"
-                  onClick={() => navigate(`/artist/${artist.id}`)}
-                >
-                  <AspectRatio ratio={1}>
-                    <Image
-                      src={artist.imagePath ? `http://localhost:8084/${artist.imagePath}` : ""}
-                      alt={artist.name}
-                      objectFit="cover"
-                      transition="opacity 0.4s ease"
-                      opacity={imageLoaded[artist.id] ? 1 : 0}
-                      onLoad={() =>
-                        setImageLoaded((prev) => ({
-                          ...prev,
-                          [artist.id]: true,
-                        }))
-                      }
-                    />
-                  </AspectRatio>
-                  <Box p={3}>
-                    <Text fontWeight="bold">{artist.name}</Text>
-                  </Box>
-                </Box>
-              ))}
-            </SimpleGrid>
-
-            <Pagination
-              currentPage={artistPage}
-              totalPages={artistTotalPages}
-              onPageChange={(page) => setArtistPage(page)}
-            />
-          </TabPanel>
-        </TabPanels>
-      </Tabs>
-    </Box>
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
+      </Box>
   );
 };
 
 export default ReviewGrid;
 
-// ✅ 상단 앨범 슬라이더 (변경 없음)
+/* ===== 상단 앨범 슬라이더 ===== */
 const TopRankedAlbums = () => {
   const [albums, setAlbums] = useState([]);
   const sliderRef = useRef(null);
@@ -429,9 +443,9 @@ const TopRankedAlbums = () => {
 
   useEffect(() => {
     axios
-      .get("/api/reviews/top-albums")
-      .then((res) => setAlbums(res.data))
-      .catch((err) => console.error("Top10 불러오기 실패:", err));
+        .get("/api/reviews/top-albums")
+        .then((res) => setAlbums(res.data))
+        .catch((err) => console.error("Top10 불러오기 실패:", err));
   }, []);
 
   const slidesToShow = 6.5;
@@ -451,79 +465,80 @@ const TopRankedAlbums = () => {
   const boxSize = 160;
 
   return (
-    <Box maxW="1500px" mx="auto" px={4} py={8}>
-      <Text fontSize="2xl" fontWeight="bold" mb={4}>
-        Top Ranked Albums
-      </Text>
+      <Box maxW="1500px" mx="auto" px={4} py={8}>
+        <Text fontSize="2xl" fontWeight="bold" mb={4}>
+          Top Ranked Albums
+        </Text>
 
-      <Box position="relative">
-        {!isFirst && (
-          <Box
-            position="absolute"
-            top="50%"
-            left="-70px"
-            transform="translateY(-50%)"
-            zIndex="999"
-            cursor="pointer"
-            onClick={() => sliderRef.current?.slickPrev()}
-            p={2}
-          >
-            <BsChevronLeft size={40} color="white" style={{ filter: "drop-shadow(0 0 6px #888)" }} />
-          </Box>
-        )}
-
-        {!isLast && (
-          <Box
-            position="absolute"
-            top="50%"
-            right="-70px"
-            transform="translateY(-50%)"
-            zIndex="999"
-            cursor="pointer"
-            onClick={() => sliderRef.current?.slickNext()}
-            p={2}
-          >
-            <BsChevronRight size={40} color="white" style={{ filter: "drop-shadow(0 0 6px #888)" }} />
-          </Box>
-        )}
-
-        <Slider ref={sliderRef} {...settings}>
-          {albums.map((a, i) => (
-            <Box key={a.id || `album-${i}`} mr={i === albums.length - 1 ? 0 : 4}>
-              <VStack spacing={2} align="start" w={`${boxSize}px`}>
-                <Box w={`${boxSize}px`} h={`${boxSize}px`}>
-                  <Image
-                    src={a.imagePath ? `http://localhost:8084/${a.imagePath}` : ""}
-                    alt={a.title}
-                    w="100%"
-                    h="100%"
-                    objectFit="cover"
-                    borderRadius="md"
-                    boxShadow="md"
-                    cursor="pointer"
-                    onClick={() => navigate(`/review/${a.id}`)}
-                  />
-                </Box>
-                <Text fontSize="2xl" color="gray.600" fontWeight="bold">
-                  #{i + 1}
-                </Text>
-                <Text
-                  fontSize="lg"
-                  fontWeight="semibold"
-                  whiteSpace="normal"
+        <Box position="relative">
+          {!isFirst && (
+              <Box
+                  position="absolute"
+                  top="50%"
+                  left="-70px"
+                  transform="translateY(-50%)"
+                  zIndex="999"
                   cursor="pointer"
-                  onClick={() => navigate(`/review/${a.id}`)}
-                >
-                  {a.title}
-                </Text>
-                <Text fontSize="md" color="gray.600" whiteSpace="normal">
-                  {a.artists.map((ar) => ar.name).join(", ")}
-                </Text>
-              </VStack>
-            </Box>
-          ))}
-        </Slider>
+                  onClick={() => sliderRef.current?.slickPrev()}
+                  p={2}
+              >
+                <BsChevronLeft size={40} color="white" style={{ filter: "drop-shadow(0 0 6px #888)" }} />
+              </Box>
+          )}
+
+          {!isLast && (
+              <Box
+                  position="absolute"
+                  top="50%"
+                  right="-70px"
+                  transform="translateY(-50%)"
+                  zIndex="999"
+                  cursor="pointer"
+                  onClick={() => sliderRef.current?.slickNext()}
+                  p={2}
+              >
+                <BsChevronRight size={40} color="white" style={{ filter: "drop-shadow(0 0 6px #888)" }} />
+              </Box>
+          )}
+
+          <Slider ref={sliderRef} {...settings}>
+            {albums.map((a, i) => (
+                <Box key={a.id || `album-${i}`} mr={i === albums.length - 1 ? 0 : 4}>
+                  <VStack spacing={2} align="start" w={`${boxSize}px`}>
+                    <Box w={`${boxSize}px`} h={`${boxSize}px`}>
+                      <Image
+                          src={toAbs(a.imagePath)}
+                          alt={a.title}
+                          w="100%"
+                          h="100%"
+                          objectFit="cover"
+                          borderRadius="md"
+                          boxShadow="md"
+                          cursor="pointer"
+                          onClick={() => navigate(`/review/${a.id}`)}
+                          onError={(e) => (e.currentTarget.src = noCover)}
+                      />
+                    </Box>
+                    <Text fontSize="2xl" color="gray.600" fontWeight="bold">
+                      #{i + 1}
+                    </Text>
+                    <Text
+                        fontSize="lg"
+                        fontWeight="semibold"
+                        whiteSpace="normal"
+                        cursor="pointer"
+                        onClick={() => navigate(`/review/${a.id}`)}
+                    >
+                      {a.title}
+                    </Text>
+                    <Text fontSize="md" color="gray.600" whiteSpace="normal">
+                      {a.artists.map((ar) => ar.name).join(", ")}
+                    </Text>
+                  </VStack>
+                </Box>
+            ))}
+          </Slider>
+        </Box>
       </Box>
-    </Box>
   );
 };

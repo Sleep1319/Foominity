@@ -44,8 +44,12 @@ const AppleMusicChart = ({
   const scrollBoxRef = useRef(null);
   const sentinelRef = useRef(null);
 
-  const endpoint = useMemo(() => `/apple-feed/api/v2/${country}/music/most-played/50/songs.json`, [country]);
+  const endpoint = useMemo(
+      () => `/api/apple/top?country=${country}`,
+      [country]
+  );
 
+// fetch 그대로 써도 되고 axios로 바꿔도 OK
   useEffect(() => {
     let isCancelled = false;
     const controller = new AbortController();
@@ -54,13 +58,15 @@ const AppleMusicChart = ({
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(endpoint, { signal: controller.signal });
+        const res = await fetch(endpoint, { signal: controller.signal, headers: { Accept: "application/json" } });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = await res.json();
+
         if (isCancelled) return;
 
-        const results = json?.feed?.results ?? [];
-        setLastUpdated(json?.feed?.updated ?? "");
+        // 백엔드에서 { tracks: [...] , updated: "..." } 형태로 보내준다고 가정
+        const results = json?.tracks ?? [];
+        setLastUpdated(json?.updated ?? "");
         setItems(results);
         setVisibleCount(initialVisible);
       } catch (err) {
@@ -84,6 +90,7 @@ const AppleMusicChart = ({
       controller.abort();
     };
   }, [endpoint, toast, refreshKey, initialVisible]);
+
 
   // 박스 내부 스크롤 기반 무한 스크롤
   useEffect(() => {
