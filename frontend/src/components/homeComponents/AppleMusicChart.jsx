@@ -44,10 +44,7 @@ const AppleMusicChart = ({
   const scrollBoxRef = useRef(null);
   const sentinelRef = useRef(null);
 
-  const endpoint = useMemo(
-      () => `/api/apple/top?country=${country}`,
-      [country]
-  );
+  const endpoint = useMemo(() => `/apple-feed/api/v2/${country}/music/most-played/50/songs.json`, [country]);
 
 // fetch 그대로 써도 되고 axios로 바꿔도 OK
   useEffect(() => {
@@ -58,15 +55,14 @@ const AppleMusicChart = ({
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(endpoint, { signal: controller.signal, headers: { Accept: "application/json" } });
+        const res = await fetch(endpoint, { signal: controller.signal });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = await res.json();
 
         if (isCancelled) return;
 
-        // 백엔드에서 { tracks: [...] , updated: "..." } 형태로 보내준다고 가정
-        const results = json?.tracks ?? [];
-        setLastUpdated(json?.updated ?? "");
+        const results = json?.feed?.results ?? [];
+        setLastUpdated(json?.feed?.updated ?? "");
         setItems(results);
         setVisibleCount(initialVisible);
       } catch (err) {
